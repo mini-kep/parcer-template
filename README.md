@@ -1,7 +1,7 @@
 What is a parser?
 =================
 
-Parser is a program that does following:
+In our project a parser a part of the program that does following:
  - scrapping - retrieve raw data from web file or other API
  - varname assignment - parse raw data to get datapoints needed, naming them based on common convention 
  - interface - provide clean data for all of specified varnames at available frequencies and defined histroic depth (all available datapoints or datapoints after specified date)
@@ -18,7 +18,7 @@ Parser types
 Parser list
 ===========
 
-At various time following parsers were developed, ```rosstat-kep``` is most advanced one. Parsers are not structured to same template now.
+At various time following parsers were developed, ```rosstat-kep``` is most advanced one. Parsers are not structured to same template now. They do not have a common invoke method. All of them just write a CSV file to repo as of now.
 
 #### repo: rosstat-kep
 Produces output in <https://github.com/mini-kep/parser-rosstat-kep/tree/master/data/processed/latest>
@@ -47,5 +47,4 @@ Template components
 - [ ] parser controller 
 - [ ] json output format 
 - [ ] feature checklist
-
 
