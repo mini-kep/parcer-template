@@ -20,22 +20,17 @@ def accept_varnames(varnames, supported_varnames):
 def today():
     return arrow.now().date()
 
+assert today().year >= 2017
+
 def make_date(dt):
+    # may also use 
+    # pandas.to_datetime('2017').date()
     return arrow.get(dt).date() 
 
+assert make_date('2007-01-25').day == 25
 
-class Description:
+class Parser:
     
-    @classmethod
-    def as_markdown(cls):
-        table = [['Parameter', 'Value']]        
-        table.append(['Job', cls.does_what])
-        table.append(['Frequency', cls.freqs])         
-        table.append(['Variables', 
-                      ", ".join(cls.all_varnames)
-                      ])
-        return to_markdown(table)       
-
     def __init__(self, freq, varnames, start=None, end=None):        
         self.freq = accept_frequency(freq, self.freqs)
         self.varnames = accept_varnames(varnames, self.all_varnames)
@@ -47,16 +42,24 @@ class Description:
             self.end = today()
         else:
             self.end = end
+
+    @classmethod
+    def as_markdown(cls):
+        table = [['Parameter', 'Value']]        
+        table.append(['Job', cls.does_what])
+        table.append(['Frequency', cls.freqs])         
+        varname_str = ", ".join(cls.all_varnames)
+        table.append(['Variables', varname_str])
+        return to_markdown(table)       
             
         
-class RosstatKEP(Description):
+class RosstatKEP(Parser):
     name = 'rosstat-kep'
     does_what = 'Parse sections of KEP Rosstat publication'
     freqs = 'aqm'    
     all_varnames = ['CPI_rog', 'RUR_EUR_eop']
     start_date = make_date('1999-01-31')
     
-
     def get_data(self):
         """Yield dictionaries with datapoints"""
         
@@ -83,18 +86,18 @@ class RosstatKEP(Description):
             "value": 79.7}
         # end -----------------
 
-def mock_parser_output_1():   
+def mock_parser_output_2():   
 
     # this is a mock -----------------
-        brent = [("2017-03-16", 50.56),
-                 ("2017-03-17", 50.58),
-                 ("2017-03-20", 50.67)]   
-    
-        for date, value in brent:
-            yield {"date": date,
-                   "freq": "d",
-                   "name": "BRENT",
-                   "value": value}
+    brent = [("2017-03-16", 50.56),
+             ("2017-03-17", 50.58),
+             ("2017-03-20", 50.67)]   
+
+    for date, value in brent:
+        yield {"date": date,
+               "freq": "d",
+               "name": "BRENT",
+               "value": value}
     # end   --------------------------           
     
   
