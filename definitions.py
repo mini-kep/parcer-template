@@ -77,16 +77,23 @@ class Parser:
         
 class RosstatKEP(Parser):
     name = 'rosstat-kep'
-    does_what = 'Parse sections of KEP Rosstat publication'
+    target = 'Sections of KEP Rosstat publication'
     freqs = 'aqm'    
-    all_varnames = ['CPI_rog', 'RUR_EUR_eop']
     start_date = make_date('1999-01-31')
-    source_url = "http://www.gks.ru/wps/wcm/connect/" \
-                 "rosstat_main/rosstat/ru/statistics/" \
-                 "publications/catalog/doc_1140080765391"
+    source_url = ("http://www.gks.ru/wps/wcm/connect/" 
+                  "rosstat_main/rosstat/ru/statistics/" 
+                  "publications/catalog/doc_1140080765391")
     source_type = "Word"
-    last_updated = None
-    expected_update = None
+    
+    @property
+    def last_updated():
+        return None
+        
+    @property
+    def all_varnames():
+        # TODO: must change to actaula method 
+        return ['CPI_rog', 'RUR_EUR_eop']
+
 
     def get_data(self):
         """Yield dictionaries with datapoints"""
@@ -116,7 +123,8 @@ class RosstatKEP(Parser):
 
 
 assert "| Parameter | Value |" in RosstatKEP.as_markdown()
-assert "| Variables | CPI_rog, RUR_EUR_eop |" in RosstatKEP.as_markdown()
+assert "| Variables |" in RosstatKEP.as_markdown()
+
 
 test_list = list(RosstatKEP('m', ['CPI_rog']).get_data())
 assert test_list[1]['value'] == 70.39
@@ -124,8 +132,9 @@ assert test_list[3]['date'] == "2015-12-31"
 
 
 class CBR_USD(Parser):
-    """A parser to retrieve information about the official
-       USD to RUB exchange rate from the Bank of Russia public API.
+    """A parser to retrieve information about 
+       the official USD to RUB exchange rate 
+       from the Bank of Russia public API.
     """
 
     name = 'CBR_USD'
