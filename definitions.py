@@ -86,6 +86,46 @@ class RosstatKEP(Parser):
             "value": 79.7}
         # end -----------------
 
+
+class CBR_USD(Parser):
+    """A parser to retrieve information about the official
+       USD to RUB exchange rate from the Bank of Russia public API.
+    """
+
+    name = 'CBR_USD'
+    does_what = 'Retrieve the official USD to RUB exchange rate ' \
+                'from the Bank of Russia public API'
+    freqs = 'd'
+    all_varnames = ['CBR_USD']
+    start_date = make_date('1991-07-01')
+    source_url = "http://www.cbr.ru/scripts/Root.asp?PrtId=SXML"
+    source_type = "API"
+    last_updated = None
+    expected_update = None
+
+    def get_data(self):
+        """Returns a list of dictionaries with mock datapoints"""
+
+        labels = ["date", "freq", "name", "value"]
+        dates = ["2016-10-04", "2016-10-05", "2016-10-06", "2016-10-07"]
+        values = [62.5477, 62.4323, 62.4583, 62.3900]
+        freq = "d"
+        name = "CBR_USD"
+
+        data = list()
+        for date, value in zip(dates, values):
+            datapoint = [date, freq, name, value]
+            datapoint_dict = dict(zip(labels, datapoint))
+            data.append(datapoint_dict)
+
+        return data
+
+
+test_list = list(CBR_USD('d', ['CBR_USD']).get_data())
+assert test_list[0]['value'] == 62.5477
+assert test_list[2]['date'] == "2016-10-06"
+
+
 def mock_parser_output_2():   
 
     # this is a mock -----------------
@@ -104,4 +144,6 @@ def mock_parser_output_2():
     
 if __name__ == "__main__":
     print(RosstatKEP.as_markdown())  
-    print(list(RosstatKEP('m', ['CPI_rog']).get_data()))    
+    print(list(RosstatKEP('m', ['CPI_rog']).get_data()))
+    print("\n")
+    print(list(CBR_USD('d', ['CBR_USD']).get_data()))
