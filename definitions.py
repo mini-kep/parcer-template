@@ -30,7 +30,7 @@ def make_date(dt):
 assert make_date('2007-01-25').day == 25
 
 class Parser:
-    
+
     def __init__(self, freq, varnames, start=None, end=None):        
         self.freq = accept_frequency(freq, self.freqs)
         self.varnames = accept_varnames(varnames, self.all_varnames)
@@ -59,7 +59,13 @@ class RosstatKEP(Parser):
     freqs = 'aqm'    
     all_varnames = ['CPI_rog', 'RUR_EUR_eop']
     start_date = make_date('1999-01-31')
-    
+    source_url = "http://www.gks.ru/wps/wcm/connect/" \
+                 "rosstat_main/rosstat/ru/statistics/" \
+                 "publications/catalog/doc_1140080765391"
+    source_type = "Word"
+    last_updated = None
+    expected_update = None
+
     def get_data(self):
         """Yield dictionaries with datapoints"""
         
