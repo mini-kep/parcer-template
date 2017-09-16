@@ -45,11 +45,33 @@ class Parser:
 
     @classmethod
     def as_markdown(cls):
-        table = [['Parameter', 'Value']]        
-        table.append(['Job', cls.does_what])
-        table.append(['Frequency', cls.freqs])         
-        varname_str = ", ".join(cls.all_varnames)
-        table.append(['Variables', varname_str])
+        """Returns a string containing parser parameters,
+           and formatted to be represented as a markdown table.
+        """
+
+        # create table header
+        table = [["Parameter", "Value"]]
+
+        # define the first column values (parameters)
+        params = ["Job", "Variables", "Frequency", 'Last updated',
+                  'Expected update', "Source URL", "Source type"]
+
+        # define the second column values (values of the parameters)
+        not_available = 'NA'
+        varname_str = not_available if cls.all_varnames is None \
+            else ", ".join(cls.all_varnames)
+
+        values = [cls.does_what, varname_str, cls.freqs, cls.last_updated,
+                  cls.expected_update, cls.source_url, cls.source_type]
+
+        # combine parameter-value pairs into lists
+        for param, value in zip(params, values):
+            value_or_na = not_available if value is None else value
+            row = [param, value_or_na]
+            table.append(row)
+
+        # return string representation of the table formatted
+        # for the markdown
         return to_markdown(table)       
             
         
@@ -93,6 +115,14 @@ class RosstatKEP(Parser):
         # end -----------------
 
 
+assert "| Parameter | Value |" in RosstatKEP.as_markdown()
+assert "| Variables | CPI_rog, RUR_EUR_eop |" in RosstatKEP.as_markdown()
+
+test_list = list(RosstatKEP('m', ['CPI_rog']).get_data())
+assert test_list[1]['value'] == 70.39
+assert test_list[3]['date'] == "2015-12-31"
+
+
 class CBR_USD(Parser):
     """A parser to retrieve information about the official
        USD to RUB exchange rate from the Bank of Russia public API.
@@ -127,6 +157,11 @@ class CBR_USD(Parser):
         return data
 
 
+assert "| Frequency | d |" in CBR_USD.as_markdown()
+assert "| Source URL | http://www.cbr.ru/scripts/Root.asp?PrtId=SXML |"\
+       in CBR_USD.as_markdown()
+assert "| Source type | API |" in CBR_USD.as_markdown()
+
 test_list = list(CBR_USD('d', ['CBR_USD']).get_data())
 assert test_list[0]['value'] == 62.5477
 assert test_list[2]['date'] == "2016-10-06"
@@ -152,4 +187,5 @@ if __name__ == "__main__":
     print(RosstatKEP.as_markdown())  
     print(list(RosstatKEP('m', ['CPI_rog']).get_data()))
     print("\n")
+    print(CBR_USD.as_markdown())
     print(list(CBR_USD('d', ['CBR_USD']).get_data()))
