@@ -127,7 +127,7 @@ class CBR_USD(Parser):
     """Retrieve Bank of Russia official USD to RUB exchange rate"""
     # reference information (not affecting parser call)
     info = dict(source_type = "API")
-    # class atrributes used in parser call
+    # class attributes used in parser call
     freqs = 'd'    
     start_date = make_date('1991-07-01')
     source_url = "http://www.cbr.ru/scripts/Root.asp?PrtId=SXML"
@@ -142,6 +142,28 @@ class CBR_USD(Parser):
                        name="USDRUR_CB",
                        date=date,
                        value=value)
+
+
+class BrentEIA(Parser):
+    """Retrieve Brent Prices from the US EIA"""
+    # reference information (not affecting parser call)
+    info = dict(source_type = "API")
+    # class attributes used in parser call
+    freqs = 'dwma'
+    start_date = make_date('1987-05-15')
+    source_url = "https://www.eia.gov/opendata/qb.php?category=241335"
+    all_varnames = ['EIA_BRENT']
+
+    def get_data(self):
+        """Yields dictionaries with mock datapoints"""
+        dates =  ["2016-07-29", "2016-08-05", "2016-08-12", "2016-08-19"]
+        values = [42.55, 40.88, 43.63, 48.6]
+        for date, value in zip(dates, values):
+            yield dict(freq="w",
+                       name="EIA_BRENT",
+                       date=date,
+                       value=value)
+
 
 def mock_parser_output_2():   
 
