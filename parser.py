@@ -17,18 +17,15 @@ def accept_varnames(varnames, supported_varnames):
         assert vn in supported_varnames
     return varnames    
 
+
 def today():
     return arrow.now().date()
 
-assert today().year >= 2017
 
 def make_date(dt):
     # may also use pandas.to_datetime('2017').date()
     return arrow.get(dt).date() 
 
-assert make_date('2007-01-25').day == 25
-assert make_date('2007-01-25').month == 1
-assert make_date('2007-01-25').year == 2007
 
 class Parser:
 
@@ -52,39 +49,7 @@ class Parser:
     def as_markdown(cls):
         return Table(cls).as_markdown()
         
-#    @classmethod
-#    def as_markdown(cls):
-#        """Returns a string containing parser parameters,
-#           and formatted to be represented as a markdown table.
-#        """
-#
-#        # create table header
-#        table = [["Parameter", "Value"]]
-#        
-#        # define the first column values (parameters)
-#        params = ["Job", "Variables", "Frequency", 'Last updated',
-#                  'Expected update', "Source URL", "Source type"]
-#
-#        # define the second column values (values of the parameters)
-#        not_available = 'NA'
-#        varname_str = not_available if cls.all_varnames is None \
-#            else ", ".join(cls.all_varnames())
-#
-#        values = [cls.info['target'], varname_str, cls.freqs, 
-#                  cls.last_updated, cls.source_url, cls.info['source_type']
-#                  ]
-#
-#        # combine parameter-value pairs into lists
-#        for param, value in zip(params, values):
-#            value_or_na = not_available if value is None else value
-#            row = [param, value_or_na]
-#            table.append(row)
-#
-#        # return string representation of the table formatted
-#        # for the markdown
-#        return to_markdown(table)       
-
-         
+        
 def short_link(url, n=60):
     if len(url) > n:
         text = url[:n] + '...'
@@ -158,15 +123,6 @@ class RosstatKEP(Parser):
         # end -----------------
  
 
-assert "| Parser |" in RosstatKEP.as_markdown()
-assert "| Variables |" in RosstatKEP.as_markdown()
-
-#FIXME: need to change to some thing more generic, eg type checks
-test_list = list(RosstatKEP('m', ['CPI_rog']).get_data())
-assert test_list[1]['value'] == 70.39
-assert test_list[3]['date'] == "2015-12-31"
-
-
 class CBR_USD(Parser):
     """Retrieve Bank of Russia official USD to RUB exchange rate"""
     # reference information (not affecting parser call)
@@ -187,16 +143,6 @@ class CBR_USD(Parser):
                        date=date,
                        value=value)
 
-assert "| Frequency |" in CBR_USD.as_markdown()
-assert "| URL |" in CBR_USD.as_markdown()
-assert "| Source type | API |" in CBR_USD.as_markdown()
-
-#FIXME: need to change to some thing more generic, eg type checks
-test_list = list(CBR_USD('d', ['CBR_USD']).get_data())
-assert test_list[0]['value'] == 62.5477
-assert test_list[2]['date'] == "2016-10-06"
-
-
 def mock_parser_output_2():   
 
     # this is a mock -----------------
@@ -216,6 +162,3 @@ if __name__ == "__main__":
     print(RosstatKEP.as_markdown())  
     print("\n")
     print(CBR_USD.as_markdown())
-
-    print(list(RosstatKEP('m', ['CPI_rog']).get_data()))
-    print(list(CBR_USD('d', ['CBR_USD']).get_data()))
