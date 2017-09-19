@@ -9,4 +9,4 @@ install:
 script: 
   - pytest --cov=./ #apps #--doctest-modules 
 after_success:
-- codecov
+- codecov 
