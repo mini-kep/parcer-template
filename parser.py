@@ -40,7 +40,7 @@ class Parser:
             self.start = self.start_date
         else:    
             self.start = make_date(start) 
-        if start is None:
+        if end is None:
             self.end = today()
         else:
             self.end = end
@@ -131,7 +131,7 @@ class CBR_USD(Parser):
     freqs = 'd'    
     start_date = make_date('1991-07-01')
     source_url = "http://www.cbr.ru/scripts/Root.asp?PrtId=SXML"
-    all_varnames = ['CBR_USD']
+    all_varnames = ['USDRUR_CB']
 
     def get_data(self):
         """Yields dictionaries with mock datapoints"""
