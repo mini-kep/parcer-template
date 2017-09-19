@@ -62,7 +62,7 @@ class TestTable:
                     '| ------ | ---------- |\n'
                     '| Description | A mock parser to test Table class |\n'
                     '| URL | [http://some.url](http://some.url) |\n'
-                    '| Source type | API |\n'
+                1    '| Source type | API |\n'
                     '| Frequency | Annual, quarterly, monthly, weekly, daily |\n'
                     '| Variables | data_1, data_2 |')
         assert Table(self.MockParser).as_markdown() == expected
