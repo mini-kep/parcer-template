@@ -83,7 +83,7 @@ class Table:
 
 
 class RosstatKEP(Parser):
-    """Parse sections of KEP Rosstat publication"""
+    """Parse sections of Rosstat 'KEP' publication"""
     # reference information (not affecting parser call)
     info = dict(source_type = "Word")
     # class atrributes used in parser call
@@ -145,42 +145,34 @@ class CBR_USD(Parser):
 
 
 class BrentEIA(Parser):
-    """Retrieve Brent Prices from the US EIA"""
+    """Retrieve Brent oil price from US EIA"""
     # reference information (not affecting parser call)
     info = dict(source_type = "API")
     # class attributes used in parser call
-    freqs = 'dwma'
+    freqs = 'd'
     start_date = make_date('1987-05-15')
     source_url = "https://www.eia.gov/opendata/qb.php?category=241335"
-    all_varnames = ['EIA_BRENT']
-
+    # EP: namespace change, I think there will be just one Brent 
+    all_varnames = ['BRENT']
     def get_data(self):
         """Yields dictionaries with mock datapoints"""
-        dates =  ["2016-07-29", "2016-08-05", "2016-08-12", "2016-08-19"]
-        values = [42.55, 40.88, 43.63, 48.6]
-        for date, value in zip(dates, values):
-            yield dict(freq="w",
-                       name="EIA_BRENT",
-                       date=date,
-                       value=value)
-
-
-def mock_parser_output_2():   
-
-    # this is a mock -----------------
-    brent = [("2017-03-16", 50.56),
-             ("2017-03-17", 50.58),
-             ("2017-03-20", 50.67)]   
-
-    for date, value in brent:
-        yield {"date": date,
-               "freq": "d",
-               "name": "BRENT",
-               "value": value}
-    # end   --------------------------               
+        brent =  [("2016-07-29", 42.55),                  
+                  ("2016-08-05", 40.88),
+                  ("2016-08-12", 43.63),
+                  ("2016-08-19", 48.60),
+                  ("2017-03-16", 50.56),
+                  ("2017-03-17", 50.58),
+                  ("2017-03-20", 50.67)]
+        for date, value in brent:
+            yield {"date": date,
+                   "freq": "d",
+                   "name": "BRENT",
+                   "value": value}             
   
     
 if __name__ == "__main__":
     print(RosstatKEP.as_markdown())  
     print("\n")
     print(CBR_USD.as_markdown())
+    print("\n")
+    print(BrentEIA.as_markdown())
