@@ -1,5 +1,6 @@
 import arrow
 import datetime
+
 import pytest
 
 from numbers import Number
@@ -20,7 +21,7 @@ class Test_make_date:
         assert date.month == 1
         assert date.year == 2007
 
-    def test_make_date_on_valid_input_in_another_format(self):
+    def test_make_date_on_valid_input_in_slashed_format(self):
         date = make_date('2007/01/25')
         assert date.day == 25
         assert date.month == 1
@@ -33,19 +34,17 @@ class Test_make_date:
         with pytest.raises(ValueError):
             make_date('2007-25-01')
 
-    def test_make_date_on_invalid_input_empty_str(self):
+    def test_make_date_on_invalid_input_empty_str_raises_exception(self):
         with pytest.raises(Exception):
             make_date('')
 
-    def test_make_date_on_invalid_input_empty(self):
+    def test_make_date_on_no_argument_empty_raises_type_error(self):
         with pytest.raises(TypeError):
             make_date()
 
 
 class TestTable:
     
-    #EP: better structure is to make the mock in setup method (as now), 
-    #    or a fixture (at next round of testing)
     def setup_method(self):
         
         class MockParser:
@@ -94,28 +93,36 @@ class Base_Test_Parser:
             assert isinstance(item['name'], str)
             assert isinstance(item['value'], Number)
 
-    def test_get_data_produces_dates_in_valid_format(self):
+    def test_get_data_item_date_in_valid_format(self):
         dates = (item['date'] for item in self.items)
         for date in dates:
             assert arrow.get(date)
 
-    def test_get_data_produces_dates_in_valid_range(self):
+    def test_get_data_item_date_in_valid_range(self):
         dates = (item['date'] for item in self.items)
         for date in dates:
             date = arrow.get(date).date()
-            assert (self.parser.start_date <= date <= datetime.date.today())
+            # EP: splitting to see what exactly fails
+            assert self.parser.start_date <= date
+            assert date <= datetime.date.today()
 
-    def test_get_data_produces_valid_freq(self):
+    def test_get_data_item_freq_is_one_letter_and_other_conditions(self):
         for item in self.items:
-            assert item['freq'] in self.parser.freqs and len(item['freq']) == 1
+            freq = item['freq']
+            assert freq.isalpha()
+            assert len(freq) == 1            
+            assert freq in self.parser.freqs
 
     def test_get_data_produces_valid_varname(self):
         for item in self.items:
             assert item['name'] in self.parser.all_varnames
 
-    def test_get_data_produces_values_in_valid_range(self, items, min, max):
-        for item in items:
-            assert min < item['value'] < max
+    # valid code and good idea to check, but iplementation too copmplex 
+    # for a base test class
+    
+    #def test_get_data_produces_values_in_valid_range(self, items, min, max):
+    #    for item in items:
+    #        assert min < item['value'] < max
 
 
 class TestRosstatKep(Base_Test_Parser):
@@ -124,15 +131,15 @@ class TestRosstatKep(Base_Test_Parser):
         self.parser = RosstatKEP('m', ['CPI_rog', 'RUR_EUR_eop'])
         self.items = list(self.parser.get_data())
 
-    def test_get_data_produces_values_in_valid_range(self):
-        cpi_data = [item for item in self.items
-                    if item['name'] == 'CPI_rog']
-        eur_data = [item for item in self.items
-                    if item['name'] == 'RUR_EUR_eop']
-        super(TestRosstatKep, self)\
-            .test_get_data_produces_values_in_valid_range(cpi_data, 90, 110)
-        super(TestRosstatKep, self)\
-            .test_get_data_produces_values_in_valid_range(eur_data, 50, 80)
+    #def test_get_data_produces_values_in_valid_range(self):
+    #    cpi_data = [item for item in self.items
+    #                if item['name'] == 'CPI_rog']
+    #    eur_data = [item for item in self.items
+    #                if item['name'] == 'RUR_EUR_eop']
+    #    super(TestRosstatKep, self)\
+    #        .test_get_data_produces_values_in_valid_range(cpi_data, 90, 110)
+    #   super(TestRosstatKep, self)\
+    #        .test_get_data_produces_values_in_valid_range(eur_data, 50, 80)
 
     def test_info_is_correct(self):
         assert self.parser.info['source_type'] == 'Word'
@@ -159,9 +166,9 @@ class TestCBR_USD(Base_Test_Parser):
         self.parser = CBR_USD('d', ['USDRUR_CB'])
         self.items = list(self.parser.get_data())
 
-    def test_get_data_produces_values_in_valid_range(self):
-        super(TestCBR_USD, self)\
-            .test_get_data_produces_values_in_valid_range(self.items, 50, 70)
+#    def test_get_data_produces_values_in_valid_range(self):
+#        super(TestCBR_USD, self)\
+#            .test_get_data_produces_values_in_valid_range(self.items, 50, 70)
 
     def test_info_is_correct(self):
         assert self.parser.info['source_type'] == 'API'
@@ -170,7 +177,7 @@ class TestCBR_USD(Base_Test_Parser):
         assert self.parser.freqs == 'd'
 
     def test_start_date_is_correct(self):
-        assert self.parser.start_date == arrow.get('1991-07-01').date()
+        assert self.parser.start_date == datetime.date(1991, 7, 1)
 
     def test_source_url_is_correct(self):
         assert self.parser.source_url  == ("http://www.cbr.ru/"
@@ -186,9 +193,9 @@ class TestBrentEIA(Base_Test_Parser):
         self.parser = BrentEIA('d', ['BRENT'])
         self.items = list(self.parser.get_data())
 
-    def test_get_data_produces_values_in_valid_range(self):
-        super(TestBrentEIA, self) \
-            .test_get_data_produces_values_in_valid_range(self.items, 20, 120)
+#    def test_get_data_produces_values_in_valid_range(self):
+#        super(TestBrentEIA, self) \
+#            .test_get_data_produces_values_in_valid_range(self.items, 20, 120)
 
     def test_info_is_correct(self):
         assert self.parser.info['source_type'] == 'API'
@@ -197,7 +204,7 @@ class TestBrentEIA(Base_Test_Parser):
         assert self.parser.freqs == 'd'
 
     def test_start_date_is_correct(self):
-        assert self.parser.start_date == arrow.get('1987-05-15').date()
+        assert self.parser.start_date == datetime.date(1987, 5, 15)
 
     def test_source_url_is_correct(self):
         assert self.parser.source_url  == ("https://www.eia.gov/opendata/"
@@ -208,6 +215,5 @@ class TestBrentEIA(Base_Test_Parser):
 
 
 if __name__ == '__main__':
-    import pytest
     pytest.main([__file__])
     
