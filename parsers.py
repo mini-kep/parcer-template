@@ -48,6 +48,10 @@ class Parser:
     @classmethod
     def as_markdown(cls):
         return Table(cls).as_markdown()
+    
+    @classmethod
+    def get_default_args(self):
+        return dict(freq=self.freqs[0], varnames=self.all_varnames)
         
         
 def short_link(url, n=60):
@@ -168,7 +172,7 @@ class BrentEIA(Parser):
                    "freq": "d",
                    "name": "BRENT",
                    "value": value}             
-  
+      
     
 if __name__ == "__main__":
     print(RosstatKEP.as_markdown())  
@@ -176,3 +180,15 @@ if __name__ == "__main__":
     print(CBR_USD.as_markdown())
     print("\n")
     print(BrentEIA.as_markdown())
+    
+    
+    gen1 = RosstatKEP(freq='a',varnames=['CPI_rog']).get_data()
+    gen2 = CBR_USD(freq='d',varnames=['USDRUR_CB']).get_data()
+    gen1 = RosstatKEP(freq='a',varnames=['CPI_rog']).get_data()
+    
+    dataset_sample = []
+    for cls in [RosstatKEP, CBR_USD, BrentEIA]:
+        gen = list(cls(**cls.get_default_args()).get_data())
+        dataset_sample.extend(gen)
+        
+    
