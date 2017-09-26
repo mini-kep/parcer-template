@@ -1,14 +1,5 @@
-import arrow
 import brent 
-
-class DateHelper(object):
-    def today():
-        return arrow.now().date()
-    
-    def make_date(dt):
-        # may also use pandas.to_datetime('2017').date()
-        return arrow.get(dt).date() 
-
+from helpers import DateHelper
 
 class Parser:
     def __init__(self, freq, start=None):        
@@ -95,8 +86,7 @@ class BrentEIA(Parser):
     all_varnames = ['BRENT']
     
     def get_data():
-        return brent.yield_brent_dicts()
-        
+        return brent.yield_brent_dicts()        
     
     def sample(self):
         """Yields dictionaries with mock datapoints"""
