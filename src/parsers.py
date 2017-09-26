@@ -1,6 +1,12 @@
 import arrow
 
-from to_markdown import to_markdown 
+class DateHelper(object):
+    def today():
+        return arrow.now().date()
+    
+    def make_date(dt):
+        # may also use pandas.to_datetime('2017').date()
+        return arrow.get(dt).date() 
 
 # FIXME: change assert to raise exception
 def accept_frequency(letter, supported_frequencies):
@@ -11,88 +17,24 @@ def accept_frequency(letter, supported_frequencies):
     assert letter in supported_frequencies
     return letter         
 
-# FIXME: change assert to raise exception
-def accept_varnames(varnames, supported_varnames):
-    for vn in varnames:
-        assert vn in supported_varnames
-    return varnames    
-
-
-def today():
-    return arrow.now().date()
-
-
-def make_date(dt):
-    # may also use pandas.to_datetime('2017').date()
-    return arrow.get(dt).date() 
-
-
 class Parser:
 
-    @property
-    def last_updated(self):
-        return None
-
-    def __init__(self, freq, varnames, start=None, end=None):        
-        self.freq = accept_frequency(freq, self.freqs)
-        self.varnames = accept_varnames(varnames, self.all_varnames)
+    def __init__(self, freq, start=None):        
+        self.freq = accept_frequency(freq, self.freqs)        
         if start is None:
             self.start = self.start_date
         else:    
-            self.start = make_date(start) 
-        if end is None:
-            self.end = today()
-        else:
-            self.end = end
-
-    @classmethod
-    def as_markdown(cls):
-        return Table(cls).as_markdown()
-    
+            self.start = DateHelper.make_date(start) 
+        self.end =  DateHelper.today()
+        
     @classmethod
     def get_default_args(self):
-        return dict(freq=self.freqs[0], varnames=self.all_varnames)
-        
-        
-def short_link(url, n=60):
-    if len(url) > n:
-        text = url[:n] + '...'
-    else:
-        text = url    
-    return f'[{text}]({url})'
-
-
-def interpret_frequencies(freqs):
-    mapper = dict(a='annual',
-                  q='quarterly',
-                  m='monthly',
-                  w='weekly',
-                  d='daily')
-    freq_str = ", ".join([mapper[f] for f in freqs])
-    return freq_str.capitalize() 
-    
-class Table:
-    def __init__(self, cls):
-        varname_str = ", ".join(cls.all_varnames)
-        url_str = short_link(cls.source_url)        
-        self.rows = [("Parser", cls.__name__),
-            ("Description", cls.__doc__),
-            ("URL", url_str),
-            ("Source type", cls.info['source_type']),
-            ("Frequency", interpret_frequencies(cls.freqs)),
-            ("Variables", varname_str)]
-        
-    def as_markdown(self):
-        return to_markdown(self.rows)
-
+        return dict(freq=self.freqs[0])
 
 class RosstatKEP(Parser):
     """Parse sections of Rosstat 'KEP' publication"""
-    # reference information (not affecting parser call)
-    info = dict(source_type = "Word")
-    # class atrributes used in parser call
     freqs = 'aqm'    
-    start_date = make_date('1999-01-31')
+    start_date = DateHelper.make_date('1999-01-31')
     source_url = ("http://www.gks.ru/wps/wcm/connect/" 
                   "rosstat_main/rosstat/ru/statistics/" 
                   "publications/catalog/doc_1140080765391")
@@ -129,11 +71,8 @@ class RosstatKEP(Parser):
 
 class CBR_USD(Parser):
     """Retrieve Bank of Russia official USD to RUB exchange rate"""
-    # reference information (not affecting parser call)
-    info = dict(source_type = "API")
-    # class attributes used in parser call
     freqs = 'd'    
-    start_date = make_date('1991-07-01')
+    start_date =  DateHelper.make_date('1991-07-01')
     source_url = "http://www.cbr.ru/scripts/Root.asp?PrtId=SXML"
     all_varnames = ['USDRUR_CB']
 
@@ -150,13 +89,9 @@ class CBR_USD(Parser):
 
 class BrentEIA(Parser):
     """Retrieve Brent oil price from US EIA"""
-    # reference information (not affecting parser call)
-    info = dict(source_type = "API")
-    # class attributes used in parser call
     freqs = 'd'
-    start_date = make_date('1987-05-15')
+    start_date =  DateHelper.make_date('1987-05-15')
     source_url = "https://www.eia.gov/opendata/qb.php?category=241335"
-    # EP: namespace change, I think there will be just one Brent 
     all_varnames = ['BRENT']
     def get_data(self):
         """Yields dictionaries with mock datapoints"""
@@ -175,20 +110,15 @@ class BrentEIA(Parser):
       
     
 if __name__ == "__main__":
-    print(RosstatKEP.as_markdown())  
-    print("\n")
-    print(CBR_USD.as_markdown())
-    print("\n")
-    print(BrentEIA.as_markdown())
-    
-    
-    gen1 = RosstatKEP(freq='a',varnames=['CPI_rog']).get_data()
-    gen2 = CBR_USD(freq='d',varnames=['USDRUR_CB']).get_data()
-    gen1 = RosstatKEP(freq='a',varnames=['CPI_rog']).get_data()
+    gen1 = RosstatKEP(freq='a').get_data()
+    gen2 = CBR_USD(freq='d').get_data()
+    gen3 = RosstatKEP(freq='a').get_data()
     
     dataset_sample = []
     for cls in [RosstatKEP, CBR_USD, BrentEIA]:
         gen = list(cls(**cls.get_default_args()).get_data())
         dataset_sample.extend(gen)
+    print('Sample dataset:')
+    print(dataset_sample)
         
     

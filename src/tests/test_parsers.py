@@ -4,75 +4,41 @@ import datetime
 import pytest
 
 from numbers import Number
-from parsers import (today, make_date, 
-                    Table, 
-                    RosstatKEP, CBR_USD, BrentEIA)
+from parsers import (DateHelper, 
+                     RosstatKEP, CBR_USD, BrentEIA)
 
 
 class Test_today:
     def test_today(self):
-        assert today() == datetime.date.today()
-
+        assert DateHelper.today() == datetime.date.today()
 
 class Test_make_date:
     def test_make_date_on_valid_input(self):
-        date = make_date('2007-01-25')
+        date = DateHelper.make_date('2007-01-25')
         assert date.day == 25
         assert date.month == 1
         assert date.year == 2007
 
     def test_make_date_on_valid_input_in_slashed_format(self):
-        date = make_date('2007/01/25')
+        date = DateHelper.make_date('2007/01/25')
         assert date.day == 25
         assert date.month == 1
         assert date.year == 2007
 
     def test_make_date_on_valid_input_none(self):
-        assert make_date(None) == datetime.date.today()
+        assert DateHelper.make_date(None) == datetime.date.today()
 
     def test_make_date_on_invalid_input_out_of_range(self):
         with pytest.raises(ValueError):
-            make_date('2007-25-01')
+            DateHelper.make_date('2007-25-01')
 
     def test_make_date_on_invalid_input_empty_str_raises_exception(self):
         with pytest.raises(Exception):
-            make_date('')
+            DateHelper.make_date('')
 
     def test_make_date_on_no_argument_empty_raises_type_error(self):
         with pytest.raises(TypeError):
-            make_date()
-
-
-class TestTable:
-    
-    def setup_method(self):
-        
-        class MockParser:
-            """A mock parser to test Table class"""
-            info = dict(source_type='API')
-            freqs = 'aqmwd'
-            source_url = 'http://some.url'
-            all_varnames = ['data_1', 'data_2']
-        
-        self.MockParser = MockParser
-
-    def test_as_markdown_produces_correct_string_on_short_URL(self):
-        expected = ('| Parser | MockParser |\n'
-                    '| ------ | ---------- |\n'
-                    '| Description | A mock parser to test Table class |\n'
-                    '| URL | [http://some.url](http://some.url) |\n'
-                    '| Source type | API |\n'
-                    '| Frequency | Annual, quarterly, monthly, weekly, daily |\n'
-                    '| Variables | data_1, data_2 |')
-        assert Table(self.MockParser).as_markdown() == expected
-
-    def test_as_markdown_valid_input_long_link(self):
-        self.MockParser.source_url = ("http://www.gks.ru/wps/wcm/connect/"
-                                      "rosstat_main/rosstat/ru/statistics/"
-                                      "publications/catalog/"
-                                      "doc_1140080765391")
-        expected = 'http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/st...'
-        assert expected in Table(self.MockParser).as_markdown()
+            DateHelper.make_date()
 
 
 class Base_Test_Parser:
@@ -128,7 +94,7 @@ class Base_Test_Parser:
 class TestRosstatKep(Base_Test_Parser):
     
     def setup_method(self):
-        self.parser = RosstatKEP('m', ['CPI_rog', 'RUR_EUR_eop'])
+        self.parser = RosstatKEP('m')
         self.items = list(self.parser.get_data())
 
     #def test_get_data_produces_values_in_valid_range(self):
@@ -141,8 +107,6 @@ class TestRosstatKep(Base_Test_Parser):
     #   super(TestRosstatKep, self)\
     #        .test_get_data_produces_values_in_valid_range(eur_data, 50, 80)
 
-    def test_info_is_correct(self):
-        assert self.parser.info['source_type'] == 'Word'
 
     def test_freqs_are_correct(self):
         assert self.parser.freqs == 'aqm'
@@ -163,15 +127,13 @@ class TestRosstatKep(Base_Test_Parser):
 class TestCBR_USD(Base_Test_Parser):
     
     def setup_method(self):
-        self.parser = CBR_USD('d', ['USDRUR_CB'])
+        self.parser = CBR_USD('d')
         self.items = list(self.parser.get_data())
 
 #    def test_get_data_produces_values_in_valid_range(self):
 #        super(TestCBR_USD, self)\
 #            .test_get_data_produces_values_in_valid_range(self.items, 50, 70)
 
-    def test_info_is_correct(self):
-        assert self.parser.info['source_type'] == 'API'
 
     def test_freqs_are_correct(self):
         assert self.parser.freqs == 'd'
@@ -190,15 +152,12 @@ class TestCBR_USD(Base_Test_Parser):
 class TestBrentEIA(Base_Test_Parser):
 
     def setup_method(self):
-        self.parser = BrentEIA('d', ['BRENT'])
+        self.parser = BrentEIA('d')
         self.items = list(self.parser.get_data())
 
 #    def test_get_data_produces_values_in_valid_range(self):
 #        super(TestBrentEIA, self) \
 #            .test_get_data_produces_values_in_valid_range(self.items, 20, 120)
-
-    def test_info_is_correct(self):
-        assert self.parser.info['source_type'] == 'API'
 
     def test_freqs_are_correct(self):
         assert self.parser.freqs == 'd'
