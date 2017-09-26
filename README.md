@@ -1,8 +1,9 @@
-# 
+# Task description
 
 From [src/parsers.py](https://github.com/mini-kep/parsers/blob/master/src/parsers.py) we need to invoke following scripts:
 
-<https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/getter.py#L34-L37>
+
+- <https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/getter.py#L34-L37>
 
 | Parser | RosstatKEP |
 | ------ | ---------- |
@@ -12,7 +13,7 @@ From [src/parsers.py](https://github.com/mini-kep/parsers/blob/master/src/parser
 | Variables | CPI_rog, RUR_EUR_eop |
 
 
-<https://github.com/ru-stat/parser-cbr-usd/blob/master/cbr_usd.py>
+- <https://github.com/ru-stat/parser-cbr-usd/blob/master/cbr_usd.py>
 
 | Parser | CBR_USD |
 | ------ | ------- |
@@ -21,7 +22,7 @@ From [src/parsers.py](https://github.com/mini-kep/parsers/blob/master/src/parser
 | Frequency | Daily |
 | Variables | USDRUR_CB |
 
-<https://github.com/epogrebnyak/data-fx-oil/blob/master/brent.py>
+- <https://github.com/epogrebnyak/data-fx-oil/blob/master/brent.py>
 
 | Parser | BrentEIA |
 | ------ | -------- |
