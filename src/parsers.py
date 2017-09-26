@@ -1,4 +1,5 @@
 import arrow
+import brent 
 
 class DateHelper(object):
     def today():
@@ -41,7 +42,7 @@ class RosstatKEP(Parser):
     # or always retrun all variables?
     all_varnames = ['CPI_rog', 'RUR_EUR_eop']
 
-    def get_data(self):
+    def sample(self):
         """Yield dictionaries with datapoints"""
         
         # this is a mock -----------------
@@ -75,7 +76,7 @@ class CBR_USD(Parser):
     source_url = "http://www.cbr.ru/scripts/Root.asp?PrtId=SXML"
     all_varnames = ['USDRUR_CB']
 
-    def get_data(self):
+    def sample(self):
         """Yields dictionaries with mock datapoints"""
         dates =  ["2016-10-04", "2016-10-05", "2016-10-06", "2016-10-07"]
         values = [62.5477, 62.4323, 62.4583, 62.3900]
@@ -92,7 +93,12 @@ class BrentEIA(Parser):
     start_date =  DateHelper.make_date('1987-05-15')
     source_url = "https://www.eia.gov/opendata/qb.php?category=241335"
     all_varnames = ['BRENT']
-    def get_data(self):
+    
+    def get_data():
+        return brent.yield_brent_dicts()
+        
+    
+    def sample(self):
         """Yields dictionaries with mock datapoints"""
         brent =  [("2016-07-29", 42.55),                  
                   ("2016-08-05", 40.88),
@@ -109,13 +115,11 @@ class BrentEIA(Parser):
       
     
 if __name__ == "__main__":
-    gen1 = RosstatKEP(freq='a').get_data()
-    gen2 = CBR_USD(freq='d').get_data()
-    gen3 = RosstatKEP(freq='a').get_data()
-    
     dataset_sample = []
     for cls in [RosstatKEP, CBR_USD, BrentEIA]:
-        gen = list(cls(**cls.get_default_args()).get_data())
+        freq = cls.freqs[0]
+        parser = cls(freq)
+        gen = list(parser.sample())
         dataset_sample.extend(gen)
     print('Sample dataset:')
     print(dataset_sample)        
