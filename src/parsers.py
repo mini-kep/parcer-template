@@ -8,25 +8,24 @@ class DateHelper(object):
         # may also use pandas.to_datetime('2017').date()
         return arrow.get(dt).date() 
 
-# FIXME: change assert to raise exception
-def accept_frequency(letter, supported_frequencies):
-    # must be single letter 
-    assert letter.isalpha()
-    assert len(letter) == 1
-    # must be supported          
-    assert letter in supported_frequencies
-    return letter         
 
 class Parser:
-
     def __init__(self, freq, start=None):        
-        self.freq = accept_frequency(freq, self.freqs)        
+        self.freq = self._accept_frequency(freq)       
         if start is None:
             self.start = self.start_date
         else:    
             self.start = DateHelper.make_date(start) 
         self.end =  DateHelper.today()
         
+    def _accept_frequency(self, letter):
+        if all([letter.isalpha(),
+                len(letter) == 1,
+                letter in self.freqs]):
+            return letter  
+        else:
+            raise ValueError(letter)
+
     @classmethod
     def get_default_args(self):
         return dict(freq=self.freqs[0])
@@ -119,6 +118,5 @@ if __name__ == "__main__":
         gen = list(cls(**cls.get_default_args()).get_data())
         dataset_sample.extend(gen)
     print('Sample dataset:')
-    print(dataset_sample)
-        
+    print(dataset_sample)        
     

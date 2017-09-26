@@ -51,7 +51,6 @@ class Formatter:
         self.rows = [("Parser", cls.__name__),
             ("Description", cls.__doc__),
             ("URL", url_str),
-            ("Source type", cls.info['source_type']),
             ("Frequency", interpret_frequencies(cls.freqs)),
             ("Variables", varname_str)]
         
