@@ -1,4 +1,5 @@
 import brent 
+import cbr_fx
 from helpers import DateHelper
 
 class Parser:
@@ -22,16 +23,23 @@ class Parser:
     def get_default_args(self):
         return dict(freq=self.freqs[0])
 
-class RosstatKEP(Parser):
+class RosstatKEP(object):
     """Parse sections of Rosstat 'KEP' publication"""
     freqs = 'aqm'    
-    start_date = DateHelper.make_date('1999-01-31')
+    observation_start_date = DateHelper.make_date('1999-01-31')
     source_url = ("http://www.gks.ru/wps/wcm/connect/" 
                   "rosstat_main/rosstat/ru/statistics/" 
                   "publications/catalog/doc_1140080765391")
     # FIXME: change to actual method get_data? or count? 
     # or always retrun all variables?
     all_varnames = ['CPI_rog', 'RUR_EUR_eop']
+
+    def __init__(self, freq=None, start=None):        
+        if start is None:
+            self.start = self.observation_start_date
+        else:    
+            self.start = DateHelper.make_date(start) 
+        self.freq=freq    
 
     def sample(self):
         """Yield dictionaries with datapoints"""
@@ -63,54 +71,78 @@ class RosstatKEP(Parser):
 class CBR_USD(Parser):
     """Retrieve Bank of Russia official USD to RUB exchange rate"""
     freqs = 'd'    
-    start_date =  DateHelper.make_date('1991-07-01')
+    observation_start_date = DateHelper.make_date('1991-07-01')
     source_url = "http://www.cbr.ru/scripts/Root.asp?PrtId=SXML"
     all_varnames = ['USDRUR_CB']
+    
+    def __init__(self, start=None):        
+        if start is None:
+            self.start = self.observation_start_date
+        else:    
+            self.start = DateHelper.make_date(start) 
+        self.end = DateHelper.today()
 
+    def yield_dicts(self):
+        return cbr_fx.get_cbr_er(self.start, self.end)
+    
     def sample(self):
-        """Yields dictionaries with mock datapoints"""
-        dates =  ["2016-10-04", "2016-10-05", "2016-10-06", "2016-10-07"]
-        values = [62.5477, 62.4323, 62.4583, 62.3900]
-        for date, value in zip(dates, values):
-            yield dict(freq="d",
-                       name="USDRUR_CB",
-                       date=date,
-                       value=value)
+        """Yields dictionaries with sample datapoints."""
+        return iter([{'date': '2017-09-15', 'freq': 'd', 'name': 'USDRUR_CB', 'value': 57.7706},
+ {'date': '2017-09-16', 'freq': 'd', 'name': 'USDRUR_CB', 'value': 57.5336},
+ {'date': '2017-09-19', 'freq': 'd', 'name': 'USDRUR_CB', 'value': 57.6242},
+ {'date': '2017-09-20', 'freq': 'd', 'name': 'USDRUR_CB', 'value': 58.0993},
+ {'date': '2017-09-21', 'freq': 'd', 'name': 'USDRUR_CB', 'value': 58.129},
+ {'date': '2017-09-22', 'freq': 'd', 'name': 'USDRUR_CB', 'value': 58.2242},
+ {'date': '2017-09-23', 'freq': 'd', 'name': 'USDRUR_CB', 'value': 57.6527},
+ {'date': '2017-09-26', 'freq': 'd', 'name': 'USDRUR_CB', 'value': 57.566}])
 
 
-class BrentEIA(Parser):
+class BrentEIA():
     """Retrieve Brent oil price from US EIA"""
     freqs = 'd'
-    start_date =  DateHelper.make_date('1987-05-15')
+    observation_start_date =  DateHelper.make_date('1987-05-15')
     source_url = "https://www.eia.gov/opendata/qb.php?category=241335"
     all_varnames = ['BRENT']
     
-    def get_data():
-        return brent.yield_brent_dicts()        
+    def __init__(self, start=None):        
+        if start is None:
+            self.start = self.observation_start_date
+        else:    
+            self.start = DateHelper.make_date(start) 
+    
+    def yield_dicts(self):
+        for p in brent.yield_brent_dicts():
+            if DateHelper.make_date(p['date']) >= self.start:
+                yield p            
     
     def sample(self):
-        """Yields dictionaries with mock datapoints"""
-        brent =  [("2016-07-29", 42.55),                  
-                  ("2016-08-05", 40.88),
-                  ("2016-08-12", 43.63),
-                  ("2016-08-19", 48.60),
-                  ("2017-03-16", 50.56),
-                  ("2017-03-17", 50.58),
-                  ("2017-03-20", 50.67)]
-        for date, value in brent:
-            yield {"date": date,
-                   "freq": "d",
-                   "name": "BRENT",
-                   "value": value}             
+        """Yield a few dictionaries with datapoints."""
+        return iter([{'date': '2017-09-18', 'freq': 'd', 'name': 'BRENT', 'value': 55.5},
+ {'date': '2017-09-15', 'freq': 'd', 'name': 'BRENT', 'value': 56.18},
+ {'date': '2017-09-14', 'freq': 'd', 'name': 'BRENT', 'value': 56.76},
+ {'date': '2017-09-13', 'freq': 'd', 'name': 'BRENT', 'value': 55.52},
+ {'date': '2017-09-12', 'freq': 'd', 'name': 'BRENT', 'value': 55.06},
+ {'date': '2017-09-11', 'freq': 'd', 'name': 'BRENT', 'value': 54.2}] 
+        )           
       
+
+class Collection:
+    
+    parsers = [RosstatKEP, CBR_USD, BrentEIA]
+
+    def get_sample():
+        dataset_sample = []
+        for cls in Collection.parsers:
+            parser = cls()
+            gen = list(parser.sample())
+            dataset_sample.extend(gen)
+        return dataset_sample
+       
     
 if __name__ == "__main__":
-    dataset_sample = []
-    for cls in [RosstatKEP, CBR_USD, BrentEIA]:
-        freq = cls.freqs[0]
-        parser = cls(freq)
-        gen = list(parser.sample())
-        dataset_sample.extend(gen)
+    from pprint import pprint
     print('Sample dataset:')
-    print(dataset_sample)        
+    pprint(Collection.get_sample())    
+
+    
     

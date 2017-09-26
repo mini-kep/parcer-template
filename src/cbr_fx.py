@@ -7,17 +7,9 @@ import xml.etree.ElementTree as ET
 from helpers import DateHelper
 
 
-def as_cbr_date(dt):    
-    if isinstance(dt, date):
-        return dt.strftime('%d/%m/%Y')
-    else:
-        raise TypeError(dt)
-
-def make_url(start_str=None, end_str=None):
+def make_url(start_date, end_date):
     fmt = '%d/%m/%Y'
-    _start = DateHelper.get_start(start_str, '1992-07-01')
-    _end = DateHelper.get_end(end_str)
-    start, end = (x.strftime(fmt) for x in [_start, _end])
+    start, end = (x.strftime(fmt) for x in [start_date, end_date])
     return ("http://www.cbr.ru/scripts/XML_dynamic.asp"
             f"?date_req1={start}"
             f"&date_req2={end}&VAL_NM_RQ=R01235")
@@ -54,12 +46,13 @@ def xml_text_to_stream(xml_text):
 def get_cbr_er(start_str, end_str):
     url= make_url(start_str, end_str)
     xml_text = requests.get(url).text
-    for d in map(transform, xml_text_to_stream(xml_text)):
-        yield d
+    return map(transform, xml_text_to_stream(xml_text))
     
             
 if __name__ == "__main__":
-    gen = get_cbr_er(None, None)    
+    s = date(1992,7,1)
+    e = date(1992,7,1)
+    gen = get_cbr_er(s, e)    
     a = next(gen)
     assert a == {'date': '1992-07-01', 'freq': 'd', 
                  'name': 'USDRUR_CB', 'value': 0.1253}

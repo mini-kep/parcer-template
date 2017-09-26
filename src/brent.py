@@ -18,8 +18,9 @@ def make_url(access_key=ACCESS_KEY):
             f"?api_key={access_key}"
             f"&series_id={series_id}")
 
-def yield_brent_dicts(url):
+def yield_brent_dicts():
     """Stream data from url as dicts."""
+    url = make_url()
     r = requests.get(url)
     json_data = json.loads(r.text)    
     parsed_json_data = json_data["series"][0]["data"]
