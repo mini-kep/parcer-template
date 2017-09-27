@@ -1,20 +1,12 @@
-"""Parser classes to get datapoints for the database.
-
-Note:
- - each class is for one frequency now, this simplifies parser calls
-"""
-
-#TODO-1: restore tests in test_parsers.py
-#TODO-2 (EP): put actual data in RosstatKEP_*.yield_dicts()
-#TODO-3: save to database
-
+"""Parser classes to get datapoints for the database."""
 import itertools
 
 from helpers import DateHelper
 
+# individual parser modules
 import brent 
 import cbr_fx
-
+import kep
 
 class RosstatKEP_Base(object):
     """Parse sections of Rosstat 'KEP' publication"""
@@ -64,7 +56,7 @@ class RosstatKEP_Base(object):
     #TODO-2: put actual data 
     
     def yield_dicts(self):
-        return self.sample()
+        return kep.yield_dicts(self.freq)
 
 
 class RosstatKEP_Monthly(RosstatKEP_Base):
@@ -168,7 +160,11 @@ if __name__ == "__main__":
     print('Sample dataset:')
     pprint(Collection.get_sample()) 
 
-    gen_fx = list(CBR_USD('2017-09-01').yield_dicts())    
+    fx = list(CBR_USD('2017-09-01').yield_dicts()) 
+    kep_m = list(RosstatKEP_Monthly('2017-06').yield_dicts()) 
+    oil = list(BrentEIA('2017-09-01').yield_dicts())     
     
-    # TODO-3: must put this generator into database
-    gen = Collection.yield_full_dataset()  
+    # TODO: must put this generator into database
+    gen = Collection.yield_full_dataset() 
+    
+    # TODO: round/beautify 349.89999999999998
