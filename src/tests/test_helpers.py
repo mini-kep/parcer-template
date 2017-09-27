@@ -35,3 +35,21 @@ class Test_make_date:
     def test_make_date_on_no_argument_empty_raises_type_error(self):
         with pytest.raises(TypeError):
             DateHelper.make_date()
+
+class Test_get_end:
+    def test_on_none_argument_returns_today(self):
+        assert DateHelper.get_end(None) == datetime.date.today()
+
+class Test_get_start:
+    def test_on_none_argument_returns_date(self):
+        date = datetime.date(3020,1,25)
+        assert DateHelper.get_start(None,date) == date
+
+class Test_to_date:
+    def test_on_valid_format_day_month_year(self):
+        assert DateHelper.to_date('13-02-1254','%d-%m-%Y') == '1254-02-13'
+    def test_on_invalid_format(self):
+        with pytest.raises(Exception):
+            assert DateHelper.to_date('13-02-1254','%dk%m-%Y') == '1254-02-13'
+
+
