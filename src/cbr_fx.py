@@ -36,9 +36,9 @@ def transform(datapoint):
 def xml_text_to_stream(xml_text):        
         root = ET.fromstring(xml_text)
         for child in root:
-            date = DateHelper.to_date(child.attrib['Date'], "%d.%m.%Y")
+            date = DateHelper.make_date(child.attrib['Date'], fmt="%d.%m.%Y")
             value = to_float(child[1].text)
-            yield {"date": date,
+            yield {"date": DateHelper.as_string(date),
                "freq": "d",
                "name": "USDRUR_CB",
                "value": value}  

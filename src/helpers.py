@@ -6,24 +6,18 @@ class DateHelper(object):
     def today():
         return arrow.now().date()
     
-    def make_date(dt, default=None):
-        return arrow.get(dt).date() 
-        
-    def get_start(dt, default: str):
-        if dt is None:
-            return DateHelper.make_date(default)
+    def make_date(dt_string: str, fmt=None):
+        if fmt is None:
+            return arrow.get(dt_string).date() 
         else:
-            return DateHelper.make_date(dt)
-
-    def get_end(dt):
-        if dt is None:
-            return DateHelper.today()
-        else:
-            return DateHelper.make_date(dt)
-        
-    def to_date(date_string, fmt):
+            try:
+                return datetime.strptime(dt_string, fmt).date()
+            except ValueError:
+                msg = f"Error parsing date <{dt_string}> with format <{fmt}>"
+                raise ValueError(msg)                 
+       
+    def as_string(date):   
         try:
-            return datetime.strptime(date_string, fmt).strftime("%Y-%m-%d")
-        except ValueError:
-            raise ValueError(f"Error parsing date <{date_string}>")
-            
+           return date.strftime("%Y-%m-%d")
+        except AttributeError:
+            raise TypeError(f"<{date}> must be datetime.date or similar type")           

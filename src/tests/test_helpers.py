@@ -41,31 +41,25 @@ class Test_make_date:
         with pytest.raises(ValueError):
             DateHelper.make_date('2007-25-25')
 
-
-# TODO below: do type type checks 
-# TODO below: get_end and get_start need min 2 methods becuase if-then 
-
-class Test_get_end:
-    def test_on_none_argument_returns_today(self):
-        assert DateHelper.get_end(None) == datetime.date.today()
-
-class Test_get_start:
-    def test_on_none_argument_returns_date(self):
-        #EP: this is actually unintented use, must change default to string
-        #    see actual use of get_start in parsers.py        
-        date = datetime.date(2000, 1, 25)
-        assert DateHelper.get_start(dt=None, default=date) == date
-
-# note: to_date is likely to be refactored
-class Test_to_date:
-    def test_on_valid_format_day_month_year(self):
-        assert DateHelper.to_date('13-02-1254','%d-%m-%Y') == '1254-02-13'
+    def test_with_fmt_on_valid_format_day_month_year(self):
+        date = DateHelper.make_date('25-03-2000', fmt='%d-%m-%Y')
+        assert date == datetime.date(2000, 3, 25)
+        
     def test_on_invalid_format(self):
         with pytest.raises(Exception):
-            assert DateHelper.to_date('13-02-1254','%dk%m-%Y') == '1254-02-13'
-
-# After tests: need doctsrings for DateHelper. 
-# TODO below: get_end and get_start need min 2 methods becuase if-then 
+            assert DateHelper.make_date('25-03-2000','%dk%m-%Y') 
+            
+            
+class Test_as_string():   
+        
+    def test_on_expected_arg_type(self):        
+        date = datetime.date(2000, 1, 15)
+        assert DateHelper.as_string(date) == '2000-01-15'
+        
+    def test_on_unexpected_arg_type(self):        
+        with pytest.raises(TypeError):
+            assert DateHelper.as_string('2000-01-15')
+    
             
 if __name__ == '__main__':
     pytest.main([__file__])

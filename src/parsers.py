@@ -102,7 +102,7 @@ class CBR_USD(object):
             self.start = DateHelper.make_date(start) 
         self.end = DateHelper.today()
 
-    def yield_dicts(self):
+    def yield_dicts(self):        
         return cbr_fx.get_cbr_er(self.start, self.end)
     
     def sample(self):
@@ -173,7 +173,8 @@ if __name__ == "__main__":
     from pprint import pprint
     print('Sample dataset:')
     pprint(Collection.get_sample()) 
+
+    gen_fx = list(CBR_USD('2017-09-01').yield_dicts())    
     
     # TODO-3: must put this generator into database
-    gen = Collection.yield_full_dataset()    
-    
+    gen = Collection.yield_full_dataset()  
