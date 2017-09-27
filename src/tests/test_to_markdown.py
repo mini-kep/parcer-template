@@ -2,6 +2,10 @@ from to_markdown import add_dividers, to_markdown, Formatter
 
 def test_add_dividers():
     assert add_dividers(['Branch', 'Commit']) == '| Branch | Commit |'
+    # assert add_dividers([1, 2]) == ?
+    # assert add_dividers([None]) == ?
+    # assert add_dividers(['Branch', None]) == ?
+    # also it can be parametrized with this different data
 
 def test_to_markdown():        
     table1 = [
@@ -13,6 +17,8 @@ def test_to_markdown():
     assert md.startswith("|")
     assert 'Branch' in md
     assert 'fedcba9876543210' in md
+    # here can be one assert with full result what we expecter. like: "| Branch | Commit | \n ..."
+    # also what will happen if table1 will have not expected data. ex: to_markdown(None)
 
 class MockParser:
     """A mock parser to test Table class"""
@@ -39,6 +45,8 @@ class Test_Formatter:
                                  "publications/catalog/"
                                  "doc_1140080765391")
         expected = 'http://www.gks.ru/wps/wcm/connect/rossta...'
+        # is it works? probably should be without '...' ?
+        # like: expected = 'http://www.gks.ru/wps/wcm/connect/rossta'
         assert expected in Formatter(MockParser).as_markdown()
         
 if __name__ == '__main__':
