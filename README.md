@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/mini-kep/parsers.svg?branch=master)](https://travis-ci.org/mini-kep/parsers)
+[![Coverage badge](https://codecov.io/gh/mini-kep/parsers/branch/master/graphs/badge.svg)](https://codecov.io/gh/mini-kep/parsers)
+
 # Task description
 
 From [src/parsers.py](https://github.com/mini-kep/parsers/blob/master/src/parsers.py) we need to invoke following scripts:
