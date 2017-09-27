@@ -68,14 +68,17 @@ class RosstatKEP_Base(object):
 
 
 class RosstatKEP_Monthly(RosstatKEP_Base):
+    """Monthly indicators from Rosstat 'KEP' publication"""
     freq = 'm'        
         
 
 class RosstatKEP_Quarterly(RosstatKEP_Base):
+    """Quarterly indicators from Rosstat 'KEP' publication"""
     freq = 'q'        
 
 
-class RosstatKEP_Annual(RosstatKEP_Base):    
+class RosstatKEP_Annual(RosstatKEP_Base):   
+    """Annual indicators from Rosstat 'KEP' publication"""
     freq = 'a'
     
 

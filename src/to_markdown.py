@@ -24,7 +24,7 @@ def to_markdown(table):
     return '\n'.join(table)
 
 
-def short_link(url, n=60):
+def short_link(url, n=40):
     """Shorten *url* to *n* characters."""
     if len(url) > n:
         text = url[:n] + '...'
@@ -47,18 +47,20 @@ def interpret_frequencies(freqs):
 class Formatter:
     def __init__(self, cls):
         varname_str = ", ".join(cls.all_varnames)
-        url_str = short_link(cls.source_url)        
+        url_str = short_link(cls.source_url)   
+        freq_str = interpret_frequencies(cls.freq)
         self.rows = [("Parser", cls.__name__),
-            ("Description", cls.__doc__),
+            ("Description", cls.__doc__ or ''),
             ("URL", url_str),
-            ("Frequency", interpret_frequencies(cls.freqs)),
+            ("Frequency", freq_str),
             ("Variables", varname_str)]
         
     def as_markdown(self):
         return to_markdown(self.rows)
     
 if __name__ == "__main__":
-    from parsers import RosstatKEP, CBR_USD, BrentEIA
-    for cls in  RosstatKEP, CBR_USD, BrentEIA:
+    from parsers import Collection
+    for cls in  Collection.parsers:
+        print(Formatter(cls).rows)
         print(Formatter(cls).as_markdown())
         print()
