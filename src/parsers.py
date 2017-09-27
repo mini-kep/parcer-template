@@ -16,15 +16,6 @@ import brent
 import cbr_fx
 
 
-def accept_frequency(letter, allowed_freqs):
-    if all([letter.isalpha(),
-            len(letter) == 1,
-            letter in allowed_freqs]):
-        return letter  
-    else:
-        raise ValueError(letter)
-
-
 class RosstatKEP_Base(object):
     """Parse sections of Rosstat 'KEP' publication"""
     # must override frequencies
