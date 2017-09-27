@@ -238,4 +238,3 @@ def test_yield_dicts_method_is_callable():
 #
 if __name__ == '__main__':
     pytest.main([__file__])
-    

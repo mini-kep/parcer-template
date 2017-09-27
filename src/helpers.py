@@ -20,4 +20,4 @@ class DateHelper(object):
         try:
            return date.strftime("%Y-%m-%d")
         except AttributeError:
-            raise TypeError(f"<{date}> must be datetime.date or similar type")           
+            raise TypeError(f"<{date}> must be datetime.date or similar type")
