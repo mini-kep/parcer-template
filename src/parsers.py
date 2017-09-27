@@ -1,24 +1,34 @@
-import brent 
-import cbr_fx
+"""Parser classes to get datapoints for the database.
+
+Note:
+ - each class is for one frequency now, this simplifies parser calls
+"""
+
+#TODO-1: restore tests in test_parsers.py
+#TODO-2 (EP): put actual data in RosstatKEP_*.yield_dicts()
+#TODO-3: save to database
+
+import itertools
+
 from helpers import DateHelper
 
-class Parser:
-    def __init__(self, freq, start=None):        
-        self.freq = self._accept_frequency(freq)       
-        if start is None:
-            self.start = self.start_date
-        else:    
-            self.start = DateHelper.make_date(start) 
-        self.end =  DateHelper.today()
-        
+import brent 
+import cbr_fx
 
-    @classmethod
-    def get_default_args(self):
-        return dict(freq=self.freqs[0])
 
-class RosstatKEP(object):
+def accept_frequency(letter, allowed_freqs):
+    if all([letter.isalpha(),
+            len(letter) == 1,
+            letter in allowed_freqs]):
+        return letter  
+    else:
+        raise ValueError(letter)
+
+
+class RosstatKEP_Base(object):
     """Parse sections of Rosstat 'KEP' publication"""
-    freqs = 'aqm'    
+    # must override frequencies
+    freq = '_'    
     observation_start_date = DateHelper.make_date('1999-01-31')
     source_url = ("http://www.gks.ru/wps/wcm/connect/" 
                   "rosstat_main/rosstat/ru/statistics/" 
@@ -27,20 +37,12 @@ class RosstatKEP(object):
     # or always retrun all variables?
     all_varnames = ['CPI_rog', 'RUR_EUR_eop']
 
-    def _accept_frequency(self, letter):
-        if all([letter.isalpha(),
-                len(letter) == 1,
-                letter in self.freqs]):
-            return letter  
-        else:
-            raise ValueError(letter)
-
-    def __init__(self, freq, start=None):        
+    def __init__(self, start=None):        
         if start is None:
             self.start = self.observation_start_date
         else:    
             self.start = DateHelper.make_date(start) 
-        self.freq=self._accept_frequency(freq)    
+   
 
     def sample(self):
         """Yield dictionaries with datapoints"""
@@ -68,21 +70,27 @@ class RosstatKEP(object):
             "value": 79.7}
         # end -----------------
 
-    #TODO: put actual data 
+    #TODO-2: put actual data 
     
     def yield_dicts(self):
         return self.sample()
 
-#class RosstatKEP_Monthly(RosstatKEP):
 
-    #def __init__(self, freq, start=None):        
+class RosstatKEP_Monthly(RosstatKEP_Base):
+    freq = 'm'        
         
 
+class RosstatKEP_Quarterly(RosstatKEP_Base):
+    freq = 'q'        
+
+
+class RosstatKEP_Annual(RosstatKEP_Base):    
+    freq = 'a'
     
 
-class CBR_USD(Parser):
+class CBR_USD(object):
     """Retrieve Bank of Russia official USD to RUB exchange rate"""
-    freqs = 'd'    
+    freq = 'd'    
     observation_start_date = DateHelper.make_date('1991-07-01')
     source_url = "http://www.cbr.ru/scripts/Root.asp?PrtId=SXML"
     all_varnames = ['USDRUR_CB']
@@ -111,7 +119,7 @@ class CBR_USD(Parser):
 
 class BrentEIA():
     """Retrieve Brent oil price from US EIA"""
-    freqs = 'd'
+    freq = 'd'
     observation_start_date =  DateHelper.make_date('1987-05-15')
     source_url = "https://www.eia.gov/opendata/qb.php?category=241335"
     all_varnames = ['BRENT']
@@ -140,7 +148,12 @@ class BrentEIA():
 
 class Collection:
     
-    parsers = [RosstatKEP, CBR_USD, BrentEIA]
+    parsers = [RosstatKEP_Monthly, 
+               RosstatKEP_Quarterly, 
+               RosstatKEP_Annual,
+               CBR_USD, 
+               BrentEIA
+               ]
 
     def get_sample():
         dataset_sample = []
@@ -149,6 +162,10 @@ class Collection:
             gen = list(parser.sample())
             dataset_sample.extend(gen)
         return dataset_sample
+    
+    def yield_full_dataset():
+        gen_list = [p().yield_dicts() for p in Collection.parsers]
+        return itertools.chain.from_iterable(gen_list)
        
     
 if __name__ == "__main__":
@@ -156,8 +173,6 @@ if __name__ == "__main__":
     print('Sample dataset:')
     pprint(Collection.get_sample()) 
     
-    # TODO: must put into database
-    gen1 = RosstatKEP('m').yield_dicts()
-
-    
+    # TODO-3: must put this generator into database
+    gen = Collection.yield_full_dataset()    
     
