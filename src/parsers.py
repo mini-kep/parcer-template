@@ -147,6 +147,7 @@ class BrentEIA():
       
 
 class Collection:
+    """Operations related to aggreted reult of all parsers."""
     
     parsers = [RosstatKEP_Monthly, 
                RosstatKEP_Quarterly, 
