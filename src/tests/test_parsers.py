@@ -1,9 +1,4 @@
-#import arrow
-#import datetime
-#
-#import pytest
-#
-#from numbers import Number
+import pytest
 
 import datetime
 
@@ -26,6 +21,7 @@ def test_parser_class_atributes():
         assert len(cls.freq) == 1
         assert isinstance(cls.observation_start_date, datetime.date)
         assert isinstance(cls.source_url, str)
+        assert cls.source_url.startswith('http')
         assert isinstance (cls.all_varnames, list)
         assert isinstance (cls.all_varnames[0], str)
 
@@ -40,10 +36,51 @@ def test_parser_instance_created_without_date():
 def test_parser_instance_created_with_date():
     for cls in PARSER_CLASSES:
         assert cls('2017-09-15')        
+  
+      
+def validate_datapoint(datapoint):
+    # Suggestions: 
+    #1. timestamp is recent 
+    #2. number of fields is expected 
+    #3. fields have correct type (value is float and timestamp is valid etc) 
+    #4. names are correct. 
+    #5. lists are non-empty or exception
+
+    # dict has 4 elements
+    assert isinstance(datapoint, dict)
+    assert len(datapoint) == 4    
+    # date
+    assert isinstance(datapoint['date'], str)
+    # frequency
+    freq = datapoint['freq']
+    assert isinstance(datapoint['freq'], str)
+    assert freq in "aqmwd"
+    # name
+    assert isinstance(datapoint['name'], str)
+    # value
+    assert isinstance(datapoint['value'], float)
+
         
+# .sample() method returns stream of dicts
+def test_sample_method_returns_stream_of_dicts():
+    for cls in PARSER_CLASSES:
+        for datapoint in cls().sample():
+            validate_datapoint(datapoint)           
+
+def test_CBR_USD_will_not_work_before_1992():
+    gen=CBR_USD('1992-01-01').yield_dicts()
+    next(gen)    
+
+def test_yield_dicts_method_is_callable():
+    for cls in PARSER_CLASSES:
+        print(cls)
+        gen = cls().yield_dicts()
+        a = next(gen)
+        validate_datapoint(a)  
+      
         
-#
-#
+#TODO: use parts of code belwo if needed for validate_datapoint()         
+            
 #class Base_Test_Parser:
 #    
 #    def setup_method(self):
@@ -92,6 +129,11 @@ def test_parser_instance_created_with_date():
 #    #def test_get_data_produces_values_in_valid_range(self, items, min, max):
 #    #    for item in items:
 #    #        assert min < item['value'] < max
+
+# ------------------------   end of datapoitn validation    
+
+
+
 #
 #
 #class TestRosstatKep(Base_Test_Parser):

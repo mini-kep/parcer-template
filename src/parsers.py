@@ -82,7 +82,7 @@ class RosstatKEP_Annual(RosstatKEP_Base):
 class CBR_USD(object):
     """Retrieve Bank of Russia official USD to RUB exchange rate"""
     freq = 'd'    
-    observation_start_date = DateHelper.make_date('1991-07-01')
+    observation_start_date = DateHelper.make_date('1992-01-01') #'1991-07-01'
     source_url = "http://www.cbr.ru/scripts/Root.asp?PrtId=SXML"
     all_varnames = ['USDRUR_CB']
     

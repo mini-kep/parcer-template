@@ -8,11 +8,11 @@ from helpers import DateHelper
 
 
 def make_url(start_date, end_date):
-    fmt = '%d/%m/%Y'
-    start, end = (x.strftime(fmt) for x in [start_date, end_date])
+    start, end = (x.strftime('%d/%m/%Y') for x in [start_date, end_date])
     return ("http://www.cbr.ru/scripts/XML_dynamic.asp"
             f"?date_req1={start}"
-            f"&date_req2={end}&VAL_NM_RQ=R01235")
+            f"&date_req2={end}"
+             "&VAL_NM_RQ=R01235")
 
 
 def to_float(string):
@@ -42,17 +42,24 @@ def xml_text_to_stream(xml_text):
                "freq": "d",
                "name": "USDRUR_CB",
                "value": value}  
+
+def get_xml(url):
+    xml_text = requests.get(url).text
+    if 'Error in parameters' in xml_text:
+        raise Exception(f'Error in parameters: {url}')
+    else:
+        return xml_text
             
 def get_cbr_er(start_str, end_str):
     url= make_url(start_str, end_str)
-    xml_text = requests.get(url).text
+    xml_text = get_xml(url)
     return map(transform, xml_text_to_stream(xml_text))
     
             
 if __name__ == "__main__":
-    s = date(1992,7,1)
-    e = date(1992,7,1)
+    s = date(1991, 7, 1)
+    e = date(2017, 9, 26)
     gen = get_cbr_er(s, e)    
-    a = next(gen)
+    # a = next(gen)
     assert a == {'date': '1992-07-01', 'freq': 'd', 
                  'name': 'USDRUR_CB', 'value': 0.1253}
