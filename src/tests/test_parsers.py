@@ -8,35 +8,33 @@ from parsers import (RosstatKEP_Monthly,
                      CBR_USD, 
                      BrentEIA)
 
-PARSER_CLASSES = (RosstatKEP_Monthly, 
+PARSER_CLASSES = [RosstatKEP_Monthly, 
                   RosstatKEP_Quarterly, 
                   RosstatKEP_Annual,
                   CBR_USD, 
-                  BrentEIA)
+                  BrentEIA]
 
 # attributes
-# can be parametrized
-def test_parser_class_atributes():
+@pytest.mark.parametrize("cls", PARSER_CLASSES)
+def test_parser_class_atributes(cls):
     for cls in PARSER_CLASSES:
         assert cls.freq.isalpha()
         assert len(cls.freq) == 1
         assert isinstance(cls.observation_start_date, datetime.date)
         assert isinstance(cls.source_url, str)
         assert cls.source_url.startswith('http')
-        assert isinstance(cls.all_varnames, list)
-        assert isinstance(cls.all_varnames[0], str)
+        assert isinstance (cls.all_varnames, list)
+        assert isinstance (cls.all_varnames[0], str)
 
 
-# usual calls - no date
-def test_parser_instance_created_without_date():
-    for cls in PARSER_CLASSES:
-        assert cls()
+@pytest.mark.parametrize("cls", PARSER_CLASSES)
+def test_parser_instance_created_without_date(cls):
+    assert cls()
         
 
-# usual calls - no date
-def test_parser_instance_created_with_date():
-    for cls in PARSER_CLASSES:
-        assert cls('2017-09-15')        
+@pytest.mark.parametrize("cls", PARSER_CLASSES)
+def test_parser_instance_created_with_date(cls):
+    assert cls('2017-09-15')        
   
       
 def validate_datapoint(datapoint):
