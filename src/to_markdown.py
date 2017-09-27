@@ -1,5 +1,5 @@
 def add_dividers(row):
-    content = " | ".join(row) 
+    content = " | ".join(row)
     return "| {} |".format(content)
 
     
@@ -23,7 +23,7 @@ def to_markdown(table):
     table = [add_dividers(row) for row in table]    
     return '\n'.join(table)
 
-
+# there are no test for short_link
 def short_link(url, n=40):
     """Shorten *url* to *n* characters."""
     if len(url) > n:
@@ -35,6 +35,7 @@ def short_link(url, n=40):
 
 def interpret_frequencies(freqs):
     """Make a text description of frequencies based on *freqs* string."""
+    # mapper can be put to file constants.py, and here src/tests/test_parsers.py:58 your can use MAPPER.keys()
     mapper = dict(a='annual',
                   q='quarterly',
                   m='monthly',

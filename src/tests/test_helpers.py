@@ -47,7 +47,7 @@ class Test_make_date:
         
     def test_on_invalid_format(self):
         with pytest.raises(Exception):
-            assert DateHelper.make_date('25-03-2000','%dk%m-%Y') 
+            assert DateHelper.make_date('25-03-2000', '%dk%m-%Y')
             
             
 class Test_as_string():   

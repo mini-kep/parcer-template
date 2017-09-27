@@ -8,16 +8,16 @@ class DateHelper(object):
     
     def make_date(dt_string: str, fmt=None):
         if fmt is None:
-            return arrow.get(dt_string).date() 
-        else:
-            try:
-                return datetime.strptime(dt_string, fmt).date()
-            except ValueError:
-                msg = f"Error parsing date <{dt_string}> with format <{fmt}>"
-                raise ValueError(msg)                 
+            return arrow.get(dt_string).date()
+        # witout else will work correctly
+        try:
+            return datetime.strptime(dt_string, fmt).date()
+        except ValueError:
+            msg = f"Error parsing date <{dt_string}> with format <{fmt}>"
+            raise ValueError(msg)
        
     def as_string(date):   
         try:
            return date.strftime("%Y-%m-%d")
         except AttributeError:
-            raise TypeError(f"<{date}> must be datetime.date or similar type")           
+            raise TypeError(f"<{date}> must be datetime.date or similar type")

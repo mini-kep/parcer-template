@@ -15,6 +15,7 @@ PARSER_CLASSES = (RosstatKEP_Monthly,
                   BrentEIA)
 
 # attributes
+# can be parametrized
 def test_parser_class_atributes():
     for cls in PARSER_CLASSES:
         assert cls.freq.isalpha()
@@ -22,8 +23,8 @@ def test_parser_class_atributes():
         assert isinstance(cls.observation_start_date, datetime.date)
         assert isinstance(cls.source_url, str)
         assert cls.source_url.startswith('http')
-        assert isinstance (cls.all_varnames, list)
-        assert isinstance (cls.all_varnames[0], str)
+        assert isinstance(cls.all_varnames, list)
+        assert isinstance(cls.all_varnames[0], str)
 
 
 # usual calls - no date
@@ -236,4 +237,3 @@ def test_yield_dicts_method_is_callable():
 #
 if __name__ == '__main__':
     pytest.main([__file__])
-    

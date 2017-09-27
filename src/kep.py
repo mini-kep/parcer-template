@@ -45,9 +45,7 @@ def is_valid(d):
 
 def yield_dicts(freq):
     return filter(is_valid, yield_all_dicts(freq)) 
-    
 
-    
     
 if "__main__" == __name__:    
     a = next(yield_dicts('a'))    
