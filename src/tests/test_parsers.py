@@ -73,7 +73,6 @@ def test_CBR_USD_will_not_work_before_1992():
 
 def test_yield_dicts_method_is_callable():
     for cls in PARSER_CLASSES:
-        print(cls)
         gen = cls().yield_dicts()
         a = next(gen)
         validate_datapoint(a)  
