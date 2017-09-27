@@ -11,13 +11,6 @@ class Parser:
             self.start = DateHelper.make_date(start) 
         self.end =  DateHelper.today()
         
-    def _accept_frequency(self, letter):
-        if all([letter.isalpha(),
-                len(letter) == 1,
-                letter in self.freqs]):
-            return letter  
-        else:
-            raise ValueError(letter)
 
     @classmethod
     def get_default_args(self):
@@ -34,12 +27,20 @@ class RosstatKEP(object):
     # or always retrun all variables?
     all_varnames = ['CPI_rog', 'RUR_EUR_eop']
 
-    def __init__(self, freq=None, start=None):        
+    def _accept_frequency(self, letter):
+        if all([letter.isalpha(),
+                len(letter) == 1,
+                letter in self.freqs]):
+            return letter  
+        else:
+            raise ValueError(letter)
+
+    def __init__(self, freq, start=None):        
         if start is None:
             self.start = self.observation_start_date
         else:    
             self.start = DateHelper.make_date(start) 
-        self.freq=freq    
+        self.freq=self._accept_frequency(freq)    
 
     def sample(self):
         """Yield dictionaries with datapoints"""
@@ -66,7 +67,18 @@ class RosstatKEP(object):
             "name": "RUR_EUR_eop",
             "value": 79.7}
         # end -----------------
- 
+
+    #TODO: put actual data 
+    
+    def yield_dicts(self):
+        return self.sample()
+
+#class RosstatKEP_Monthly(RosstatKEP):
+
+    #def __init__(self, freq, start=None):        
+        
+
+    
 
 class CBR_USD(Parser):
     """Retrieve Bank of Russia official USD to RUB exchange rate"""
@@ -142,7 +154,10 @@ class Collection:
 if __name__ == "__main__":
     from pprint import pprint
     print('Sample dataset:')
-    pprint(Collection.get_sample())    
+    pprint(Collection.get_sample()) 
+    
+    # TODO: must put into database
+    gen1 = RosstatKEP('m').yield_dicts()
 
     
     
