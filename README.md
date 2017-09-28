@@ -1,9 +1,10 @@
 [![Build Status](https://travis-ci.org/mini-kep/parsers.svg?branch=master)](https://travis-ci.org/mini-kep/parsers)
 [![Coverage badge](https://codecov.io/gh/mini-kep/parsers/branch/master/graphs/badge.svg)](https://codecov.io/gh/mini-kep/parsers)
 
-```parsers``` get you data from sources, you can use ```runner.py``` as entry point. 
 
-Aggregated dataset can be obtained using code below. The datapoints are from start of observation. 
+```parsers``` give you access to data sources,  use ```runner.py``` as entry point. 
+
+Full dataset obtained using code below. The datapoints are from start of dataset. 
 
 ```python 
 from runner import Dataset
@@ -12,7 +13,8 @@ gen = Dataset.yield_dicts()
 
 ```
 
-Individual parsers can return datapoints from a specific date to present: 
+Querying full dataset each time we want up update is a burden on the original API sources. 
+Thus, individual parsers can return datapoints from a specific date to present: 
 
 ```python
 from runner import CBR_USD
@@ -20,7 +22,7 @@ from runner import CBR_USD
 gen = CBR_USD(start='2017-09-01').yield_dicts()
 ```
 
-Each generator  yields dictionaries like 
+Generator in ```.yield_dicts()``` method produces dictionaries like this: 
 
 ```python 
 {'date': '2017-09-13', 
