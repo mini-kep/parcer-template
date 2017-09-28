@@ -34,7 +34,7 @@ def yield_all_dicts(freq):
     for dt in d.keys():
         for name, value in d[dt].items():
             yield {'date': dt.strftime("%Y-%m-%d"),
-                   'freq': 'd',
+                   'freq': freq,
                    'name': name,
                    'value': round(value,4)}
 

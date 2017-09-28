@@ -169,3 +169,8 @@ if __name__ == "__main__":
 
     # TODO: must put this generator into database
     gen = Dataset.yield_dicts()
+    
+    #import json
+    #with open('dataset.json', 'w') as f:
+    #    json.dump(list(gen), f)
+    
