@@ -75,7 +75,7 @@ def test_parser_instance_created_with_date(cls):
     
 
 @pytest.mark.parametrize("cls", PARSER_CLASSES)
-def test_parser_instance_has_callable method(cls):
+def test_parser_instance_has_callable_repr_method(cls):
     assert isinstance(cls().__repr__(), str)
     
 
