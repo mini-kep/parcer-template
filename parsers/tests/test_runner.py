@@ -110,6 +110,10 @@ def validate_datapoint(datapoint):
     assert isinstance(datapoint['name'], str)
     # value
     assert isinstance(datapoint['value'], Decimal)
+    # precision
+    decimal_str = str(datapoint['value']).rstrip('0')
+    float_str = str(round(float(datapoint['value']),4))
+    assert(decimal_str == float_str)
 
 
 def test_CBR_USD_will_not_work_before_1992():
