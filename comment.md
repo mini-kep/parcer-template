@@ -34,17 +34,8 @@ Produces output in <https://github.com/mini-kep/parser-rosstat-kep/tree/master/d
 result: <https://raw.githubusercontent.com/epogrebnyak/ust/master/ust.csv> (1.1 Mb)
 
 #### API parcer: Brent (EIA)
-<https://github.com/epogrebnyak/data-fx-oil/blob/master/eia.py>
+<https://github.com/epogrebnyak/data-fx-oil/blob/master/brent.py>
 result: <https://github.com/epogrebnyak/data-fx-oil/blob/master/brent_daily.txt>
 
 
-Template components
-===================
-
-- [ ] reuse common code in parsers (downlood)
-- [ ] folder structure 
-- [ ] query interface 
-- [ ] parser controller 
-- [ ] json output format 
-- [ ] feature checklist
 
