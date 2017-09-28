@@ -33,6 +33,9 @@ def parse_response(text):
     return json_data["series"][0]["data"]
 
 
+# must test below with injecting a mock *download_func* function 
+
+
 def yield_brent_dicts(download_func=fetch):
     """Yeilds data from url as dicts."""
     url = make_url()

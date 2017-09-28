@@ -1,17 +1,16 @@
-"""Parser classes to get datapoints for the database."""
+"""Parser interfaces."""
 
 import itertools
 
 from helpers import DateHelper, Markdown, interpret_frequency
 
-# individual parser modules
+# individual parser functions
 import getter.brent as brent
 import getter.cbr_fx as cbr_fx
 import getter.kep as kep
 
 
 class ParserBase:
-
     def __repr__(self):
         start = DateHelper.as_string(self.start)
         return f'{self.__class__.__name__}(\'{start}\')'
@@ -21,23 +20,23 @@ class ParserBase:
         url_str = Markdown.short_link(cls.source_url)
         freq_str = interpret_frequency(cls.freq)
         varname_str = ", ".join(cls.all_varnames)
+        
         rows = [("Parser", cls.__name__),
                 ("Description", cls.__doc__ or ''),
-                ("URL", url_str or ''),
+                ("URL", url_str or ''),                
                 ("Frequency", freq_str),
-                ("Variables", varname_str or '')]
+                ("Variables", varname_str or ''),
+                ("Code", url_str or '')]
         return Markdown.table(rows)
 
 
 class RosstatKEP_Base(ParserBase):
     """Sections of Rosstat Short-term economic indicators ('KEP') publication."""
-
-    freq = '_'
     observation_start_date = DateHelper.make_date('1999-01-31')
     source_url = ("http://www.gks.ru/wps/wcm/connect/"
                   "rosstat_main/rosstat/ru/statistics/"
                   "publications/catalog/doc_1140080765391")
-    all_varnames = ['CPI', 'GDP', 'etc']
+    all_varnames = ['CPI', 'GDP', 'etc']    
 
     def __init__(self, start=None):
         if start is None:
@@ -46,10 +45,10 @@ class RosstatKEP_Base(ParserBase):
             self.start = DateHelper.make_date(start)
 
     def sample(self):
-        yield {"date": "2015-11-30", "freq": self.freq, "name": "CPI_rog", "value": 100.8}
-        yield {"date": "2015-11-30", "freq": self.freq, "name": "RUR_EUR_eop", "value": 70.39}
-        yield {"date": "2015-12-31", "freq": self.freq, "name": "CPI_rog", "value": 100.8}
-        yield {"date": "2015-12-31", "freq": self.freq, "name": "RUR_EUR_eop", "value": 79.7}
+        yield {"date": "2015-11-30", "freq": '_', "name": "CPI_rog", "value": 100.8}
+        yield {"date": "2015-11-30", "freq": '_', "name": "RUR_EUR_eop", "value": 70.39}
+        yield {"date": "2015-12-31", "freq": '_', "name": "CPI_rog", "value": 100.8}
+        yield {"date": "2015-12-31", "freq": '_', "name": "RUR_EUR_eop", "value": 79.7}
 
     def yield_dicts(self):
         return kep.yield_dicts(self.freq)

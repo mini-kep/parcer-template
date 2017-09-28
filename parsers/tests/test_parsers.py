@@ -31,13 +31,15 @@ def mock_parser():
 class Test_Formatter:
 
     def test_as_markdown_returns_string_on_short_URL(self, mock_parser):
-        expected = ('| Parser | ParserBase |\n'
-                    '| ------ | ---------- |\n'
-                    '| Description | Short text |\n'
-                    '| URL | [http://some.url](http://some.url) |\n'
-                    '| Frequency | Annual |\n'
-                    '| Variables | VAR1, VAR2 |')
-        assert mock_parser.as_markdown() == expected
+        result = mock_parser.as_markdown() 
+        expected = ['| Parser | ParserBase |\n',
+                    '| ------ | ---------- |\n',
+                    '| Description | Short text |\n',
+                    '| URL | [http://some.url](http://some.url) |\n',
+                    '| Frequency | Annual |\n',
+                    '| Variables | VAR1, VAR2 |']
+        for line in expected:
+            assert line in result
 
     def test_as_markdown_valid_input_long_link(self, mock_parser):
         mock_parser.source_url = ("http://www.gks.ru/wps/wcm/connect/"
