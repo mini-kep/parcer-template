@@ -4,8 +4,7 @@ import json
 from datetime import datetime
 import requests
 from decimal import Decimal
-
-from config import EIA_ACCESS_KEY
+from parsers.config import EIA_ACCESS_KEY
 
 
 def format_string(date_string):
