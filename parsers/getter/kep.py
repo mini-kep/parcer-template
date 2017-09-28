@@ -43,7 +43,7 @@ def yield_all_dicts(freq):
 def is_valid(d):
     negative_conditions = []
     negative_conditions.append(d['name'] in ['year', 'qtr', 'month'])
-    # negative_conditions.append(np.isnan(d['value']))
+    negative_conditions.append(np.isnan(float(d['value'])))
     return not any(negative_conditions)
 
 
