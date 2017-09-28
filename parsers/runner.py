@@ -155,9 +155,6 @@ class Dataset:
 
 
 if __name__ == "__main__":
-    # to tests:
-    assert CBR_USD().__repr__() == "CBR_USD('1992-01-01')"
-
     from pprint import pprint
     print('Sample dataset:')
     pprint(Dataset.get_sample())
@@ -165,11 +162,10 @@ if __name__ == "__main__":
     print('\nMarkdown descriptions:')
     print(Dataset.as_markdown())
 
-    #fx = list(CBR_USD('2017-09-01').yield_dicts())
-    #kep_m = list(RosstatKEP_Monthly('2017-06').yield_dicts())
-    #oil = list(BrentEIA('2017-09-01').yield_dicts())
+    fx = CBR_USD('2017-09-01').yield_dicts()
+    oil = BrentEIA('2017-09-01').yield_dicts()
+    # TODO: round/beautify 349.89999999999998
+    kep_m = RosstatKEP_Monthly('2017-06').yield_dicts()
 
     # TODO: must put this generator into database
-    #gen = Dataset.yield_full_dataset()
-
-    # TODO: round/beautify 349.89999999999998
+    gen = Dataset.yield_dicts()
