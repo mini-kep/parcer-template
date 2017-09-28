@@ -3,6 +3,7 @@
 import json
 from datetime import datetime
 import requests
+from decimal import Decimal
 
 from config import EIA_ACCESS_KEY
 
@@ -42,7 +43,7 @@ def yield_brent_dicts(download_func=fetch):
     text = download_func(url)
     for row in parse_response(text):
         date = format_string(row[0])
-        price = float(row[1])
+        price = round(Decimal(float(row[1])),4)
         yield {"date": date,
                "freq": "d",
                "name": "BRENT",
