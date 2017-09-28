@@ -3,12 +3,12 @@
 
 ```parsers``` get you data from sources, you can use ```runner.py``` as entry point. 
 
-Aggregated dataset can be obtained using code below. It provides datapoints from the start of observation in each dataset. 
+Aggregated dataset can be obtained using code below. The datapoints are from start of observation. 
 
 ```python 
 from runner import Dataset
 
-gen = Dataset.yield_full_dataset()
+gen = Dataset.yield_dicts()
 
 ```
 
