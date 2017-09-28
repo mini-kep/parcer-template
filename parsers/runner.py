@@ -145,7 +145,7 @@ class Dataset:
             dataset_sample.extend(gen)
         return dataset_sample
 
-    def yield_full_dataset():
+    def yield_dicts():
         gen_list = [p().yield_dicts() for p in Dataset.parsers]
         return itertools.chain.from_iterable(gen_list)
 
