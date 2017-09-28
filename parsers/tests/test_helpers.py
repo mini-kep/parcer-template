@@ -3,7 +3,7 @@ import datetime
 import pytest
 
 from helpers import DateHelper
-from helpers import Markdown 
+from helpers import Markdown
 
 
 class Test_today:
@@ -63,17 +63,18 @@ class Test_as_string():
         with pytest.raises(TypeError):
             assert DateHelper.as_string('2000-01-15')
 
+
 class Test_Markdown:
-    
+
     def test_add_dividers(self):
-        assert Markdown.add_dividers(['Branch', 'Commit']) == '| Branch | Commit |'
+        assert Markdown.add_dividers(
+            ['Branch', 'Commit']) == '| Branch | Commit |'
         # WONTFIX:
         # assert add_dividers([1, 2]) == ?
         # assert add_dividers([None]) == ?
         # assert add_dividers(['Branch', None]) == ?
         # also it can be parametrized with this different data
-    
-    
+
     def test_table(self):
         table1 = [
             ['Branch', 'Commit'],
@@ -85,7 +86,7 @@ class Test_Markdown:
         assert 'Branch' in md
         assert 'fedcba9876543210' in md
         assert md == '| Branch | Commit |\n| ------ | ------ |\n| master | 0123456789abcdef |\n| staging | fedcba9876543210 |'
-                
+
         # WONTFIX:
         # also what will happen if table1 will have not expected data. ex:
         # to_markdown(None)
@@ -95,7 +96,9 @@ class Test_Markdown:
                "rosstat_main/rosstat/ru/statistics/"
                "publications/catalog/"
                "doc_1140080765391")
-        assert Markdown.short_link(url) == '[http://www.gks.ru/wps/wcm/connect/rossta...](http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391)'
-     
+        assert Markdown.short_link(
+            url) == '[http://www.gks.ru/wps/wcm/connect/rossta...](http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391)'
+
+
 if __name__ == '__main__':
     pytest.main([__file__])

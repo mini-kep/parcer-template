@@ -7,12 +7,14 @@ import xml.etree.ElementTree as ET
 from helpers import DateHelper
 
 # R01235 is USD code
+
+
 def make_url(start_date, end_date):
     start, end = (x.strftime('%d/%m/%Y') for x in [start_date, end_date])
     return ("http://www.cbr.ru/scripts/XML_dynamic.asp"
             f"?date_req1={start}"
             f"&date_req2={end}"
-             "&VAL_NM_RQ=R01235")
+            "&VAL_NM_RQ=R01235")
 
 
 def to_float(string):
@@ -63,5 +65,5 @@ if __name__ == "__main__":
     e = date(2017, 9, 26)
     # gen = get_cbr_er(s, e)
     # a = next(gen)
-    #assert a == {'date': '1992-07-01', 'freq': 'd',
+    # assert a == {'date': '1992-07-01', 'freq': 'd',
     #             'name': 'USDRUR_CB', 'value': 0.1253}

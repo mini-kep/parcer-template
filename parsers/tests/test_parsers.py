@@ -17,6 +17,7 @@ PARSER_CLASSES = [RosstatKEP_Monthly,
 
 # test md representation
 
+
 @pytest.fixture
 def mock_parser():
     MockParser = ParserBase
@@ -24,7 +25,7 @@ def mock_parser():
     MockParser.freq = 'a'
     MockParser.source_url = 'http://some.url'
     MockParser.all_varnames = ['VAR1', 'VAR2']
-    return MockParser  
+    return MockParser
 
 
 class Test_Formatter:
@@ -40,13 +41,14 @@ class Test_Formatter:
 
     def test_as_markdown_valid_input_long_link(self, mock_parser):
         mock_parser.source_url = ("http://www.gks.ru/wps/wcm/connect/"
-                                 "rosstat_main/rosstat/ru/statistics/"
-                                 "publications/catalog/"
-                                 "doc_1140080765391")
+                                  "rosstat_main/rosstat/ru/statistics/"
+                                  "publications/catalog/"
+                                  "doc_1140080765391")
         expected = 'http://www.gks.ru/wps/wcm/connect/rossta...'
         assert expected in mock_parser.as_markdown()
 
 # class attributes
+
 
 @pytest.mark.parametrize("cls", PARSER_CLASSES)
 def test_parser_class_atributes(cls):
@@ -69,14 +71,16 @@ def test_parser_instance_created_without_date(cls):
 def test_parser_instance_created_with_date(cls):
     assert cls('2017-09-15')
 
+
 @pytest.mark.parametrize("cls", PARSER_CLASSES)
 def test_yield_dicts_method_is_callable(cls):
     gen = cls().yield_dicts()
     a = next(gen)
     validate_datapoint(a)
 
+
 @pytest.mark.parametrize("cls", [datapoint for cls in PARSER_CLASSES
-                                           for datapoint in cls().sample()])
+                                 for datapoint in cls().sample()])
 def validate_datapoint(datapoint):
     # Suggestions:
     # 1. timestamp is recent
@@ -104,7 +108,6 @@ def test_CBR_USD_will_not_work_before_1992():
     with pytest.raises(Exception):
         gen = CBR_USD('1991-07-15').yield_dicts()
         next(gen)
-
 
 
 # TODO: use parts of code belwo if needed for validate_datapoint()
