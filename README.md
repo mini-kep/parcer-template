@@ -1,12 +1,14 @@
 [![Build Status](https://travis-ci.org/mini-kep/parsers.svg?branch=master)](https://travis-ci.org/mini-kep/parsers)
 [![Coverage badge](https://codecov.io/gh/mini-kep/parsers/branch/master/graphs/badge.svg)](https://codecov.io/gh/mini-kep/parsers)
 
-```parser/runner.py``` has parser classes to get data from sources. Aggregated dataset can be obtained using code below. It provides datapoints from the start of observation in each dataset. 
+```parsers``` get you data from sources, you can use ```runner.py``` as entry point. 
+
+Aggregated dataset can be obtained using code below. The datapoints are from start of observation. 
 
 ```python 
 from runner import Dataset
 
-gen = Dataset.yield_full_dataset()
+gen = Dataset.yield_dicts()
 
 ```
 
@@ -16,6 +18,15 @@ Individual parsers can return datapoints from a specific date to present:
 from runner import CBR_USD
 
 gen = CBR_USD(start='2017-09-01').yield_dicts()
+```
+
+Each generator  yields dictionaries like 
+
+```python 
+{'date': '2017-09-13', 
+ 'freq': 'd', 
+ 'name': 'BRENT', 
+ 'value': 55.52}
 ```
 
 # Parser descriptions
@@ -54,3 +65,37 @@ gen = CBR_USD(start='2017-09-01').yield_dicts()
 | URL | [https://www.eia.gov/opendata/qb.php?cate...](https://www.eia.gov/opendata/qb.php?category=241335) |
 | Frequency | Daily |
 | Variables | BRENT |
+
+Parser types
+============
+
+**repo** (*'heavy'*, *'dirty'*) - some parsers are styled to download the data, transform it and provide the output in local folder or URL. These ususally work on bad formats of data, eg Word, and require a lot of work to extract data because the source data is not structured well. 
+
+**serverless** (*'thin'*, *'clean'*, *'API-parcer'*) - some parsers can do the job on query, yield datapoints and die fast and easily because source data is rather clean and fast to get. 
+
+
+Parser list
+===========
+
+At various time following parsers were developed, ```rosstat-kep``` is most advanced one. Original code listings are below.
+
+#### repo: rosstat-kep
+Produces output in <https://github.com/mini-kep/parser-rosstat-kep/tree/master/data/processed/latest>
+
+#### API parcer: cbr-usd (CB)
+<https://github.com/ru-stat/parser-cbr-usd>
+
+#### API parcer: Brent (EIA)
+<https://github.com/epogrebnyak/data-fx-oil/blob/master/brent.py>
+result: <https://github.com/epogrebnyak/data-fx-oil/blob/master/brent_daily.txt>
+
+To add
+======
+
+#### API parcer: yield curve (Treausry)
+<https://github.com/epogrebnyak/ust>
+result: <https://raw.githubusercontent.com/epogrebnyak/ust/master/ust.csv> (1.1 Mb)
+
+#### repo: rosstat-806-regional
+<https://github.com/epogrebnyak/data-rosstat-806-regional>
+
