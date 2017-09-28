@@ -31,7 +31,7 @@ def mock_parser():
 class Test_Formatter:
 
     def test_as_markdown_returns_string_on_short_URL(self, mock_parser):
-        result = mock_parser.as_markdown() 
+        result = mock_parser.as_markdown()
         expected = ['| Parser | ParserBase |\n',
                     '| ------ | ---------- |\n',
                     '| Description | Short text |\n',
@@ -72,12 +72,11 @@ def test_parser_instance_created_without_date(cls):
 @pytest.mark.parametrize("cls", PARSER_CLASSES)
 def test_parser_instance_created_with_date(cls):
     assert cls('2017-09-15')
-    
+
 
 @pytest.mark.parametrize("cls", PARSER_CLASSES)
 def test_parser_instance_has_callable_repr_method(cls):
     assert isinstance(cls().__repr__(), str)
-    
 
 
 @pytest.mark.parametrize("cls", PARSER_CLASSES)
@@ -112,7 +111,7 @@ def validate_datapoint(datapoint):
     assert isinstance(datapoint['value'], Decimal)
     # precision
     decimal_str = str(datapoint['value']).rstrip('0')
-    float_str = str(round(float(datapoint['value']),4))
+    float_str = str(round(float(datapoint['value']), 4))
     assert(decimal_str == float_str)
 
 

@@ -37,7 +37,7 @@ def yield_all_dicts(freq):
             yield {'date': dt.strftime("%Y-%m-%d"),
                    'freq': freq,
                    'name': name,
-                   'value': round(Decimal(value),4)}
+                   'value': round(Decimal(value), 4)}
 
 
 def is_valid(d):

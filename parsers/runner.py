@@ -21,10 +21,10 @@ class ParserBase:
         url_str = Markdown.short_link(cls.source_url)
         freq_str = interpret_frequency(cls.freq)
         varname_str = ", ".join(cls.all_varnames)
-        
+
         rows = [("Parser", cls.__name__),
                 ("Description", cls.__doc__ or ''),
-                ("URL", url_str or ''),                
+                ("URL", url_str or ''),
                 ("Frequency", freq_str),
                 ("Variables", varname_str or ''),
                 ("Code", url_str or '')]
@@ -37,7 +37,7 @@ class RosstatKEP_Base(ParserBase):
     source_url = ("http://www.gks.ru/wps/wcm/connect/"
                   "rosstat_main/rosstat/ru/statistics/"
                   "publications/catalog/doc_1140080765391")
-    all_varnames = ['CPI', 'GDP', 'etc']    
+    all_varnames = ['CPI', 'GDP', 'etc']
 
     def __init__(self, start=None):
         if start is None:
@@ -160,8 +160,7 @@ class Dataset:
             return d
         gen = map(to_float, Dataset.yield_dicts())
         with open(filename, 'w') as f:
-            json.dump(list(gen), f)       
-
+            json.dump(list(gen), f)
 
 
 if __name__ == "__main__":
@@ -174,13 +173,9 @@ if __name__ == "__main__":
 
     fx = CBR_USD('2017-09-01').yield_dicts()
     oil = BrentEIA('2017-09-01').yield_dicts()
-    # TODO: round/beautify 349.89999999999998
     kep_m = RosstatKEP_Monthly('2017-06').yield_dicts()
 
     # TODO: must put this generator into database
     gen = Dataset.yield_dicts()
-    
-    Dataset.serialize()
-    
 
-    
+    # Dataset.serialize()

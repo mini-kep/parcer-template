@@ -40,7 +40,7 @@ def xml_text_to_stream(xml_text):
     root = ET.fromstring(xml_text)
     for child in root:
         date = DateHelper.make_date(child.attrib['Date'], fmt="%d.%m.%Y")
-        value = round(Decimal(to_float(child[1].text)),4)
+        value = round(Decimal(to_float(child[1].text)), 4)
         yield {"date": DateHelper.as_string(date),
                "freq": "d",
                "name": "USDRUR_CB",
