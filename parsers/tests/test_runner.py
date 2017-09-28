@@ -1,6 +1,6 @@
 import pytest
-
 import datetime
+from decimal import *
 
 from runner import (ParserBase,
                     RosstatKEP_Monthly,
@@ -109,7 +109,7 @@ def validate_datapoint(datapoint):
     # name
     assert isinstance(datapoint['name'], str)
     # value
-    assert isinstance(datapoint['value'], float)
+    assert isinstance(datapoint['value'], Decimal)
 
 
 def test_CBR_USD_will_not_work_before_1992():
