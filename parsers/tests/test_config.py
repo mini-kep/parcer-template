@@ -1,7 +1,5 @@
 import pytest
-
 import config
-import getter.brent
 
 
 def test_config():

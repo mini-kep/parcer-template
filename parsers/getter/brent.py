@@ -4,7 +4,6 @@ import json
 from datetime import datetime
 import requests
 from decimal import Decimal
-
 from config import EIA_ACCESS_KEY
 
 
