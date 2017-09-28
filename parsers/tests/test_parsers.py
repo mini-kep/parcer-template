@@ -2,19 +2,52 @@ import pytest
 
 import datetime
 
-from parsers import (RosstatKEP_Monthly, 
-                     RosstatKEP_Quarterly, 
-                     RosstatKEP_Annual,
-                     CBR_USD, 
-                     BrentEIA)
+from runner import (ParserBase,
+                    RosstatKEP_Monthly,
+                    RosstatKEP_Quarterly,
+                    RosstatKEP_Annual,
+                    CBR_USD,
+                    BrentEIA)
 
-PARSER_CLASSES = [RosstatKEP_Monthly, 
-                  RosstatKEP_Quarterly, 
+PARSER_CLASSES = [RosstatKEP_Monthly,
+                  RosstatKEP_Quarterly,
                   RosstatKEP_Annual,
-                  CBR_USD, 
+                  CBR_USD,
                   BrentEIA]
 
-# attributes
+# test md representation
+
+@pytest.fixture
+def mock_parser():
+    MockParser = ParserBase
+    MockParser.__doc__ = 'Short text'
+    MockParser.freq = 'a'
+    MockParser.source_url = 'http://some.url'
+    MockParser.all_varnames = ['VAR1', 'VAR2']
+    return MockParser  
+
+
+class Test_Formatter:
+
+    def test_as_markdown_returns_string_on_short_URL(self, mock_parser):
+        expected = ('| Parser | ParserBase |\n'
+                    '| ------ | ---------- |\n'
+                    '| Description | Short text |\n'
+                    '| URL | [http://some.url](http://some.url) |\n'
+                    '| Frequency | Annual |\n'
+                    '| Variables | VAR1, VAR2 |')
+        assert mock_parser.as_markdown() == expected
+
+    def test_as_markdown_valid_input_long_link(self, mock_parser):
+        mock_parser.source_url = ("http://www.gks.ru/wps/wcm/connect/"
+                                 "rosstat_main/rosstat/ru/statistics/"
+                                 "publications/catalog/"
+                                 "doc_1140080765391")
+        expected = 'http://www.gks.ru/wps/wcm/connect/rossta...'
+        assert expected in mock_parser.as_markdown()
+
+# class attributes
+
 @pytest.mark.parametrize("cls", PARSER_CLASSES)
 def test_parser_class_atributes(cls):
     for cls in PARSER_CLASSES:
@@ -23,31 +56,38 @@ def test_parser_class_atributes(cls):
         assert isinstance(cls.observation_start_date, datetime.date)
         assert isinstance(cls.source_url, str)
         assert cls.source_url.startswith('http')
-        assert isinstance (cls.all_varnames, list)
-        assert isinstance (cls.all_varnames[0], str)
+        assert isinstance(cls.all_varnames, list)
+        assert isinstance(cls.all_varnames[0], str)
 
 
 @pytest.mark.parametrize("cls", PARSER_CLASSES)
 def test_parser_instance_created_without_date(cls):
     assert cls()
-        
+
 
 @pytest.mark.parametrize("cls", PARSER_CLASSES)
 def test_parser_instance_created_with_date(cls):
-    assert cls('2017-09-15')        
-  
-      
+    assert cls('2017-09-15')
+
+@pytest.mark.parametrize("cls", PARSER_CLASSES)
+def test_yield_dicts_method_is_callable(cls):
+    gen = cls().yield_dicts()
+    a = next(gen)
+    validate_datapoint(a)
+
+@pytest.mark.parametrize("cls", [datapoint for cls in PARSER_CLASSES
+                                           for datapoint in cls().sample()])
 def validate_datapoint(datapoint):
-    # Suggestions: 
-    #1. timestamp is recent 
-    #2. number of fields is expected 
-    #3. fields have correct type (value is float and timestamp is valid etc) 
-    #4. names are correct. 
-    #5. lists are non-empty or exception
+    # Suggestions:
+    # 1. timestamp is recent
+    # 2. number of fields is expected
+    # 3. fields have correct type (value is float and timestamp is valid etc)
+    # 4. names are correct.
+    # 5. lists are non-empty or exception
 
     # dict has 4 elements
     assert isinstance(datapoint, dict)
-    assert len(datapoint) == 4    
+    assert len(datapoint) == 4
     # date
     assert isinstance(datapoint['date'], str)
     # frequency
@@ -59,28 +99,18 @@ def validate_datapoint(datapoint):
     # value
     assert isinstance(datapoint['value'], float)
 
-        
-# .sample() method returns stream of dicts
-def test_sample_method_returns_stream_of_dicts():
-    for cls in PARSER_CLASSES:
-        for datapoint in cls().sample():
-            validate_datapoint(datapoint)           
 
 def test_CBR_USD_will_not_work_before_1992():
-    gen=CBR_USD('1992-01-01').yield_dicts()
-    next(gen)    
+    with pytest.raises(Exception):
+        gen = CBR_USD('1991-07-15').yield_dicts()
+        next(gen)
 
-def test_yield_dicts_method_is_callable():
-    for cls in PARSER_CLASSES:
-        gen = cls().yield_dicts()
-        a = next(gen)
-        validate_datapoint(a)  
-      
-        
-#TODO: use parts of code belwo if needed for validate_datapoint()         
-            
-#class Base_Test_Parser:
-#    
+
+
+# TODO: use parts of code belwo if needed for validate_datapoint()
+
+# class Base_Test_Parser:
+#
 #    def setup_method(self):
 #        #must overload this
 #        self.parser = None
@@ -114,28 +144,27 @@ def test_yield_dicts_method_is_callable():
 #        for item in self.items:
 #            freq = item['freq']
 #            assert freq.isalpha()
-#            assert len(freq) == 1            
+#            assert len(freq) == 1
 #            assert freq in self.parser.freqs
 #
 #    def test_get_data_produces_valid_varname(self):
 #        for item in self.items:
 #            assert item['name'] in self.parser.all_varnames
 #
-#    # valid code and good idea to check, but iplementation too copmplex 
+#    # valid code and good idea to check, but iplementation too copmplex
 #    # for a base test class
-#    
+#
 #    #def test_get_data_produces_values_in_valid_range(self, items, min, max):
 #    #    for item in items:
 #    #        assert min < item['value'] < max
 
-# ------------------------   end of datapoitn validation    
-
+# ------------------------   end of datapoitn validation
 
 
 #
 #
-#class TestRosstatKep(Base_Test_Parser):
-#    
+# class TestRosstatKep(Base_Test_Parser):
+#
 #    def setup_method(self):
 #        self.parser = RosstatKEP('m')
 #        self.items = list(self.parser.get_data())
@@ -169,9 +198,10 @@ def test_yield_dicts_method_is_callable():
 #
 
 
-#    def yield_dicts(self):        
+
+#    def yield_dicts(self):
 #        return cbr_fx.get_cbr_er(self.start, self.end)
-#    
+#
 #    def sample(self):
 #        """Yields dictionaries with sample datapoints."""
 #        return iter([{'date': '2017-09-15', 'freq': 'd', 'name': 'USDRUR_CB', 'value': 57.7706},
@@ -184,15 +214,15 @@ def test_yield_dicts_method_is_callable():
 # {'date': '2017-09-26', 'freq': 'd', 'name': 'USDRUR_CB', 'value': 57.566}])
 #
 #
-#class TestCBR_USD():
-#    
+# class TestCBR_USD():
+#
 #    def setup_method(self):
 #        self.parser = CBR_USD('d')
 #        self.items = list(self.parser.get_data())
 #
-##    def test_get_data_produces_values_in_valid_range(self):
+# def test_get_data_produces_values_in_valid_range(self):
 ##        super(TestCBR_USD, self)\
-##            .test_get_data_produces_values_in_valid_range(self.items, 50, 70)
+# .test_get_data_produces_values_in_valid_range(self.items, 50, 70)
 #
 #
 #    def test_freqs_are_correct(self):
@@ -209,15 +239,15 @@ def test_yield_dicts_method_is_callable():
 #        assert self.parser.all_varnames == ['USDRUR_CB']
 ##
 #
-#class TestBrentEIA(Base_Test_Parser):
+# class TestBrentEIA(Base_Test_Parser):
 #
 #    def setup_method(self):
 #        self.parser = BrentEIA('d')
 #        self.items = list(self.parser.get_data())
 #
-##    def test_get_data_produces_values_in_valid_range(self):
+# def test_get_data_produces_values_in_valid_range(self):
 ##        super(TestBrentEIA, self) \
-##            .test_get_data_produces_values_in_valid_range(self.items, 20, 120)
+# .test_get_data_produces_values_in_valid_range(self.items, 20, 120)
 #
 #    def test_freqs_are_correct(self):
 #        assert self.parser.freqs == 'd'

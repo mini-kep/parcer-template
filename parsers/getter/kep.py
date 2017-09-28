@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 
+
 def make_url(freq):
     return ('https://raw.githubusercontent.com/mini-kep/'
             'parser-rosstat-kep/master/data/processed/latest/'
@@ -32,20 +33,22 @@ def yield_all_dicts(freq):
     d = df.to_dict('index')
     for dt in d.keys():
         for name, value in d[dt].items():
-            yield {'date': dt.strftime("%Y-%m-%d"), 
-                   'freq': 'd', 
+            yield {'date': dt.strftime("%Y-%m-%d"),
+                   'freq': 'd',
                    'name': name,
-                   'value': value}             
+                   'value': value}
+
 
 def is_valid(d):
     negative_conditions = []
     negative_conditions.append(d['name'] in ['year', 'qtr', 'month'])
     negative_conditions.append(np.isnan(d['value']))
-    return not any(negative_conditions)   
+    return not any(negative_conditions)
+
 
 def yield_dicts(freq):
-    return filter(is_valid, yield_all_dicts(freq)) 
+    return filter(is_valid, yield_all_dicts(freq))
 
-    
-if "__main__" == __name__:    
-    a = next(yield_dicts('a'))    
+
+if "__main__" == __name__:
+    a = next(yield_dicts('a'))
