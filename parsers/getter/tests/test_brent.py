@@ -1,5 +1,5 @@
 import mock
-from parsers.getter import brent
+from getter import brent
 from decimal import Decimal
 
 
