@@ -1,5 +1,5 @@
 import mock
-from getter import brent
+import getter.brent as brent
 from decimal import Decimal
 
 
