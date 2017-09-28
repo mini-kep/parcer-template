@@ -1,5 +1,6 @@
 """Parser interfaces."""
 
+import json
 import itertools
 
 from helpers import DateHelper, Markdown, interpret_frequency
@@ -153,6 +154,15 @@ class Dataset:
         tables = [cls.as_markdown() for cls in Dataset.parsers]
         return '\n\n'.join(tables)
 
+    def serialize(filename='dataset.json'):
+        def to_float(d):
+            d['value'] = float(d['value'])
+            return d
+        gen = map(to_float, Dataset.yield_dicts())
+        with open(filename, 'w') as f:
+            json.dump(list(gen), f)       
+
+
 
 if __name__ == "__main__":
     from pprint import pprint
@@ -170,7 +180,7 @@ if __name__ == "__main__":
     # TODO: must put this generator into database
     gen = Dataset.yield_dicts()
     
-    #import json
-    #with open('dataset.json', 'w') as f:
-    #    json.dump(list(gen), f)
+    Dataset.serialize()
+    
+
     
