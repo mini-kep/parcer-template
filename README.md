@@ -4,7 +4,6 @@
 ```parser/runner.py``` has parser classes to get data from sources. Aggregated dataset can be obtained using code below. It provides datapoints from the start of observation in each dataset. 
 
 ```python 
-
 from runner import Dataset
 
 gen = Dataset.yield_full_dataset()
@@ -15,7 +14,8 @@ Individual parsers can return datapoints from a specific date to present:
 
 ```python
 from runner import CBR_USD
-gen = CBR_USD('2017-09-01').yield_dicts()
+
+gen = CBR_USD(start='2017-09-01').yield_dicts()
 ```
 
 # Parser descriptions
