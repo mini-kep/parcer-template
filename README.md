@@ -13,7 +13,7 @@ gen = Dataset.yield_full_dataset()
 
 Individual parsers can return datapoints from a specific date to present: 
 
-```
+```python
 from runner import CBR_USD
 gen = CBR_USD('2017-09-01').yield_dicts()
 ```
