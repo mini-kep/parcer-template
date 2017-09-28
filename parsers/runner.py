@@ -178,4 +178,4 @@ if __name__ == "__main__":
     # TODO: must put this generator into database
     gen = Dataset.yield_dicts()
 
-    # Dataset.serialize()
+    Dataset.serialize()
