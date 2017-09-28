@@ -1,6 +1,7 @@
 import mock
 from decimal import Decimal
-from getter import brent
+from parsers.getter import brent
+
 
 def test_yield_brent_dicts(mocker):
     mocker.patch('parsers.getter.brent.fetch', mock.MagicMock(return_value=None))
