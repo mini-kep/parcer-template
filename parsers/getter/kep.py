@@ -1,3 +1,4 @@
+from decimal import Decimal
 import pandas as pd
 import numpy as np
 
@@ -36,13 +37,13 @@ def yield_all_dicts(freq):
             yield {'date': dt.strftime("%Y-%m-%d"),
                    'freq': 'd',
                    'name': name,
-                   'value': round(value,4)}
+                   'value': round(Decimal(value),4)}
 
 
 def is_valid(d):
     negative_conditions = []
     negative_conditions.append(d['name'] in ['year', 'qtr', 'month'])
-    negative_conditions.append(np.isnan(d['value']))
+    # negative_conditions.append(np.isnan(d['value']))
     return not any(negative_conditions)
 
 
