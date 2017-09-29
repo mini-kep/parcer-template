@@ -3,12 +3,12 @@
 import json
 import itertools
 
-from helpers import DateHelper, Markdown, interpret_frequency
+from parsers.helpers import DateHelper, Markdown, interpret_frequency
 
 # individual parser functions
-import getter.brent as brent
-import getter.cbr_fx as cbr_fx
-import getter.kep as kep
+import parsers.getter.brent as brent
+import parsers.getter.cbr_fx as cbr_fx
+import parsers.getter.kep as kep
 
 
 class ParserBase:
