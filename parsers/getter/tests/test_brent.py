@@ -1,11 +1,12 @@
-import mock
+import pytest
+from getter import brent
 from decimal import Decimal
-from parsers.getter import brent
 
+def fake_fetch(url):
+    return """{"series":[{"data":[["20170925",59.42]]}]}"""
 
-def test_yield_brent_dicts(mocker):
-    mocker.patch('parsers.getter.brent.fetch', mock.MagicMock(return_value=None))
-    mocker.patch('parsers.getter.brent.format_string', mock.MagicMock(return_value='2017-12-31'))
-    mocker.patch('parsers.getter.brent.parse_response', mock.MagicMock(return_value=[['20171231', 2.23899]]))
-    for data in brent.yield_brent_dicts():
-        assert data == {'date': '2017-12-31', 'freq': 'd', 'name': 'BRENT', 'value': Decimal('2.2390')}
+def test_yield_brent_dict():
+    gen = getter.brent.yield_brent_dicts(download_func=fake_fetch)
+    d = next(gen)
+    assert d['date'] == '2017-09-25'
+    assert d['value'] == Decimal('59.42')
