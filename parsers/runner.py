@@ -1,7 +1,6 @@
 """Parser interfaces."""
 
 import json
-import itertools
 
 from parsers.helpers import DateHelper, Markdown, interpret_frequency
 
@@ -46,10 +45,10 @@ class RosstatKEP_Base(ParserBase):
             self.start = DateHelper.make_date(start)
 
     def sample(self):
-        yield {"date": "2015-11-30", "freq": '_', "name": "CPI_rog", "value": 100.8}
-        yield {"date": "2015-11-30", "freq": '_', "name": "RUR_EUR_eop", "value": 70.39}
-        yield {"date": "2015-12-31", "freq": '_', "name": "CPI_rog", "value": 100.8}
-        yield {"date": "2015-12-31", "freq": '_', "name": "RUR_EUR_eop", "value": 79.7}
+        yield {"date": "2015-11-30", "freq": self.freq, "name": "CPI_rog", "value": 100.8}
+        yield {"date": "2015-11-30", "freq": self.freq, "name": "RUR_EUR_eop", "value": 70.39}
+        yield {"date": "2015-12-31", "freq": self.freq, "name": "CPI_rog", "value": 100.8}
+        yield {"date": "2015-12-31", "freq": self.freq, "name": "RUR_EUR_eop", "value": 79.7}
 
     def yield_dicts(self):
         return kep.yield_dicts(self.freq)
@@ -128,6 +127,9 @@ class BrentEIA(ParserBase):
                     )
 
 
+
+
+
 class Dataset:
     """Operations related to all parsers."""
 
@@ -139,17 +141,14 @@ class Dataset:
                ]
 
     def get_sample():
-        dataset_sample = []
-        for cls in Dataset.parsers:
-            parser = cls()
-            gen = list(parser.sample())
-            dataset_sample.extend(gen)
-        return dataset_sample
+        return [d for parser in Dataset.parsers
+                  for d in parser().sample()]
 
-    def yield_dicts():
-        gen_list = [p().yield_dicts() for p in Dataset.parsers]
-        return itertools.chain.from_iterable(gen_list)
-
+    def yield_dicts(start=None):     
+        for parser in Dataset.parsers:
+            for datapoint in parser(start).yield_dicts():
+                yield datapoint 
+                
     def as_markdown():
         tables = [cls.as_markdown() for cls in Dataset.parsers]
         return '\n\n'.join(tables)
@@ -175,7 +174,7 @@ if __name__ == "__main__":
     oil = BrentEIA('2017-09-01').yield_dicts()
     kep_m = RosstatKEP_Monthly('2017-06').yield_dicts()
 
-    # TODO: must put this generator into database
+    # this generator seeds the database
     gen = Dataset.yield_dicts()
 
     Dataset.serialize()
