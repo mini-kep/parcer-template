@@ -1,5 +1,6 @@
 import mock
-from getter import cbr_fx
+from parsers.getter import cbr_fx
+
 
 def test_get_xml(mocker):
     foo_obj = type('', (object,), {"foo": 1})()

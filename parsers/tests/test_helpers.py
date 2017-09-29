@@ -2,8 +2,8 @@
 import datetime
 import pytest
 
-from helpers import DateHelper
-from helpers import Markdown
+from parsers.helpers import DateHelper
+from parsers.helpers import Markdown
 
 
 class Test_today:

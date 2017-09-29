@@ -2,7 +2,7 @@ import pytest
 import datetime
 from decimal import *
 
-from runner import (ParserBase,
+from parsers.runner import (ParserBase,
                     RosstatKEP_Monthly,
                     RosstatKEP_Quarterly,
                     RosstatKEP_Annual,

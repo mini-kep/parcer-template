@@ -1,5 +1,5 @@
 import pytest
-import config
+from parsers import config
 
 
 def test_config():
