@@ -27,6 +27,7 @@ def make_url(access_key=EIA_ACCESS_KEY):
 def fetch(url):
     r = requests.get(url)
     return r.text
+    # EP: why json.loads(r.text) will not execute? 
     # return json.loads(r.text) this line will not execute. need to be deleted
 
 
@@ -34,9 +35,6 @@ def parse_response(text):
     """Returns list of rows."""
     json_data = json.loads(text)
     return json_data["series"][0]["data"]
-
-
-# must test below with injecting a mock *download_func* function
 
 
 def yield_brent_dicts(download_func=fetch):
