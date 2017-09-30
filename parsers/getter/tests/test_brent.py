@@ -7,7 +7,7 @@ import mock
 from parsers.getter.brent import parse_response
 
 
-def fake_fetch():
+def fake_fetch(url=None):
     return """{"series":[{"data":[["20170925",59.42]]}]}"""
 
 def test_yield_brent_dict():
