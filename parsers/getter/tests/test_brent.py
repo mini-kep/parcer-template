@@ -1,5 +1,3 @@
-import pytest
-
 from parsers.getter import brent
 from decimal import Decimal
 import mock
@@ -37,8 +35,8 @@ def test_parse_response_2():
     assert parse_response(text) == [['20170925', 59.42]]
 
 def test_fetch(mocker):
-    kwargs = {"text": 'some_text'}
-    mocker.patch('requests.get', mock.MagicMock(return_value=foo_obj(**kwargs)))
+    return_value = foo_obj(**{"text": 'some_text'})
+    mocker.patch('requests.get', mock.MagicMock(return_value=return_value))
     assert fetch('some_url') == 'some_text'
 
 def test_make_url():
@@ -46,15 +44,17 @@ def test_make_url():
     url = make_url(access_key=key)
     assert key in url
 
-@pytest.mark.parametrize('date_string, expected', [
-    ('20171231', '2017-12-31'),
-    ('bad_date_format', "time data 'bad_date_format' does not match format '%Y%m%d'"),
-    (None, "strptime() argument 1 must be str, not None"),
-])
-def test_format_string(date_string, expected):
+def test_format_string_with_good_args():
+    assert format_string('20171231') == '2017-12-31'
+
+def test_format_string_with_bad_args():
     try:
-        result = format_string(date_string)
-        assert result == expected
-    except Exception as e:
-        assert Exception == ValueError or TypeError
-        assert str(e) == expected
+        format_string('bad_date_format')
+    except ValueError as e:
+        assert str(e) == "time data 'bad_date_format' does not match format '%Y%m%d'"
+
+def test_format_string_with_None_args():
+    try:
+        format_string(None)
+    except TypeError as e:
+        assert str(e) == "strptime() argument 1 must be str, not None"
