@@ -10,7 +10,10 @@ from parsers.config import EIA_ACCESS_KEY
 def format_string(date_string):
     return datetime.strptime(date_string, "%Y%m%d").strftime("%Y-%m-%d")
 
-# can't understand why we have assert inside a codebase ?
+# MS: can't understand why we have assert inside a codebase ?
+# EP: please mark your comments initials, so that it is tracable who is writing 
+#     the reason for this assert is that it should be converted to test
+#     better way os saying that is TODO(MS): convert to test
 assert format_string('20171231') == '2017-12-31'
 
 
