@@ -1,8 +1,10 @@
+import pytest
+
 from parsers.getter import brent
 from decimal import Decimal
 import mock
-from parsers.getter.brent import parse_response
-
+from parsers.getter.brent import parse_response, fetch, make_url, format_string
+from parsers.getter.tests.fixtures import foo_obj
 
 # I am not sure that's is a good way create fake method outsidee the test.
 # Thats why we use mocker. To patch everything that we want make fake call
@@ -33,3 +35,26 @@ def test_parse_response_1():
 def test_parse_response_2():
     text = """{"series":[{"data":[["20170925",59.42]]}]}"""
     assert parse_response(text) == [['20170925', 59.42]]
+
+def test_fetch(mocker):
+    kwargs = {"text": 'some_text'}
+    mocker.patch('requests.get', mock.MagicMock(return_value=foo_obj(**kwargs)))
+    assert fetch('some_url') == 'some_text'
+
+def test_make_url():
+    key = "NOT_EIA_ACCESS_KEY"
+    url = make_url(access_key=key)
+    assert key in url
+
+@pytest.mark.parametrize('date_string, expected', [
+    ('20171231', '2017-12-31'),
+    ('bad_date_format', "time data 'bad_date_format' does not match format '%Y%m%d'"),
+    (None, "strptime() argument 1 must be str, not None"),
+])
+def test_format_string(date_string, expected):
+    try:
+        result = format_string(date_string)
+        assert result == expected
+    except Exception as e:
+        assert Exception == ValueError or TypeError
+        assert str(e) == expected

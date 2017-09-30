@@ -10,7 +10,7 @@ from parsers.config import EIA_ACCESS_KEY
 def format_string(date_string):
     return datetime.strptime(date_string, "%Y%m%d").strftime("%Y-%m-%d")
 
-
+# can't understand why we have assert inside a codebase ?
 assert format_string('20171231') == '2017-12-31'
 
 
@@ -24,7 +24,7 @@ def make_url(access_key=EIA_ACCESS_KEY):
 def fetch(url):
     r = requests.get(url)
     return r.text
-    return json.loads(r.text)
+    # return json.loads(r.text) this line will not execute. need to be deleted
 
 
 def parse_response(text):
