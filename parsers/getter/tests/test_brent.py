@@ -1,12 +1,11 @@
 from parsers.getter import brent
 from decimal import Decimal
 import mock
-
-# I am not sure that's is a good way create fake method outsidee the test.
-# Thats why we use mocker. To patch everything that we want make fake call
 from parsers.getter.brent import parse_response
 
 
+# I am not sure that's is a good way create fake method outsidee the test.
+# Thats why we use mocker. To patch everything that we want make fake call
 def fake_fetch(url=None):
     return """{"series":[{"data":[["20170925",59.42]]}]}"""
 
