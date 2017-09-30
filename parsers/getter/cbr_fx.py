@@ -1,4 +1,5 @@
 """ Download USD RUR official exchange rate from Bank of Russia web site."""
+# R01235 is USD code
 
 from datetime import date
 import requests
@@ -6,9 +7,6 @@ import xml.etree.ElementTree as ET
 from decimal import Decimal
 
 from parsers.helpers import DateHelper
-
-# R01235 is USD code
-
 
 def make_url(start_date, end_date):
     start, end = (x.strftime('%d/%m/%Y') for x in [start_date, end_date])
