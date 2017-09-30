@@ -45,6 +45,6 @@ def yield_brent_dicts(download_func=fetch):
 
 
 if __name__ == "__main__":
-    url = make_url()
+    # url = make_url() can be deleted from here as far as it is called in yield_brent_dict()
     gen = yield_brent_dicts()
     b = next(gen)
