@@ -1,5 +1,6 @@
 import datetime
 import mock
+
 from parsers.getter import cbr_fx
 from parsers.getter.cbr_fx import make_url
 from parsers.getter.tests.fixtures import foo_obj
