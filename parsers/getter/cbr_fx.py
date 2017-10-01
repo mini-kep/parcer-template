@@ -18,8 +18,7 @@ def make_url(start_date, end_date):
 
 def to_float(string):
     # starting 02.06.1993 there are values like "2 153,0000"
-    s = string.replace(",", ".") \
-              .replace(chr(160), "")
+    s = string.replace(",", ".").replace(" ", "")
     try:
         return float(s)
     except ValueError:
@@ -52,7 +51,9 @@ def get_xml(url):
     else:
         return xml_text
 
-
+# NEED FIX: author muroslav2909 : Arguments in this function are str_date, like '1998-12-05'.
+# You can't call make_url inside this method  like make_url(start_str, end_str), because args of method make_url is datetime, like datetime.date(2018, 12, 5)
+# It will raise exception: "AttributeError: 'str' object has no attribute 'strftime'"
 def get_cbr_er(start_str, end_str):
     url = make_url(start_str, end_str)
     xml_text = get_xml(url)
