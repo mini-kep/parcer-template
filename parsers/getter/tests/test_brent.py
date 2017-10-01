@@ -1,3 +1,5 @@
+import pytest
+
 from parsers.getter import brent
 from decimal import Decimal
 import mock
@@ -40,14 +42,12 @@ def test_format_string_with_good_args():
 
 
 def test_format_string_with_bad_args():
-    try:
+    with pytest.raises(ValueError) as value_error:
         format_string('bad_date_format')
-    except ValueError as e:
-        assert str(e) == "time data 'bad_date_format' does not match format '%Y%m%d'"
+    assert "bad_date_format' does not match format '%Y%m%d'" in str(value_error.value)
 
 
 def test_format_string_with_None_args():
-    try:
+    with pytest.raises(TypeError) as type_error:
         format_string(None)
-    except TypeError as e:
-        assert str(e) == "strptime() argument 1 must be str, not None"
+    assert "strptime() argument 1 must be str, not None" in str(type_error.value)
