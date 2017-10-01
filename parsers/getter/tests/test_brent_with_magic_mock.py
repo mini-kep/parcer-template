@@ -1,7 +1,5 @@
 import pytest
 import mock
-
-from parsers.getter.tests.fixtures import foo_obj
 from parsers.getter.brent import fetch
 
 @pytest.fixture
@@ -14,13 +12,16 @@ def foo_obj(**kwargs):
     return type('', (object,), kwargs)()
 
 
-# EP: on me it fails with  fixture 'mocker' not found
-
-#def test_fetch(mocker):
-#    return_value = foo_obj(**{"text": 'some_text'})
-#    mocker.patch('requests.get', mock.MagicMock(return_value=return_value))
-#    assert fetch('some_url') == 'some_text'
+def test_fetch(mocker):
+    return_value = foo_obj(**{"text": 'some_text'})
+    mocker.patch('requests.get', mock.MagicMock(return_value=return_value))
+    assert fetch('some_url') == 'some_text'
     
+#FIXME: fails with:
+    
+#file C:\Users\Евгений\Documents\GitHub\parser-template\parsers\getter\tests\test_brent_with_magic_mock.py, line 15
+#  def test_fetch(mocker):
+#E       fixture 'mocker' not found
                 
    
 if __name__ == "__main__":
