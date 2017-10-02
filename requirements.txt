@@ -2,3 +2,4 @@ arrow
 pandas # note about versions of packages. better to mark it
 mock==2.0.0
 pytest_mock==1.6.2
+requests-mock==1.3.0
