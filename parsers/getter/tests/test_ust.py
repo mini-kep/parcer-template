@@ -14,17 +14,15 @@ from parsers.getter.ust import (make_year,
 
 #fixture
 
+@pytest.fixture
 def fake_content():
-    return """<?xml version="1.0" encoding="utf-8" standalone="yes"?><pre>
+    return """<?xml ><pre>
                 <m:properties>
                 <d:NEW_DATE>2017-01-03T00:00:00</d:NEW_DATE>
                 <d:BC_1MONTH>0.52</d:BC_1MONTH>"""
 
 def fake_fetch(url=None):
-    return """<?xml version="1.0" encoding="utf-8" standalone="yes"?><pre>
-                <m:properties>
-                <d:NEW_DATE>2017-01-03T00:00:00</d:NEW_DATE>
-                <d:BC_1MONTH>0.52</d:BC_1MONTH>"""
+    return fake_content()
 
 class Test_make_year:
     def test_make_year_with_good_date(self):
@@ -39,7 +37,7 @@ class Test_make_year:
             make_year(None)
 
 def test_make_url():
-    year = 1850
+    year = 2000
     url = make_url(year)
     assert str(year) in url
     assert url.startswith("http")
@@ -59,7 +57,7 @@ class Test_fetch:
                 fetch(url)
 
 def test_format_value():
-    assert format_value('2.2600') == Decimal('2.2600')
+    assert format_value('2.26') == Decimal('2.26')
 
 class Test_get_date:
     def test_get_date_with_valid_date_string(self):
@@ -76,9 +74,8 @@ class Test_get_date:
 def test_rename_variable_with_valid_varname():
     assert rename_variable("BC_Something") == 'UST_Something'
 
-def test_parse_xml_with_valid_xml_input():
-    fake_c = fake_content()
-    gen = parse_xml(fake_c)
+def test_parse_xml_with_valid_xml_input(fake_content):
+    gen = parse_xml(fake_content)
     d = next(gen)
     assert d['date'] == '2017-01-03'
     assert d['value'] == Decimal('0.52')
@@ -88,8 +85,7 @@ def test_parse_xml_with_valid_xml_input():
 
 def test_yield_ust_dic():
     start_date = date(2017, 1, 1)
-    fake_f = fake_fetch()
-    gen = yield_ust_dict(start_date,fake_fetch)
+    gen = yield_ust_dict(start_date,downloader=fake_fetch)
     d = next(gen)
     assert d['date'] == '2017-01-03'
     assert d['value'] == Decimal('0.52')
