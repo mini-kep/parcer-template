@@ -2,6 +2,7 @@ import pytest
 from datetime import date, datetime
 import requests_mock
 from decimal import Decimal
+import bs4
 from parsers.getter.ust import (make_year,
                                 make_url,
                                 fetch,
