@@ -1,21 +1,26 @@
 import json
 import requests
-from datetime import datetime
+from datetime import datetime, date
 import bs4
 
 def get_date(string):
     dt = datetime.strptime(string, '%Y-%m-%dT%H:%M:%S')
     return dt.strftime('%Y-%m-%d')
 
-def make_url(year):
-    """Creates Web Url based on the given year"""
+def make_year(s):
+    """Parse Year from given start date""" 
     cur_year = datetime.today().year
+    year = s.year
     if year not in [x for x in range(1990, cur_year + 1)]:
         raise ValueError("Given year is not from year interval (1990 - "+str(cur_year)+")")
     else:
-        return ("https://www.treasury.gov/resource-center/"
-                "data-chart-center/interest-rates/pages/"
-                "XmlView.aspx?data=yieldyear&year={}".format(year))
+        return year
+
+def make_url(year):
+    """Creates Web Url based on the given year"""
+    return ("https://www.treasury.gov/resource-center/"
+            "data-chart-center/interest-rates/pages/"
+            "XmlView.aspx?data=yieldyear&year={}".format(year))
 
 def fetch(url):
     """Fetch content from given url."""
@@ -25,29 +30,29 @@ def fetch(url):
     else:
         return content.text
 
-def yield_ust_dict(year,downloader=fetch,period='UST_1M'):
+def yield_ust_dict(start_date,downloader=fetch):
     """
-    Yeild Monthly UST datapoints ad dict
+    Yeild UST datapoints as dict
     """
+    year = make_year(start_date)
     url = make_url(year)
     content = downloader(url)
     soup = bs4.BeautifulSoup(content, "xml")
     properties = soup.find_all('properties')
     for prop in properties:
         date = get_date(prop.find('NEW_DATE').text)
-        if period == 'UST_1M':
-            price = prop.BC_1MONTH.text
-        elif period == 'UST_1Y':
-            price = prop.BC_1YEAR.text
-        else:
-            raise ValueError("Wrong period > Periods only available: "
-                             "UST_1M, UST_1Y")
-        yield { "date" : date,
-                "freq": "d",
-                "name": period,
-                "value": price}
+        children = prop.findChildren()
+        for child in children:
+            if child.name.startswith('BC_'):
+                price = child.text
+                name = child.name
+                yield { "date" : date,
+                        "freq": "d",
+                        "name": name,
+                        "value": price}
 
-
-gen = yield_ust_dict(2010)
-for g in gen:
-    print(g)
+if __name__ == "__main__":
+    s = date(1991, 7, 1)
+    gen = yield_ust_dict(s)
+    for g in gen:
+        print(g)
