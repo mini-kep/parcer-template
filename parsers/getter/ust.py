@@ -1,4 +1,3 @@
-import json
 import requests
 from datetime import datetime, date
 import bs4
@@ -54,5 +53,4 @@ def yield_ust_dict(start_date,downloader=fetch):
 if __name__ == "__main__":
     s = date(1991, 7, 1)
     gen = yield_ust_dict(s)
-    for g in gen:
-        print(g)
+    b = next(gen)
