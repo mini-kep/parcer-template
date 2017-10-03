@@ -1,6 +1,6 @@
 """Import interest rates for US treasuries for different bond durations.
 
-Yield a stream of datapoint dictionaries like: 
+Yield a stream of datapoint dictionaries like:
 {'date': '2017-01-03', 'freq': 'd', 'name': 'UST_1MONTH', 'value': Decimal('0.5200')}
 {'date': '2017-01-03', 'freq': 'd', 'name': 'UST_3MONTH', 'value': Decimal('0.5300')}
 {'date': '2017-01-03', 'freq': 'd', 'name': 'UST_6MONTH', 'value': Decimal('0.6500')}
@@ -23,15 +23,16 @@ import requests
 
 
 def make_year(start_date):
-    """Extract year form *start_date*    
-    
+    """Extract year form *start_date*
+
     Args:
        start_date(datetime.date)
     Retruns:
         year as (int)
     """
     year = start_date.year
-    if year not in [x for x in range(1990, datetime.today().year + 1)]:
+    cur_year = datetime.today().year
+    if year not in [x for x in range(1990, cur_year + 1)]:
         raise ValueError(f"Year <{year}> must be in [1990, {cur_year}] range.")
     return year
 
@@ -50,7 +51,7 @@ def fetch(url):
 
 #FIXME: this can be a importable util in the project
 def format_value(value_string: str):
-    return round(Decimal(value_string), 4)    
+    return round(Decimal(value_string), 4)
 
 
 def get_date(string):
@@ -59,7 +60,7 @@ def get_date(string):
 
 
 def rename_variable(varname):
-    return varname.replace("BC_", "UST_")    
+    return varname.replace("BC_", "UST_")
 
 
 def parse_xml(content: str):
@@ -76,7 +77,7 @@ def parse_xml(content: str):
                         "freq": "d",
                         "name": name,
                         "value": price}
-    
+
 
 def yield_ust_dict(start_date,downloader=fetch):
     """
