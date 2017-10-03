@@ -51,7 +51,7 @@ def fetch(url):
 
 #FIXME: this can be a importable util in the project
 def format_value(value_string: str):
-    return round(Decimal(value_string), 4)
+    return round(Decimal(value_string), 2)
 
 
 def get_date(string):
@@ -87,7 +87,6 @@ def yield_ust_dict(start_date,downloader=fetch):
     url = make_url(year)
     content = downloader(url)
     return parse_xml(content)
-
 
 if __name__ == "__main__":
     s = date(2017, 1, 1)
