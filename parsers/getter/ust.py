@@ -8,7 +8,7 @@ def get_date(string):
     return dt.strftime('%Y-%m-%d')
 
 def make_year(s):
-    """Parse Year from given start date""" 
+    """Parse Year from given start date"""
     cur_year = datetime.today().year
     year = s.year
     if year not in [x for x in range(1990, cur_year + 1)]:
@@ -45,7 +45,7 @@ def yield_ust_dict(start_date,downloader=fetch):
         for child in children:
             if child.name.startswith('BC_'):
                 price = child.text
-                name = child.name
+                name = "UST_"+child.name[3:]
                 yield { "date" : date,
                         "freq": "d",
                         "name": name,
