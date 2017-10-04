@@ -8,6 +8,7 @@ from parsers.helpers import DateHelper, Markdown, interpret_frequency
 import parsers.getter.brent as brent
 import parsers.getter.cbr_fx as cbr_fx
 import parsers.getter.kep as kep
+import parsers.getter.ust as ust
 
 
 class ParserBase:
@@ -51,7 +52,7 @@ class RosstatKEP_Base(ParserBase):
         yield {"date": "2015-12-31", "freq": self.freq, "name": "RUR_EUR_eop", "value": 79.7}
 
     def yield_dicts(self):
-        return kep.yield_dicts(self.freq)
+        return kep.yield_kep_dicts(self.freq)
 
 
 class RosstatKEP_Monthly(RosstatKEP_Base):
@@ -125,9 +126,34 @@ class BrentEIA(ParserBase):
                      {'date': '2017-09-12', 'freq': 'd', 'name': 'BRENT', 'value': 55.06},
                      {'date': '2017-09-11', 'freq': 'd', 'name': 'BRENT', 'value': 54.2}]
                     )
-
-
-
+# TODO:
+# class USTbonds(ParserBase):
+#    """Brent oil price from US EIA"""
+#    freq = 'd'
+#    observation_start_date = DateHelper.make_date('1987-05-15')
+#    source_url = "https://www.eia.gov/opendata/qb.php?category=241335"
+#    all_varnames = ['BRENT']
+#
+#    def __init__(self, start=None):
+#        if start is None:
+#            self.start = self.observation_start_date
+#        else:
+#            self.start = DateHelper.make_date(start)
+#
+#    def yield_dicts(self):
+#        for p in brent.yield_brent_dicts():
+#            if DateHelper.make_date(p['date']) >= self.start:
+#                yield p
+#
+#    def sample(self):
+#        """Yield a few dictionaries with datapoints."""
+#        return iter([{'date': '2017-09-18', 'freq': 'd', 'name': 'BRENT', 'value': 55.5},
+#                     {'date': '2017-09-15', 'freq': 'd', 'name': 'BRENT', 'value': 56.18},
+#                     {'date': '2017-09-14', 'freq': 'd', 'name': 'BRENT', 'value': 56.76},
+#                     {'date': '2017-09-13', 'freq': 'd', 'name': 'BRENT', 'value': 55.52},
+#                     {'date': '2017-09-12', 'freq': 'd', 'name': 'BRENT', 'value': 55.06},
+#                     {'date': '2017-09-11', 'freq': 'd', 'name': 'BRENT', 'value': 54.2}]
+#                    )
 
 
 class Dataset:
@@ -137,18 +163,19 @@ class Dataset:
                RosstatKEP_Quarterly,
                RosstatKEP_Annual,
                CBR_USD,
-               BrentEIA
+               BrentEIA,
+               # USTbonds
                ]
 
     def get_sample():
         return [d for parser in Dataset.parsers
-                  for d in parser().sample()]
+                for d in parser().sample()]
 
-    def yield_dicts(start=None):     
+    def yield_dicts(start=None):
         for parser in Dataset.parsers:
             for datapoint in parser(start).yield_dicts():
-                yield datapoint 
-                
+                yield datapoint
+
     def as_markdown():
         tables = [cls.as_markdown() for cls in Dataset.parsers]
         return '\n\n'.join(tables)

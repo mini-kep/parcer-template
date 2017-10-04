@@ -7,17 +7,19 @@ from parsers.config import EIA_ACCESS_KEY
 from parsers.getter.brent import (format_string,
                                   format_value,
                                   make_url,
-                                  fetch, # not tested
+                                  fetch,  # not tested
                                   parse_response,
                                   yield_brent_dicts)
 
 # fixture
 
+
 def fake_fetch(url=None):
     return """{"series":[{"data":[["20170925",59.42]]}]}"""
 
 
-# EP (delete): note tests are in same order as they appear in brent.py, it easier reading
+# EP (delete): note tests are in same order as they appear in brent.py, it
+# easier reading
 
 
 # NOTE (EP): earlier we had a parametrisation, close to this:
@@ -27,7 +29,8 @@ def fake_fetch(url=None):
 # ususally this is one paramater.
 
 class Test_format_string:
-    # EP: quick naming is ok, but better use 'something on something does something'
+    # EP: quick naming is ok, but better use 'something on something does
+    # something'
     def test_format_string_on_valid_arg_returns_string(self):
         assert format_string('20171231') == '2017-12-31'
 
@@ -41,10 +44,12 @@ class Test_format_string:
         with pytest.raises(TypeError):
             format_string(None)
 
+
 def test_format_value():
     return format_value('59.42') == Decimal('59.42')
 
 # parsing flow
+
 
 def test_make_url():
     key = "NO_KEY"
@@ -68,7 +73,8 @@ def test_yield_brent_dict():
 
 
 def test_fetch(access_key=EIA_ACCESS_KEY):
-    url = "http://api.eia.gov/series/?api_key="+access_key+"&series_id=PET.RBRTE.D"
+    url = "http://api.eia.gov/series/?api_key=" + \
+        access_key + "&series_id=PET.RBRTE.D"
     with requests_mock.mock() as m:
         m.get(url, text='fake response from url')
         assert fetch(url) == 'fake response from url'
@@ -77,10 +83,10 @@ def test_fetch(access_key=EIA_ACCESS_KEY):
 
 #from mock import patch
 #
-#class MockingTestTestCase(unittest.TestCase):
+# class MockingTestTestCase(unittest.TestCase):
 #
 #@patch('app.mocking.get_user_name')
-#def test_mock_stubs(self, test_patch):
+# def test_mock_stubs(self, test_patch):
 #test_patch.return_value = 'Mocked This Silly'
 #ret = test_method()
 #self.assertEqual(ret, 'Mocked This Silly')

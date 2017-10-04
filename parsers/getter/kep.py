@@ -2,16 +2,13 @@ from decimal import Decimal
 import pandas as pd
 import numpy as np
 
+import parsers.getter.util as util
+
 
 def make_url(freq):
     return ('https://raw.githubusercontent.com/mini-kep/'
             'parser-rosstat-kep/master/data/processed/latest/'
             f'df{freq}.csv')
-
-
-assert make_url('a') == ('https://raw.githubusercontent.com/mini-kep/'
-                         'parser-rosstat-kep/master/data/processed/latest/'
-                         'dfa.csv')
 
 
 def read_csv(source):
@@ -37,19 +34,23 @@ def yield_all_dicts(freq):
             yield {'date': dt.strftime("%Y-%m-%d"),
                    'freq': freq,
                    'name': name,
-                   'value': round(Decimal(value), 4)}
+                   'value': util.format_value(value)}
 
 
 def is_valid(d):
     negative_conditions = []
+    # no datapoints with year, qtr or month number
     negative_conditions.append(d['name'] in ['year', 'qtr', 'month'])
+    # no NaN values
     negative_conditions.append(np.isnan(float(d['value'])))
     return not any(negative_conditions)
 
 
-def yield_dicts(freq):
+def yield_kep_dicts(freq):
     return filter(is_valid, yield_all_dicts(freq))
 
 
-if "__main__" == __name__:
-    a = next(yield_dicts('a'))
+if __name__ == "__main__":
+    gen = yield_kep_dicts("a")
+    for i in range(14):
+        print(next(gen))

@@ -1,28 +1,35 @@
 """ Download USD RUR official exchange rate from Bank of Russia web site."""
-# R01235 is USD code
+
 
 from datetime import date
-import requests
 import xml.etree.ElementTree as ET
-from decimal import Decimal
+import parsers.getter.util as util
 
-from parsers.helpers import DateHelper
 
 def make_url(start_date, end_date):
     start, end = (x.strftime('%d/%m/%Y') for x in [start_date, end_date])
+    usd_code = 'R01235'
     return ("http://www.cbr.ru/scripts/XML_dynamic.asp"
             f"?date_req1={start}"
             f"&date_req2={end}"
-            "&VAL_NM_RQ=R01235")
+            f"&VAL_NM_RQ={usd_code}")
 
 
-def to_float(string):
-    # starting 02.06.1993 there are values like "2 153,0000"
-    s = string.replace(",", ".").replace(" ", "")
-    try:
-        return float(s)
-    except ValueError:
-        raise ValueError("Error parsing value <{}>".format(string))
+def xml_text_to_stream(xml_text):
+    root = ET.fromstring(xml_text)
+    for child in root:
+        # starting 02.06.1993 there are values like "2 153,0000"
+        date_str = child.attrib['Date']
+        date = util.format_date(date_str, fmt="%d.%m.%Y")
+        value_str = child[1].text \
+            .replace(",", ".") \
+            .replace(" ", "") \
+            .replace(chr(160), "")  # replace abother space-like chraracter
+        value = util.format_value(value_str, precision=4)
+        yield {"date": date,
+               "freq": "d",
+               "name": "USDRUR_CB",
+               "value": value}
 
 
 def transform(datapoint):
@@ -33,37 +40,15 @@ def transform(datapoint):
     return datapoint
 
 
-def xml_text_to_stream(xml_text):
-    root = ET.fromstring(xml_text)
-    for child in root:
-        date = DateHelper.make_date(child.attrib['Date'], fmt="%d.%m.%Y")
-        value = round(Decimal(to_float(child[1].text)), 4)
-        yield {"date": DateHelper.as_string(date),
-               "freq": "d",
-               "name": "USDRUR_CB",
-               "value": value}
-
-
-def get_xml(url):
-    xml_text = requests.get(url).text
-    if 'Error in parameters' in xml_text:
-        raise Exception(f'Error in parameters: {url}')
-    else:
-        return xml_text
-
-# NEED FIX: author muroslav2909 : Arguments in this function are str_date, like '1998-12-05'.
-# You can't call make_url inside this method  like make_url(start_str, end_str), because args of method make_url is datetime, like datetime.date(2018, 12, 5)
-# It will raise exception: "AttributeError: 'str' object has no attribute 'strftime'"
-def get_cbr_er(start_str, end_str):
-    url = make_url(start_str, end_str)
-    xml_text = get_xml(url)
+def get_cbr_er(start_date, end_date, downloader=util.fetch):
+    url = make_url(start_date, end_date)
+    xml_text = downloader(url)
     return map(transform, xml_text_to_stream(xml_text))
 
 
 if __name__ == "__main__":
-    s = date(1991, 7, 1)
-    e = date(2017, 9, 26)
-    # gen = get_cbr_er(s, e)
-    # a = next(gen)
-    # assert a == {'date': '1992-07-01', 'freq': 'd',
-    #             'name': 'USDRUR_CB', 'value': 0.1253}
+    s = date(1992, 1, 1)
+    e = date(2017, 10, 4)
+    gen = get_cbr_er(s, e)
+    for i in range(20):
+        print(next(gen))

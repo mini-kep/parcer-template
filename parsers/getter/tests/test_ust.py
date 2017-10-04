@@ -12,7 +12,8 @@ from parsers.getter.ust import (make_year,
                                 parse_xml,
                                 yield_ust_dict)
 
-#fixture
+# fixture
+
 
 @pytest.fixture
 def fake_content():
@@ -21,8 +22,10 @@ def fake_content():
                 <d:NEW_DATE>2017-01-03T00:00:00</d:NEW_DATE>
                 <d:BC_1MONTH>0.52</d:BC_1MONTH>"""
 
+
 def fake_fetch(url=None):
     return fake_content()
+
 
 class Test_make_year:
     def test_make_year_with_good_date(self):
@@ -36,11 +39,13 @@ class Test_make_year:
         with pytest.raises(AttributeError):
             make_year(None)
 
+
 def test_make_url():
     year = 2000
     url = make_url(year)
     assert str(year) in url
     assert url.startswith("http")
+
 
 class Test_fetch:
     def test_fetch_good_response(self):
@@ -56,8 +61,10 @@ class Test_fetch:
                 mocked_content.get(url, text="Error reponse")
                 fetch(url)
 
+
 def test_format_value():
     assert format_value('2.26') == Decimal('2.26')
+
 
 class Test_get_date:
     def test_get_date_with_valid_date_string(self):
@@ -71,8 +78,10 @@ class Test_get_date:
         with pytest.raises(TypeError):
             get_date(None)
 
+
 def test_rename_variable_with_valid_varname():
     assert rename_variable("BC_Something") == 'UST_Something'
+
 
 def test_parse_xml_with_valid_xml_input(fake_content):
     gen = parse_xml(fake_content)
@@ -85,12 +94,13 @@ def test_parse_xml_with_valid_xml_input(fake_content):
 
 def test_yield_ust_dic():
     start_date = date(2017, 1, 1)
-    gen = yield_ust_dict(start_date,downloader=fake_fetch)
+    gen = yield_ust_dict(start_date, downloader=fake_fetch)
     d = next(gen)
     assert d['date'] == '2017-01-03'
     assert d['value'] == Decimal('0.52')
     assert d['freq'] == 'd'
     assert d['name'] == 'UST_1MONTH'
+
 
 if __name__ == "__main__":
     pytest.main([__file__])

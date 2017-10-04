@@ -3,11 +3,11 @@ import datetime
 from decimal import *
 
 from parsers.runner import (ParserBase,
-                    RosstatKEP_Monthly,
-                    RosstatKEP_Quarterly,
-                    RosstatKEP_Annual,
-                    CBR_USD,
-                    BrentEIA)
+                            RosstatKEP_Monthly,
+                            RosstatKEP_Quarterly,
+                            RosstatKEP_Annual,
+                            CBR_USD,
+                            BrentEIA)
 
 PARSER_CLASSES = [RosstatKEP_Monthly,
                   RosstatKEP_Quarterly,
