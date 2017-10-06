@@ -5,6 +5,11 @@ from parsers.getter.util import (fetch,
                                  format_date,
                                  format_value)
 
+# FIXME: this line of code gets repeated 3 times below, do we have a chance to recylce it? a ixture/setup method?
+#        url = "http://www.testpage.com"
+#        with requests_mock.mock() as mocked_content:
+
+
 class Test_fetch:
     def test_fetch_good_response(self):
         url = "http://www.testpage.com"
@@ -46,7 +51,12 @@ class Test_format_date:
 class Test_format_value:
     def test_format_value_with_valid_parameters(self):
         assert format_value('2.26') == Decimal('2.26')
-
+        
+    # FIXME:    
+    # EP: Very sceptical about this - we test for passing a list - but what is the likelihood we encounter a list in code? 
+    #     This test gives a flase sense we tested for invalid parameter, but such parameter will never be encountered,
+    #     so what is the use? this is a bit fantasy case and rather useless test I think.
+    #     Much more likely - a value like '1 020' is passed - we have seen it in cbr_fx.py
     def test_format_value_with_invalid_parameters(self):
         with pytest.raises(ValueError):
             format_value(['123,56','something'])
