@@ -16,6 +16,5 @@ def fetch(url):
 def format_date(date_string: str, fmt):
     return datetime.strptime(date_string, fmt).strftime("%Y-%m-%d")
 
-
 def format_value(value_string: str, precision=2):
     return round(Decimal(value_string), precision)

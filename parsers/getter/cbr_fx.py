@@ -48,7 +48,7 @@ def get_cbr_er(start_date, end_date, downloader=util.fetch):
 
 if __name__ == "__main__":
     s = date(1992, 1, 1)
-    e = date(2017, 10, 4)
+    e = date(2000, 1, 2)
     gen = get_cbr_er(s, e)
     for i in range(20):
         print(next(gen))
