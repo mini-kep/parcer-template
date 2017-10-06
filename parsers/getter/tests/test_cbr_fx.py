@@ -44,16 +44,17 @@ def test_xml_text_to_stream(fake_xml_content):
     assert d["name"] == "USDRUR_CB"
     assert d['value'] == Decimal('125.2600')
 
+# FIXME: method naming
 class Test_transform:
-    def test_transform_with_year_less_than_1997(self):
+    def test_transform_with_year_less_than_1997_DOES_WHAT(self):
         datapoint = {'date': '1996-12-29', 'value': 11.25987}
         assert transform(datapoint) == {'date': '1996-12-29', 'value': 0.0113}
 
-    def test_transform_with_year_over_than_1997(slef):
+    def test_transform_with_year_over_than_1997_DOES_WHAT(self):
         datapoint = {'date': '2017-09-25', 'value': 11.25987}
         assert transform(datapoint) == datapoint
 
-    def test_transform_with_bad_args(self):
+    def test_transform_with_bad_args_DOES_WHAT(self):
         datapoint = {'date': datetime.date(2017, 12, 5), 'value': 11.25987}
         with pytest.raises(TypeError) as e:
             transform(datapoint)
