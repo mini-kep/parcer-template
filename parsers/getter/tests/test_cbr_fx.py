@@ -1,4 +1,4 @@
-import datetime
+from datetime import date
 import requests_mock
 import pytest
 from decimal import Decimal
@@ -20,18 +20,21 @@ def fake_xml_content(url=None):
 
 class Test_make_url:
     def test_make_url_with_good_args(self):
-        assert '05/12/2017&date_req2=05/12/2018' in make_url(
-            datetime.date(2017, 12, 5), datetime.date(2018, 12, 5))
-
+        url = make_url(date(2017, 12, 5), date(2018, 12, 5))
+        assert '05/12/2017&date_req2=05/12/2018' in url
+        
+# FIXME: ------------------------------------------------------------------  
 # author: muroslav2909
 # NOTE: end_date less than start_date. I think should be some validation
 # inside method.
-
 # JV: In my opinion > This should throw an exception
-    def test_make_url_with_end_date_less_than_start_date(self):
-        assert '05/12/2018&date_req2=05/12/2017' in make_url(
-            datetime.date(2018, 12, 5), datetime.date(2017, 12, 5))
+# EP: should there be new, porperly named test then for this?
+# FIXME: ------------------------------------------------------------------
 
+    def test_make_url_with_end_date_less_than_start_date_raises_exception(self):
+        url = make_url(date(2018, 12, 5), date(2017, 12, 5))
+        assert '05/12/2018&date_req2=05/12/2017' in url
+        
     def test_make_url_with_bad_date_format(self):
         with pytest.raises(AttributeError) as e:
             make_url('bad_date_format', None)
@@ -55,13 +58,13 @@ class Test_transform:
         assert transform(datapoint) == datapoint
 
     def test_transform_with_bad_args_DOES_WHAT(self):
-        datapoint = {'date': datetime.date(2017, 12, 5), 'value': 11.25987}
+        datapoint = {'date': date(2017, 12, 5), 'value': 11.25987}
         with pytest.raises(TypeError) as e:
             transform(datapoint)
 
 def test_get_cbr_er():
-    start_str = datetime.date(1992, 7, 1)
-    end_str = datetime.date(2017, 10, 4)
+    start_str = date(1992, 7, 1)
+    end_str = date(2017, 10, 4)
     result = get_cbr_er(start_str,end_str,downloader=fake_xml_content)
     d = next(result)
     assert d['date'] == '1992-07-01'
