@@ -7,12 +7,15 @@ import parsers.getter.util as util
 
 
 def make_url(start_date, end_date):
-    start, end = (x.strftime('%d/%m/%Y') for x in [start_date, end_date])
-    usd_code = 'R01235'
-    return ("http://www.cbr.ru/scripts/XML_dynamic.asp"
-            f"?date_req1={start}"
-            f"&date_req2={end}"
-            f"&VAL_NM_RQ={usd_code}")
+    if start_date < end_date:
+        start, end = (x.strftime('%d/%m/%Y') for x in [start_date, end_date])
+        usd_code = 'R01235'
+        return ("http://www.cbr.ru/scripts/XML_dynamic.asp"
+                f"?date_req1={start}"
+                f"&date_req2={end}"
+                f"&VAL_NM_RQ={usd_code}")
+    else:
+        raise ValueError(f"End date <{end_date}> is less then {start_date}.")
 
 
 def xml_text_to_stream(xml_text):
@@ -47,7 +50,7 @@ def get_cbr_er(start_date, end_date, downloader=util.fetch):
 
 
 if __name__ == "__main__":
-    s = date(1992, 1, 1)
+    s = date(2001, 1, 1)
     e = date(2000, 1, 2)
     gen = get_cbr_er(s, e)
     for i in range(20):
