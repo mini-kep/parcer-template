@@ -26,10 +26,16 @@ class ParserBase:
             self.end = DateHelper.make_date(end)   
             
     def yield_dicts(self):
+        # assumes self._yield_dicts() is present in child class
         def is_date_in_range(d):
             dt = DateHelper.make_date(d['date'])        
             return dt >= self.start and dt <= self.end 
         return filter(is_date_in_range, self._yield_dicts())
+    
+    def upload(self):
+        # TODO: upload individual parser data to database
+        gen = self.yield_dicts()
+        pass 
     
     def __repr__(self):
         start = DateHelper.as_string(self.start)
@@ -179,6 +185,12 @@ class Dataset:
                 datapoint['value'] = float(datapoint['value'])                
                 yield datapoint
 
+    def upload(self, start=None, end=None):
+        # TODO: uplood gen to database
+        gen = Dataset.yield_dicts(start, end)
+        pass 
+        
+        
     def as_markdown():
         tables_str = [cls.as_markdown() for cls in Dataset.parsers]
         return '\n\n'.join(tables_str)
@@ -207,8 +219,10 @@ if __name__ == "__main__":
     kep_m = list(RosstatKEP_Monthly('2017-06').yield_dicts())
 
     # reference dataset
-    Dataset.save_json_readable(filename='test_data_2016H2.json', 
-                               start='2016-06-01', 
-                               end='2016-12-31')
+    param = dict(filename='test_data_2016H2.json', 
+                 start='2016-06-01', 
+                 end='2016-12-31')      
+    # Dataset.save_json_readable(**param)
+    
     # full dataset
-    Dataset.save_json()
+    # Dataset.save_json()
