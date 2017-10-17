@@ -2,9 +2,21 @@
 [![Coverage badge](https://codecov.io/gh/mini-kep/parsers/branch/master/graphs/badge.svg)](https://codecov.io/gh/mini-kep/parsers)
 
 
-```parsers``` give you access to data sources,  use ```runner.py``` as entry point. 
+```parsers``` package enables adding data from new sources to database. 
 
-Full dataset obtained using code below. The datapoints are from start of dataset. 
+```parsers.getters``` contain modules for individual parsers. Each parser module has a function 
+that yields dictionaries with datapoints:
+```python 
+ {'date': '2017-09-26', 
+  'freq': 'd', 
+  'name': 'USDRUR_CB', 
+  'value': 57.566},
+```
+
+```parsers.runner``` has base class ```ParserBase``` used to invoke getter functions.
+
+```Dataset``` class used to manipulate all information, obtained from parsers. 
+Full dataset can be obtained using code below.
 
 ```python 
 from runner import Dataset
@@ -13,8 +25,8 @@ gen = Dataset.yield_dicts()
 
 ```
 
-Querying full dataset each time we want up update is a burden on the original API sources. 
-Thus, individual parsers can return datapoints from a specific date to present: 
+Querying full dataset is a burden on the original API sources. Thus, individual parsers can return 
+datapoints from a specific date to present: 
 
 ```python
 from runner import CBR_USD
@@ -22,14 +34,6 @@ from runner import CBR_USD
 gen = CBR_USD(start='2017-09-01').yield_dicts()
 ```
 
-Generator in ```.yield_dicts()``` method produces dictionaries like this: 
-
-```python 
-{'date': '2017-09-13', 
- 'freq': 'd', 
- 'name': 'BRENT', 
- 'value': 55.52}
-```
 
 # Parser descriptions
 
