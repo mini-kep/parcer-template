@@ -1,6 +1,6 @@
 import pytest
 import datetime
-from decimal import *
+from decimal import Decimal
 
 from parsers.runner import (ParserBase,
                             RosstatKEP_Monthly,
@@ -23,8 +23,8 @@ def mock_parser():
     MockParser = ParserBase
     MockParser.__doc__ = 'Short text'
     MockParser.freq = 'a'
-    MockParser.source_url = 'http://some.url'
-    MockParser.all_varnames = ['VAR1', 'VAR2']
+    MockParser.reference = dict(source_url = 'http://some.url',
+                                varnames = ['VAR1', 'VAR2'])
     return MockParser
 
 
@@ -42,7 +42,8 @@ class Test_Formatter:
             assert line in result
 
     def test_as_markdown_valid_input_long_link(self, mock_parser):
-        mock_parser.source_url = ("http://www.gks.ru/wps/wcm/connect/"
+        mock_parser.reference['source_url'] = \
+                                 ("http://www.gks.ru/wps/wcm/connect/"
                                   "rosstat_main/rosstat/ru/statistics/"
                                   "publications/catalog/"
                                   "doc_1140080765391")
@@ -53,15 +54,19 @@ class Test_Formatter:
 
 
 @pytest.mark.parametrize("cls", PARSER_CLASSES)
-def test_parser_class_atributes(cls):
+def test_parser_class_atributes_core(cls):
     for cls in PARSER_CLASSES:
         assert cls.freq.isalpha()
         assert len(cls.freq) == 1
         assert isinstance(cls.observation_start_date, datetime.date)
-        assert isinstance(cls.source_url, str)
-        assert cls.source_url.startswith('http')
-        assert isinstance(cls.all_varnames, list)
-        assert isinstance(cls.all_varnames[0], str)
+
+@pytest.mark.parametrize("cls", PARSER_CLASSES)
+def test_parser_class_atributes_reference(cls):
+        ref = cls.reference
+        assert isinstance(ref['source_url'], str)
+        assert ref['source_url'].startswith('http')
+        assert isinstance(ref['varnames'], list)
+        assert isinstance(ref['varnames'][0], str)
 
 
 @pytest.mark.parametrize("cls", PARSER_CLASSES)
@@ -71,7 +76,7 @@ def test_parser_instance_created_without_date(cls):
 
 @pytest.mark.parametrize("cls", PARSER_CLASSES)
 def test_parser_instance_created_with_date(cls):
-    assert cls('2017-09-15')
+    assert cls(start='2017-09-15', end='2017-12-15')
 
 
 @pytest.mark.parametrize("cls", PARSER_CLASSES)

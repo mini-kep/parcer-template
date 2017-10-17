@@ -8,51 +8,63 @@ from parsers.helpers import DateHelper, Markdown, interpret_frequency
 import parsers.getter.brent as brent
 import parsers.getter.cbr_fx as cbr_fx
 import parsers.getter.kep as kep
+#TODO: use ust function below
 import parsers.getter.ust as ust
 
 
 class ParserBase:
+    """Parent class for parser runner."""
+    
+    def __init__(self, start=None, end=None):        
+        if start is None:
+            self.start = self.observation_start_date
+        else:
+            self.start = DateHelper.make_date(start)            
+        if end is None:
+            self.end = DateHelper.today()
+        else:
+            self.end = DateHelper.make_date(end)   
+            
+    def yield_dicts(self):
+        def is_date_in_range(d):
+            dt = DateHelper.make_date(d['date'])        
+            return dt >= self.start and dt <= self.end 
+        return filter(is_date_in_range, self._yield_dicts())
+    
     def __repr__(self):
         start = DateHelper.as_string(self.start)
-        return f'{self.__class__.__name__}(\'{start}\')'
+        end = DateHelper.as_string(self.end)
+        return f'{self.__class__.__name__}(\'{start}\', \'{end}\')'
 
     @classmethod
     def as_markdown(cls):
-        url_str = Markdown.short_link(cls.source_url)
+        url_str = Markdown.short_link(cls.reference['source_url'])
         freq_str = interpret_frequency(cls.freq)
-        varname_str = ", ".join(cls.all_varnames)
-
+        varname_str = ", ".join(cls.reference['varnames'])
         rows = [("Parser", cls.__name__),
                 ("Description", cls.__doc__ or ''),
                 ("URL", url_str or ''),
                 ("Frequency", freq_str),
-                ("Variables", varname_str or ''),
-                ("Code", url_str or '')]
+                ("Variables", varname_str or '')]
         return Markdown.table(rows)
 
 
 class RosstatKEP_Base(ParserBase):
-    """Sections of Rosstat Short-term economic indicators ('KEP') publication."""
-    observation_start_date = DateHelper.make_date('1999-01-31')
-    source_url = ("http://www.gks.ru/wps/wcm/connect/"
-                  "rosstat_main/rosstat/ru/statistics/"
-                  "publications/catalog/doc_1140080765391")
-    all_varnames = ['CPI', 'GDP', 'etc']
+    observation_start_date = DateHelper.make_date('1999-01-31')    
+    reference = dict(source_url = ("http://www.gks.ru/wps/wcm/connect/"
+                                   "rosstat_main/rosstat/ru/statistics/"
+                                   "publications/catalog/doc_1140080765391"),
+                     varnames = ['GDP', 'CPI', 'etc'])
+    freq = None #overload this in child classes
 
-    def __init__(self, start=None):
-        if start is None:
-            self.start = self.observation_start_date
-        else:
-            self.start = DateHelper.make_date(start)
+    def _yield_dicts(self):
+        return kep.yield_kep_dicts(self.freq)
 
     def sample(self):
         yield {"date": "2015-11-30", "freq": self.freq, "name": "CPI_rog", "value": 100.8}
         yield {"date": "2015-11-30", "freq": self.freq, "name": "RUR_EUR_eop", "value": 70.39}
         yield {"date": "2015-12-31", "freq": self.freq, "name": "CPI_rog", "value": 100.8}
         yield {"date": "2015-12-31", "freq": self.freq, "name": "RUR_EUR_eop", "value": 79.7}
-
-    def yield_dicts(self):
-        return kep.yield_kep_dicts(self.freq)
 
 
 class RosstatKEP_Monthly(RosstatKEP_Base):
@@ -74,17 +86,10 @@ class CBR_USD(ParserBase):
     """Bank of Russia official USD to RUB exchange rate"""
     freq = 'd'
     observation_start_date = DateHelper.make_date('1992-01-01')  # '1991-07-01'
-    source_url = "http://www.cbr.ru/scripts/Root.asp?PrtId=SXML"
-    all_varnames = ['USDRUR_CB']
-
-    def __init__(self, start=None):
-        if start is None:
-            self.start = self.observation_start_date
-        else:
-            self.start = DateHelper.make_date(start)
-        self.end = DateHelper.today()
-
-    def yield_dicts(self):
+    reference = dict(source_url = "http://www.cbr.ru/scripts/Root.asp?PrtId=SXML",
+                     varnames = ['USDRUR_CB'])
+    
+    def _yield_dicts(self):
         return cbr_fx.get_cbr_er(self.start, self.end)
 
     def sample(self):
@@ -103,16 +108,11 @@ class BrentEIA(ParserBase):
     """Brent oil price from US EIA"""
     freq = 'd'
     observation_start_date = DateHelper.make_date('1987-05-15')
-    source_url = "https://www.eia.gov/opendata/qb.php?category=241335"
-    all_varnames = ['BRENT']
+    reference = dict(source_url = 'https://www.eia.gov/opendata/qb.php?category=241335',
+                     varnames = ['BRENT'])
 
-    def __init__(self, start=None):
-        if start is None:
-            self.start = self.observation_start_date
-        else:
-            self.start = DateHelper.make_date(start)
-
-    def yield_dicts(self):
+    def _yield_dicts(self):
+        # brent always returns full dataset, need truncate for start_date
         for p in brent.yield_brent_dicts():
             if DateHelper.make_date(p['date']) >= self.start:
                 yield p
@@ -167,41 +167,48 @@ class Dataset:
                # USTbonds
                ]
 
-    def get_sample():
-        return [d for parser in Dataset.parsers
-                for d in parser().sample()]
+    def sample():
+        return [datapoint for parser in Dataset.parsers
+                          for datapoint in parser().sample()]
 
-    def yield_dicts(start=None):
-        for parser in Dataset.parsers:
-            for datapoint in parser(start).yield_dicts():
+    def yield_dicts(start=None, end=None):
+        for parser_cls in Dataset.parsers:            
+            parser = parser_cls(start, end)
+            for datapoint in parser.yield_dicts():
+                # convert to float
+                datapoint['value'] = float(datapoint['value'])                
                 yield datapoint
 
     def as_markdown():
-        tables = [cls.as_markdown() for cls in Dataset.parsers]
-        return '\n\n'.join(tables)
+        tables_str = [cls.as_markdown() for cls in Dataset.parsers]
+        return '\n\n'.join(tables_str)
 
-    def serialize(filename='dataset.json'):
-        def to_float(d):
-            d['value'] = float(d['value'])
-            return d
-        gen = map(to_float, Dataset.yield_dicts())
+    def save_json(filename='dataset.json', start=None, end=None, fmt={}):            
+        gen = Dataset.yield_dicts(start, end)
         with open(filename, 'w') as f:
-            json.dump(list(gen), f)
-
+            json.dump(list(gen), f, **fmt)
+            
+    def save_json_readable(filename, start=None, end=None):
+        fmt = dict(indent=4, separators=(',', ': '))
+        Dataset.save_json(filename, start, end, fmt)      
+    
 
 if __name__ == "__main__":
     from pprint import pprint
     print('Sample dataset:')
-    pprint(Dataset.get_sample())
+    pprint(Dataset.sample())
 
     print('\nMarkdown descriptions:')
     print(Dataset.as_markdown())
 
-    fx = CBR_USD('2017-09-01').yield_dicts()
-    oil = BrentEIA('2017-09-01').yield_dicts()
-    kep_m = RosstatKEP_Monthly('2017-06').yield_dicts()
+    #sample subsets
+    fx = list(CBR_USD('2017-09-01').yield_dicts())
+    oil = list(BrentEIA('2017-09-01').yield_dicts())
+    kep_m = list(RosstatKEP_Monthly('2017-06').yield_dicts())
 
-    # this generator seeds the database
-    gen = Dataset.yield_dicts()
-
-    Dataset.serialize()
+    # reference dataset
+    Dataset.save_json_readable(filename='test_data_2016H2.json', 
+                               start='2016-06-01', 
+                               end='2016-12-31')
+    # full dataset
+    Dataset.save_json()
