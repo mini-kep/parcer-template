@@ -13,7 +13,7 @@ class Test_convert_decimal_to_float():
 
 
 class Test_convert_gen_object_to_json():
-    def test_function_convert_decimal_to_float_return_float(self):
+    def test_on_iterable_with_Decimal_returns_string(self):
         #FIXME refine test to close to actual data
         gen_sample = iter([Decimal(1.01)])
         assert to_json(gen=gen_sample) == '[1.01]'
