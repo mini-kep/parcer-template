@@ -1,6 +1,8 @@
 """Parser interfaces."""
 
 import json
+import requests
+import decimal
 
 from parsers.helpers import DateHelper, Markdown, interpret_frequency
 
@@ -10,6 +12,14 @@ import parsers.getter.cbr_fx as cbr_fx
 import parsers.getter.kep as kep
 #TODO: use ust function below
 import parsers.getter.ust as ust
+
+
+# We use this function for converting Decimals to Float during data upload
+# because Python doesn't support JSON serialization for Decimals
+def convert_decimal_to_float(obj):
+    if isinstance(obj, decimal.Decimal):
+        return float(obj)
+    raise TypeError
 
 
 class ParserBase:
@@ -33,11 +43,16 @@ class ParserBase:
         return filter(is_date_in_range, self._yield_dicts())
     
     def upload(self):
-        # TODO: upload individual parser data to database
-        
         # data to upload
         gen = self.yield_dicts()
-        pass 
+        # Here we need to convert decimals which exists in data to float
+        data = json.dumps(list(gen), default=convert_decimal_to_float),
+        # Hardcoded url
+        response = requests.post(url='https://minikep-db.herokuapp.com/api/incoming',
+                                 data=data,
+                                 # Hardcoded API_TOKEN
+                                 headers=dict(API_TOKEN='123'))
+        return True if response.status_code == 200 else False
     
     def __repr__(self):
         start = DateHelper.as_string(self.start)
@@ -187,12 +202,17 @@ class Dataset:
                 datapoint['value'] = float(datapoint['value'])                
                 yield datapoint
 
-    def upload(self, start=None, end=None):
-        # TODO: uplood gen to database
-        
+    def upload(start=None, end=None):
         # data to upload
         gen = Dataset.yield_dicts(start, end)
-        pass 
+        # Here we need to convert decimals which exists in data to float
+        data = json.dumps(list(gen), default=convert_decimal_to_float)
+        # Hardcoded URL
+        response = requests.post(url='https://minikep-db.herokuapp.com/api/incoming',
+                                 data=data,
+                                 # Hardcoded API_TOKEN
+                                 headers=dict(API_TOKEN='123'))
+        return True if response.status_code == 200 else False
         
         
     def as_markdown():
@@ -211,22 +231,23 @@ class Dataset:
 
 if __name__ == "__main__":
     from pprint import pprint
+
     print('Sample dataset:')
     pprint(Dataset.sample())
 
     print('\nMarkdown descriptions:')
     print(Dataset.as_markdown())
 
-    #sample subsets
+    # sample subsets
     fx = list(CBR_USD('2017-09-01').yield_dicts())
     oil = list(BrentEIA('2017-09-01').yield_dicts())
     kep_m = list(RosstatKEP_Monthly('2017-06').yield_dicts())
 
     # reference dataset
-    param = dict(filename='test_data_2016H2.json', 
-                 start='2016-06-01', 
-                 end='2016-12-31')      
+    param = dict(filename='test_data_2016H2.json',
+                 start='2016-06-01',
+                 end='2016-12-31')
     # Dataset.save_json_readable(**param)
-    
+
     # full dataset
     # Dataset.save_json()
