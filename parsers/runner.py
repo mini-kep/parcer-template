@@ -14,6 +14,10 @@ import parsers.getter.kep as kep
 import parsers.getter.ust as ust
 
 
+# Hardcoded params
+url_for_uploading_data = 'https://minikep-db.herokuapp.com/api/incoming'
+API_TOKEN_for_uploading_data = '123'
+
 # We use this function for converting Decimals to Float during data upload
 # because Python doesn't support JSON serialization for Decimals
 def convert_decimal_to_float(obj):
@@ -46,12 +50,12 @@ class ParserBase:
         # data to upload
         gen = self.yield_dicts()
         # Here we need to convert decimals which exists in data to float
-        data = json.dumps(list(gen), default=convert_decimal_to_float),
+        data = json.dumps(list(gen), default=convert_decimal_to_float)
         # Hardcoded url
-        response = requests.post(url='https://minikep-db.herokuapp.com/api/incoming',
+        response = requests.post(url=url_for_uploading_data,
                                  data=data,
                                  # Hardcoded API_TOKEN
-                                 headers=dict(API_TOKEN='123'))
+                                 headers=dict(API_TOKEN=API_TOKEN_for_uploading_data))
         return True if response.status_code == 200 else False
     
     def __repr__(self):
@@ -208,10 +212,10 @@ class Dataset:
         # Here we need to convert decimals which exists in data to float
         data = json.dumps(list(gen), default=convert_decimal_to_float)
         # Hardcoded URL
-        response = requests.post(url='https://minikep-db.herokuapp.com/api/incoming',
+        response = requests.post(url=url_for_uploading_data,
                                  data=data,
                                  # Hardcoded API_TOKEN
-                                 headers=dict(API_TOKEN='123'))
+                                 headers=dict(API_TOKEN=API_TOKEN_for_uploading_data))
         return True if response.status_code == 200 else False
         
         
