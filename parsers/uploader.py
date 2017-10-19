@@ -12,27 +12,34 @@ UPLOAD_API_TOKEN = '123'
 
 
 def convert_decimal_to_float(obj):
-    """Helper function to serilaise Decimals to float type."""
+    """Helper function to serilaise Decimals to float type.
+       Used inside to_json(). 
+    """
     if isinstance(obj, decimal.Decimal):
         return float(obj)
     raise TypeError
 
 
-def to_json(gen):    
+def to_json(gen): 
+    """Convert generator *gen* to json string.    
+    
+    Returns:
+        string
+    """
     return json.dumps(list(gen), default=convert_decimal_to_float)
 
 
-def upload_to_database(gen):
-    """Save data from generator *gen* to database.
+def upload_to_database(gen, endpoint=UPLOAD_URL, token=UPLOAD_API_TOKEN)):
+    """Save data from generator *gen* to database endpoint.
     
     Returns:
         True on success (status code 200),
         False otherwise     
     """
     _data = to_json(gen)
-    response = requests.post(url=url_for_uploading_data,
+    response = requests.post(url=endpoint,
                              data=_data,                             
-                             headers={'API_TOKEN': UPLOAD_API_TOKEN})
+                             headers={'API_TOKEN': token})
     if response.status_code == 200:
         return True
     else:
