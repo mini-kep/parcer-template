@@ -34,6 +34,8 @@ class ParserBase:
     
     def upload(self):
         # TODO: upload individual parser data to database
+        
+        # data to upload
         gen = self.yield_dicts()
         pass 
     
@@ -187,6 +189,8 @@ class Dataset:
 
     def upload(self, start=None, end=None):
         # TODO: uplood gen to database
+        
+        # data to upload
         gen = Dataset.yield_dicts(start, end)
         pass 
         
