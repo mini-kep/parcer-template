@@ -3,7 +3,6 @@
 import json
 
 from parsers.helpers import DateHelper, Markdown, interpret_frequency
-
 from parsers.uploader import upload_to_database
 
 # individual parser functions
