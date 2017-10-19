@@ -1,10 +1,10 @@
 """Parser interfaces."""
 
 import json
-import requests
-import decimal
 
 from parsers.helpers import DateHelper, Markdown, interpret_frequency
+
+from parsers.uploader import upload_to_database
 
 # individual parser functions
 import parsers.getter.brent as brent
@@ -12,29 +12,6 @@ import parsers.getter.cbr_fx as cbr_fx
 import parsers.getter.kep as kep
 #TODO: use ust function below
 import parsers.getter.ust as ust
-
-
-# We use this function for converting Decimals to Float during data upload
-# because Python doesn't support JSON serialization for Decimals
-def convert_decimal_to_float(obj):
-    if isinstance(obj, decimal.Decimal):
-        return float(obj)
-    raise TypeError
-
-# Hardcoded params for uploading data to DB
-url_for_uploading_data = 'https://minikep-db.herokuapp.com/api/incoming'
-API_TOKEN_for_uploading_data = '123'
-
-# Functin uploading data to DB
-def upload_data_to_db(gen):
-    # Here we need to convert decimals which exists in data to float
-    data = json.dumps(list(gen), default=convert_decimal_to_float)
-    # Hardcoded url
-    response = requests.post(url=url_for_uploading_data,
-                             data=data,
-                             # Hardcoded API_TOKEN
-                             headers=dict(API_TOKEN=API_TOKEN_for_uploading_data))
-    return True if response.status_code == 200 else False
 
 
 class ParserBase:
@@ -60,7 +37,7 @@ class ParserBase:
     def upload(self):
         # data to upload
         gen = self.yield_dicts()
-        return upload_data_to_db(gen)
+        return upload_to_database(gen)
     
     def __repr__(self):
         start = DateHelper.as_string(self.start)
@@ -213,7 +190,7 @@ class Dataset:
     def upload(start=None, end=None):
         # data to upload
         gen = Dataset.yield_dicts(start, end)
-        return upload_data_to_db(gen)
+        return upload_to_database(gen)
         
         
     def as_markdown():
