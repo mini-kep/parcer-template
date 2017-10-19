@@ -63,13 +63,21 @@ class Test_format_value:
     #     This test gives a flase sense we tested for invalid parameter, but such parameter will never be encountered,
     #     so what is the use? this is a bit fantasy case and rather useless test I think.
     #     Much more likely - a value like '1 020' is passed - we have seen it in cbr_fx.py
-    #----------------------------------------------------------------------------------------
+    #---------------------------------------------------------------------------------------------------------------------
     # JV :  I wanted to test, if program throws exception when some invalid parameter is passed.
     #       so I supposed that such situation can occur, that in source will be wrong value so parsed value
     #       will be also wrong. But aggre with you that '1 020' is more realistic situation which can be encountered
+    #---------------------------------------------------------------------------------------------------------------------
+    #
+    # EP: this is exactly a situaltion for 
+    #     <#9 in concentrate around practical risks in program execution, not fantasy situations>
+    #     <https://github.com/mini-kep/intro/tree/master/testing_guidelines#checklist>
+    #    '12 356' is highly preferred over a list as an input. (list deleted)
+    
+    
     def test_format_value_with_invalid_parameters(self):
         with pytest.raises(Exception):
-            format_value('12 356')
+            format_value('12 356' )
 
     def test_format_value_with_None_parameter(self):
         with pytest.raises(TypeError):
