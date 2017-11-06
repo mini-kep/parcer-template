@@ -120,7 +120,6 @@ class BrentEIA(ParserBase):
 #    freq = 'd'
 #    observation_start_date = DateHelper.make_date('1987-05-15')
 #    source_url = "https://www.eia.gov/opendata/qb.php?category=241335"
-#    all_varnames = ['BRENT']
 #
 #    def __init__(self, start=None):
 #        if start is None:

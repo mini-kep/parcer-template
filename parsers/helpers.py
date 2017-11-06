@@ -45,6 +45,18 @@ def as_string(date):
 
 assert make_date(None) is None
 
+                
+def as_markdown(cls):
+    url_str = Markdown.short_link(cls.source_url)
+    freq_str = interpret_frequency(cls.freq)
+    rows = [("Parser", cls.__name__),
+            ("Description", cls.__doc__ or ''),
+            ("URL", url_str or ''),
+            ("Frequency", freq_str),
+            ("Start date", as_string(cls.observation_start_date)),
+            ]
+    return Markdown.table(rows)
+                
 
 def interpret_frequency(freq):
     """Make a text description of frequency based on *freq* string."""
