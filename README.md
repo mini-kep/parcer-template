@@ -1,8 +1,7 @@
 [![Build Status](https://travis-ci.org/mini-kep/parsers.svg?branch=master)](https://travis-ci.org/mini-kep/parsers)
 [![Coverage badge](https://codecov.io/gh/mini-kep/parsers/branch/master/graphs/badge.svg)](https://codecov.io/gh/mini-kep/parsers)
 
-
-```parsers``` package enables adding data from new sources to database. 
+Parsers add data from sources to database. 
 
 ```parsers.getters``` contain modules for individual parsers. Each parser module has a function 
 that yields dictionaries with datapoints:
@@ -13,7 +12,12 @@ that yields dictionaries with datapoints:
   'value': 57.566},
 ```
 
-```parsers.runner``` has base class ```ParserBase``` used to invoke getter functions.
+```parsers.runner``` has parser handler classes (derived from ```ParserBase``` class)
+that invoke getter functions and upload data to database:
+   
+   - ```all_items()``` method always invokes a getter function
+   - ```upload()``` saves to database
+
 
 ```Dataset``` class used to manipulate all information, obtained from parsers. 
 Full dataset can be obtained using code below.
@@ -21,7 +25,7 @@ Full dataset can be obtained using code below.
 ```python 
 from runner import Dataset
 
-gen = Dataset.yield_dicts()
+gen = Dataset.items()
 
 ```
 
@@ -31,8 +35,24 @@ datapoints from a specific date to present:
 ```python
 from runner import CBR_USD
 
-gen = CBR_USD(start='2017-09-01').yield_dicts()
+gen = CBR_USD(start='2017-09-01').items
 ```
+
+and so can ```Dataset```:
+
+```
+gen = Dataset.items(start='2017-09-01')
+```
+
+Uploading to database is done by calling ```upload()``` method: 
+
+```
+CBR_USD(start='2017-11-01').upload()
+Dataset.upload('2017-11-01')
+
+```
+
+Uploading large datasets may cause error, better use recent dates for upload. 
 
 
 # Parser descriptions
@@ -42,35 +62,35 @@ gen = CBR_USD(start='2017-09-01').yield_dicts()
 | Description | Monthly indicators from Rosstat 'KEP' publication |
 | URL | [http://www.gks.ru/wps/wcm/connect/rossta...](http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391) |
 | Frequency | Monthly |
-| Variables | CPI, GDP, etc |
+| Start date | 1999-01-31 |
 
 | Parser | RosstatKEP_Quarterly |
 | ------ | -------------------- |
 | Description | Quarterly indicators from Rosstat 'KEP' publication |
 | URL | [http://www.gks.ru/wps/wcm/connect/rossta...](http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391) |
 | Frequency | Quarterly |
-| Variables | CPI, GDP, etc |
+| Start date | 1999-01-31 |
 
 | Parser | RosstatKEP_Annual |
 | ------ | ----------------- |
 | Description | Annual indicators from Rosstat 'KEP' publication |
 | URL | [http://www.gks.ru/wps/wcm/connect/rossta...](http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391) |
 | Frequency | Annual |
-| Variables | CPI, GDP, etc |
+| Start date | 1999-01-31 |
 
 | Parser | CBR_USD |
 | ------ | ------- |
 | Description | Bank of Russia official USD to RUB exchange rate |
 | URL | [http://www.cbr.ru/scripts/Root.asp?PrtId...](http://www.cbr.ru/scripts/Root.asp?PrtId=SXML) |
 | Frequency | Daily |
-| Variables | USDRUR_CB |
+| Start date | 1992-01-01 |
 
 | Parser | BrentEIA |
 | ------ | -------- |
 | Description | Brent oil price from US EIA |
 | URL | [https://www.eia.gov/opendata/qb.php?cate...](https://www.eia.gov/opendata/qb.php?category=241335) |
 | Frequency | Daily |
-| Variables | BRENT |
+| Start date | 1987-05-15 |
 
 Parser types
 ============
@@ -104,4 +124,3 @@ result: <https://raw.githubusercontent.com/epogrebnyak/ust/master/ust.csv> (1.1 
 
 #### repo: rosstat-806-regional
 <https://github.com/epogrebnyak/data-rosstat-806-regional>
-
