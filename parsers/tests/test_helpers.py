@@ -95,6 +95,7 @@ class Test_as_markdown:
                                   "doc_1140080765391")
         expected = 'http://www.gks.ru/wps/wcm/connect/rossta...'
         assert expected in as_markdown(mock_parser)
+        
 
 class Test_Markdown:
 
