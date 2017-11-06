@@ -16,9 +16,6 @@ PARSER_CLASSES = [RosstatKEP_Monthly,
                   CBR_USD,
                   BrentEIA]
 
-# test md representation
-
-
 @pytest.fixture
 def mock_parser():
     MockParser = ParserBase
@@ -126,7 +123,7 @@ def test_CBR_USD_will_not_work_before_1992():
         next(gen)
 
 
-# TODO: use parts of code belwo if needed for validate_datapoint()
+# TODO: must review below
 
 class Base_Test_Parser:
    def setup_method(self):
@@ -178,6 +175,8 @@ class TestRosstatKep(Base_Test_Parser):
                   if item['name'] == 'CPI_rog']
       eur_data = [item for item in self.items
                   if item['name'] == 'RUR_EUR_eop']
+      
+      # FIXME: must not use Super
       super(TestRosstatKep, self)\
           .test_get_data_produces_values_in_valid_range(cpi_data, 90, 110)
       super(TestRosstatKep, self)\
@@ -230,6 +229,12 @@ class TestBrentEIA(Base_Test_Parser):
    def test_all_varnames_are_correct(self):
        assert self.parser.reference.get('varnames') == ['BRENT']
 
+# sample reactroing:
+@pytest.mark.parametrize("parser, string", [
+    [BrentEIA, "https://www.eia.gov/opendata/qb.php?category=241335"]
+])
+def test_source_url_is_correct(parser, string):
+       assert parser().reference.get('source_url') == string
 
 if __name__ == '__main__':
     pytest.main([__file__])
