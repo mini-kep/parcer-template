@@ -78,45 +78,5 @@ def test_CBR_USD_will_not_work_before_1992():
     with pytest.raises(Exception):
         next(CBR_USD('1991-07-15').items)
 
-# NOT IMPLEMENTED - NOT TODO: date check
-#import arrow
-#def is_date_valid(date, parser_class)
-#     
-#     date = arrow.get(date).date()
-#     assert parser_class.start <= date
-#     assert date <= datetime.date.today()
-#
-#
-#   def test_get_data_item_date_in_valid_range(self):
-#       dates = (item['date'] for item in self.items)
-#       for date in dates:
-
-# NOT IMPLEMENTED - NOT TODO: value range check          
-           
-#   # valid code and good idea to check, but iplementation too copmplex
-#   # for a base test class
-#
-#   def test_get_data_produces_values_in_valid_range(self, items, min, max):
-#      for item in items:
-#          assert min < item['value'] < max
-#
-#   def test_get_data_produces_values_in_valid_range(self):
-#      cpi_data = [item for item in self.items
-#                  if item['name'] == 'CPI_rog']
-#      eur_data = [item for item in self.items
-#                  if item['name'] == 'RUR_EUR_eop']
-#      
-#      # FIXME: must not use Super
-#      super(TestRosstatKep, self)\
-#          .test_get_data_produces_values_in_valid_range(cpi_data, 90, 110)
-#      super(TestRosstatKep, self)\
-#          .test_get_data_produces_values_in_valid_range(eur_data, 50, 80)
-#
-#   def test_get_data_produces_values_in_valid_range(self):
-#       super(TestCBR_USD, self).test_get_data_produces_values_in_valid_range(self.items, 50, 70)
-#
-#   def test_get_data_produces_values_in_valid_range(self):
-#       super(TestBrentEIA, self).test_get_data_produces_values_in_valid_range(self.items, 20, 120)
-
 if __name__ == '__main__':
     pytest.main([__file__])
