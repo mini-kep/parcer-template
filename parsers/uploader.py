@@ -1,3 +1,4 @@
+# FIXME: change endpoint
 UPLOAD_URL = 'https://minikep-db.herokuapp.com/api/incoming'
 
 # FIXME: unsecure
@@ -32,9 +33,9 @@ def post(data, endpoint=UPLOAD_URL, token=UPLOAD_API_TOKEN):
     return requests.post(url=endpoint,
                          data=data,                             
                          headers={'API_TOKEN': token})
-    
 
-def upload_to_database(gen, upload_func=post):
+
+def upload_datapoints(gen, upload_func=post):
     """Save data from generator *gen* to database endpoint.
     
        Returns:

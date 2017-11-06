@@ -1,8 +1,9 @@
 """Parser interfaces."""
 
 import json
-from parsers.helpers import make_date, today, as_string
-from parsers.uploader import upload_datapoints
+
+from parsers.helpers import DateHelper, Markdown, interpret_frequency
+from parsers.uploader import upload_to_database
 
 # individual parser functions
 import parsers.getter.brent as brent
@@ -12,51 +13,60 @@ import parsers.getter.kep as kep
 import parsers.getter.ust as ust
 
 
-def get_dates(observation_start_date, start=None, end=None):
-   start = make_date(start) or observation_start_date    
-   end = make_date(end) or today() 
-   return start, end 
-
-
 class ParserBase:
     """Parent class for parser runner."""
     
-    observation_start_date = make_date('1965-01-01')
-    source_url = ''
-    
-    def __init__(self, start=None, end=None):
-        self.start, self.end = get_dates(self.observation_start_date, start, end)
+    def __init__(self, start=None, end=None):        
+        if start is None:
+            self.start = self.observation_start_date
+        else:
+            self.start = DateHelper.make_date(start)            
+        if end is None:
+            self.end = DateHelper.today()
+        else:
+            self.end = DateHelper.make_date(end)   
             
-    def all_items(self):
-        pass
+    def yield_dicts(self):
+        # assumes self._yield_dicts() is present in child class
+        def is_date_in_range(d):
+            dt = DateHelper.make_date(d['date'])        
+            return dt >= self.start and dt <= self.end 
+        return filter(is_date_in_range, self._yield_dicts())
     
-    @property
-    def items(self):
-        # assumes self.all_items() is present in child class
-        for item in self.all_items():            
-            dt = make_date(item['date'])        
-            if dt >= self.start and dt <= self.end:
-                yield item
-                
     def upload(self):
-        return upload_datapoints(self.items)
+        # data to upload
+        gen = self.yield_dicts()
+        return upload_to_database(gen)
     
     def __repr__(self):
-        start = as_string(self.start)
-        end = as_string(self.end)
+        start = DateHelper.as_string(self.start)
+        end = DateHelper.as_string(self.end)
         return f'{self.__class__.__name__}(\'{start}\', \'{end}\')'
+
+    @classmethod
+    def as_markdown(cls):
+        url_str = Markdown.short_link(cls.reference['source_url'])
+        freq_str = interpret_frequency(cls.freq)
+        varname_str = ", ".join(cls.reference['varnames'])
+        rows = [("Parser", cls.__name__),
+                ("Description", cls.__doc__ or ''),
+                ("URL", url_str or ''),
+                ("Frequency", freq_str),
+                ("Variables", varname_str or '')]
+        return Markdown.table(rows)
 
 
 class RosstatKEP_Base(ParserBase):
-    observation_start_date = make_date('1999-01-31')    
-    source_url = ("http://www.gks.ru/wps/wcm/connect/"
-                  "rosstat_main/rosstat/ru/statistics/"
-                  "publications/catalog/doc_1140080765391")
-    freq = None #must overload in child classes
+    observation_start_date = DateHelper.make_date('1999-01-31')    
+    reference = dict(source_url = ("http://www.gks.ru/wps/wcm/connect/"
+                                   "rosstat_main/rosstat/ru/statistics/"
+                                   "publications/catalog/doc_1140080765391"),
+                     varnames = ['GDP', 'CPI', 'etc'])
+    freq = None #overload this in child classes
 
-    def all_items(self):
+    def _yield_dicts(self):
         return kep.yield_kep_dicts(self.freq)
-    
+
     def sample(self):
         yield {"date": "2015-11-30", "freq": self.freq, "name": "CPI_rog", "value": 100.8}
         yield {"date": "2015-11-30", "freq": self.freq, "name": "RUR_EUR_eop", "value": 70.39}
@@ -82,10 +92,11 @@ class RosstatKEP_Annual(RosstatKEP_Base):
 class CBR_USD(ParserBase):
     """Bank of Russia official USD to RUB exchange rate"""
     freq = 'd'
-    observation_start_date = make_date('1992-01-01')  # '1991-07-01'
-    source_url = "http://www.cbr.ru/scripts/Root.asp?PrtId=SXML"
+    observation_start_date = DateHelper.make_date('1992-01-01')  # '1991-07-01'
+    reference = dict(source_url = "http://www.cbr.ru/scripts/Root.asp?PrtId=SXML",
+                     varnames = ['USDRUR_CB'])
     
-    def all_items(self):
+    def _yield_dicts(self):
         return cbr_fx.get_cbr_er(self.start, self.end)
 
     def sample(self):
@@ -94,25 +105,33 @@ class CBR_USD(ParserBase):
                      {'date': '2017-09-16', 'freq': 'd', 'name': 'USDRUR_CB', 'value': 57.5336},
                      {'date': '2017-09-19', 'freq': 'd', 'name': 'USDRUR_CB', 'value': 57.6242},
                      {'date': '2017-09-20', 'freq': 'd', 'name': 'USDRUR_CB', 'value': 58.0993},
-                    ])
+                     {'date': '2017-09-21', 'freq': 'd', 'name': 'USDRUR_CB', 'value': 58.129},
+                     {'date': '2017-09-22', 'freq': 'd', 'name': 'USDRUR_CB', 'value': 58.2242},
+                     {'date': '2017-09-23', 'freq': 'd', 'name': 'USDRUR_CB', 'value': 57.6527},
+                     {'date': '2017-09-26', 'freq': 'd', 'name': 'USDRUR_CB', 'value': 57.566}])
 
 
 class BrentEIA(ParserBase):
     """Brent oil price from US EIA"""
     freq = 'd'
-    observation_start_date = make_date('1987-05-15')
-    source_url = 'https://www.eia.gov/opendata/qb.php?category=241335'
+    observation_start_date = DateHelper.make_date('1987-05-15')
+    reference = dict(source_url = 'https://www.eia.gov/opendata/qb.php?category=241335',
+                     varnames = ['BRENT'])
 
-    def all_items(self):
-        # brent always returns full dataset
-        return brent.yield_brent_dicts()
-            
+    def _yield_dicts(self):
+        # brent always returns full dataset, need truncate for start_date
+        for p in brent.yield_brent_dicts():
+            if DateHelper.make_date(p['date']) >= self.start:
+                yield p
+
     def sample(self):
         """Yield a few dictionaries with datapoints."""
         return iter([{'date': '2017-09-18', 'freq': 'd', 'name': 'BRENT', 'value': 55.5},
                      {'date': '2017-09-15', 'freq': 'd', 'name': 'BRENT', 'value': 56.18},
                      {'date': '2017-09-14', 'freq': 'd', 'name': 'BRENT', 'value': 56.76},
-                     {'date': '2017-09-13', 'freq': 'd', 'name': 'BRENT', 'value': 55.52}]
+                     {'date': '2017-09-13', 'freq': 'd', 'name': 'BRENT', 'value': 55.52},
+                     {'date': '2017-09-12', 'freq': 'd', 'name': 'BRENT', 'value': 55.06},
+                     {'date': '2017-09-11', 'freq': 'd', 'name': 'BRENT', 'value': 54.2}]
                     )
 # TODO:
 # class USTbonds(ParserBase):
@@ -159,30 +178,33 @@ class Dataset:
         return [datapoint for parser in Dataset.parsers
                           for datapoint in parser().sample()]
 
-    def items(start=None, end=None):
+    def yield_dicts(start=None, end=None):
         for parser_cls in Dataset.parsers:            
             parser = parser_cls(start, end)
-            for datapoint in parser.items:
+            for datapoint in parser.yield_dicts():
                 # convert to float
                 datapoint['value'] = float(datapoint['value'])                
                 yield datapoint
 
     def upload(start=None, end=None):
-        gen = Dataset.items(start, end)
-        return upload_datapoints(gen)        
+        # data to upload
+        gen = Dataset.yield_dicts(start, end)
+        return upload_to_database(gen)
         
-    def save_json(filename='dataset.json', start=None, end=None,
-                  fmt={'separators': (',', ': '), 'indent': 4}):            
-        gen = Dataset.items(start, end)
+        
+    def as_markdown():
+        tables_str = [cls.as_markdown() for cls in Dataset.parsers]
+        return '\n\n'.join(tables_str)
+
+    def save_json(filename='dataset.json', start=None, end=None, fmt={}):            
+        gen = Dataset.yield_dicts(start, end)
         with open(filename, 'w') as f:
             json.dump(list(gen), f, **fmt)
             
-    def save_reference_dataset(): 
-        param = dict(filename='test_data_2016H2.json',
-                     start='2016-06-01',
-                     end='2016-12-31')
-        Dataset.save_json(**param)
-        
+    def save_json_readable(filename, start=None, end=None):
+        fmt = dict(indent=4, separators=(',', ': '))
+        Dataset.save_json(filename, start, end, fmt)      
+    
 
 if __name__ == "__main__":
     from pprint import pprint
@@ -190,8 +212,19 @@ if __name__ == "__main__":
     print('Sample dataset:')
     pprint(Dataset.sample())
 
+    print('\nMarkdown descriptions:')
+    print(Dataset.as_markdown())
+
     # sample subsets
-    fx = list(CBR_USD('2017-09-01').items)
-    oil = list(BrentEIA('2017-09-01').items)
-    kep_m = list(RosstatKEP_Monthly('2017-06-01').items)
-    
+    fx = list(CBR_USD('2017-09-01').yield_dicts())
+    oil = list(BrentEIA('2017-09-01').yield_dicts())
+    kep_m = list(RosstatKEP_Monthly('2017-06').yield_dicts())
+
+    # reference dataset
+    param = dict(filename='test_data_2016H2.json',
+                 start='2016-06-01',
+                 end='2016-12-31')
+    # Dataset.save_json_readable(**param)
+
+    # full dataset
+    # Dataset.save_json()

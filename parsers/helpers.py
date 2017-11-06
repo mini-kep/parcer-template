@@ -3,47 +3,47 @@ import arrow
 from datetime import datetime
 
 
-class DateHelper(object):
-    def today():
-        """Get today date.
+def today():
+    """Get today date.
 
-        Returns:
-            datetime.date
-        """
-        return arrow.now().date()
+    Returns:
+        datetime.date
+    """
+    return arrow.now().date()
 
-    def make_date(dt_string: str, fmt=None):
-        """Create a date from *dt_string*.
-        Optionally use *fmt* to control date parsing.
+def make_date(date_string: str, fmt='%Y-%m-%d'):
+    """Create a date from *date_string* using *fmt* date format.
+    
+    Args:
+        *date_string*(str) - text string like '2017-09-01'
+        fmt(str) - format string like '%Y-%m-%d'
 
-        Args:
-            dt_string(str) - text string like '2017-09-01'
-            fmt(str) - format string like '%Y-%m-%d'
+    Returns:
+        datetime.date
+    """
+    if date_string is None:
+        return None
+    try:
+        return datetime.strptime(date_string, fmt).date()
+    except ValueError:
+        msg = f"Error parsing date <{date_string}> with format <{fmt}>"
+        raise ValueError(msg)
 
-        Returns:
-            datetime.date
-        """
-        if fmt is None:
-            return arrow.get(dt_string).date()
-        try:
-            return datetime.strptime(dt_string, fmt).date()
-        except ValueError:
-            msg = f"Error parsing date <{dt_string}> with format <{fmt}>"
-            raise ValueError(msg)
+def as_string(date):
+    """Convert date to "%Y-%m-%d" format as in '2017-09-25'.
 
-    def as_string(date):
-        """Convert date to "%Y-%m-%d" format, eg '2017-09-25'.
+    Args:
+        date (datetime.date)
 
-        Args:
-            date (datetime.date)
+    Returns:
+        str, formatted as YYYY-MM-DD
+    """
+    try:
+        return date.strftime("%Y-%m-%d")
+    except AttributeError:
+        raise TypeError(f"<{date}> must be datetime.date or similar type")
 
-        Returns:
-            str, formatted as YYYY-MM-DD
-        """
-        try:
-            return date.strftime("%Y-%m-%d")
-        except AttributeError:
-            raise TypeError(f"<{date}> must be datetime.date or similar type")
+assert make_date(None) is None
 
 
 def interpret_frequency(freq):
