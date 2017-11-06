@@ -1,4 +1,6 @@
 UPLOAD_URL = 'https://minikep-db.herokuapp.com/api/incoming'
+
+# FIXME: unsecure
 UPLOAD_API_TOKEN = '123'
 
 """Upload data from parsers to database"""
@@ -25,16 +27,21 @@ def to_json(gen):
     return json.dumps(list(gen), default=convert_decimal_to_float)
 
 
-def upload_to_database(gen, endpoint=UPLOAD_URL, token=UPLOAD_API_TOKEN):
+def post(data, endpoint=UPLOAD_URL, token=UPLOAD_API_TOKEN):
+    """Post *data* json to API endpoint."""
+    return requests.post(url=endpoint,
+                         data=data,                             
+                         headers={'API_TOKEN': token})
+    
+
+def upload_to_database(gen, upload_func=post):
     """Save data from generator *gen* to database endpoint.
-        Returns:
-            True on success (status code 200),
-            False otherwise
-        """
-    _data = to_json(gen)
-    response = requests.post(url=endpoint,
-                             data=_data,                             
-                             headers={'API_TOKEN': token})
+    
+       Returns:
+          True on success (status code 200),
+          False otherwise
+    """
+    response = upload_func(data=to_json(gen))
     if response.status_code == 200:
         return True
     else:
