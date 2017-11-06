@@ -1,7 +1,7 @@
 """Parser interfaces."""
 
 import json
-from parsers.helpers import make_date, today, as_string
+from parsers.helpers import make_date, today, as_string, as_markdown
 from parsers.uploader import upload_datapoints
 
 # individual parser functions
@@ -154,6 +154,9 @@ class Dataset:
                # USTbonds
                ]
 
+    def as_markdown():
+        return "\n\n".join([as_markdown(parser) for parser in Dataset.parsers])
+        
     def sample():
         return [datapoint for parser in Dataset.parsers
                           for datapoint in parser().sample()]
@@ -193,4 +196,6 @@ if __name__ == "__main__":
     fx = list(CBR_USD('2017-09-01').items)
     oil = list(BrentEIA('2017-09-01').items)
     kep_m = list(RosstatKEP_Monthly('2017-06-01').items)
+    
+    print(Dataset.as_markdown())
     

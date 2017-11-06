@@ -1,7 +1,7 @@
 import pytest
 from decimal import Decimal
 
-from parsers.uploader import convert_decimal_to_float, to_json, upload_to_database
+from parsers.uploader import convert_decimal_to_float, to_json, upload_datapoints
 
 
 def test_convert_decimal_to_float_return_float():
@@ -27,7 +27,7 @@ def test_upload_to_database_returns_code_200():
         return MockResponse()
     
     gen = iter([1,2,3])
-    assert upload_to_database(gen, upload_func=mock_post)    
+    assert upload_datapoints(gen, upload_func=mock_post)    
 
 
 if __name__ == '__main__':
