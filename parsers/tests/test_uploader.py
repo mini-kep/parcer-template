@@ -19,9 +19,13 @@ def test_to_json(gen, s):
     assert to_json(gen) == s
                           
        
-def test_upload_to_database_returns_code_200(self):
-    def mock_post(x):        
-        return 200
+def test_upload_to_database_returns_code_200():
+    class MockResponse:
+        status_code = 200
+    
+    def mock_post(*arg, **kwarg):        
+        return MockResponse()
+    
     gen = iter([1,2,3])
     assert upload_to_database(gen, upload_func=mock_post)    
 
