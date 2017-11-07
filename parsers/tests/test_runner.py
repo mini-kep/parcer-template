@@ -7,13 +7,15 @@ from parsers.runner import (ParserBase,
                             RosstatKEP_Quarterly,
                             RosstatKEP_Annual,
                             CBR_USD,
-                            BrentEIA)
+                            BrentEIA,
+                            USTbonds)
 
 PARSER_CLASSES = [RosstatKEP_Monthly,
                   RosstatKEP_Quarterly,
                   RosstatKEP_Annual,
                   CBR_USD,
-                  BrentEIA]
+                  BrentEIA,
+                  USTbonds]
 
 # class attributes
 
