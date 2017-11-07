@@ -57,6 +57,9 @@ Uploading large datasets may cause error, better use recent dates for upload.
 
 # Parser descriptions
 
+Use ```print(Dataset.as_markdown())``` to update. 
+
+
 | Parser | RosstatKEP_Monthly |
 | ------ | ------------------ |
 | Description | Monthly indicators from Rosstat 'KEP' publication |
