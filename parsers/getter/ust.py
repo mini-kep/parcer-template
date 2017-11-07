@@ -52,7 +52,10 @@ def parse_xml(content: str):
         children = prop.findChildren()
         for child in children:
             if child.name.startswith('BC_'):
-                price = util.format_value(child.text)
+                if child.text == '':
+                    price = None
+                else:
+                    price = util.format_value(child.text)
                 name = child.name.replace("BC_", "UST_")
                 yield {"date": date,
                        "freq": "d",

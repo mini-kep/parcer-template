@@ -7,13 +7,20 @@ from parsers.getter.ust import (make_year,
                                 parse_xml,
                                 yield_ust_dict)
 
-# fixture
 @pytest.fixture
 def fake_fetch(url=None):
     return """<?xml ><pre>
                 <m:properties>
                 <d:NEW_DATE>2017-01-03T00:00:00</d:NEW_DATE>
                 <d:BC_1MONTH>0.52</d:BC_1MONTH"""
+
+@pytest.fixture
+def fake_fetch_with_null(url=None):
+    return """<?xml ><pre>
+                <m:properties>
+                <d:NEW_DATE>2017-01-03T00:00:00</d:NEW_DATE>
+                <d:BC_1MONTH m:null="true">
+    """
 
 class Test_make_year:
     def test_make_year_with_good_date(self):
@@ -40,6 +47,15 @@ def test_parse_xml_with_valid_xml_input(fake_fetch):
     d = next(gen)
     assert d['date'] == '2017-01-03'
     assert d['value'] == Decimal('0.52')
+    assert d['freq'] == 'd'
+    assert d['name'] == 'UST_1MONTH'
+
+
+def test_parse_xml_with_valid_xml_input_with_null(fake_fetch_with_null):
+    gen = parse_xml(fake_fetch_with_null)
+    d = next(gen)
+    assert d['date'] == '2017-01-03'
+    assert d['value'] is None
     assert d['freq'] == 'd'
     assert d['name'] == 'UST_1MONTH'
 
