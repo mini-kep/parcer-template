@@ -44,17 +44,14 @@ def test_parse_xml_with_valid_xml_input(fake_fetch):
     assert d['name'] == 'UST_1MONTH'
 
 
-def test_parse_xml_with_valid_xml_input_with_null():
+def test_parse_xml_with_null():
     gen = parse_xml("""<?xml ><pre>
                 <m:properties>
                 <d:NEW_DATE>2017-01-03T00:00:00</d:NEW_DATE>
-                <d:BC_1MONTH m:null="true">
+                <d:BC_1MONTH m:null="true"/>
+                <d:BC_1MONTH>0.52</d:BC_1MONTH>
     """)
     d = next(gen)
-    assert d['date'] == '2017-01-03'
-    assert d['value'] is None
-    assert d['freq'] == 'd'
-    assert d['name'] == 'UST_1MONTH'
 
 
 def test_yield_ust_dic():
