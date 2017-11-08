@@ -8,7 +8,6 @@ from parsers.uploader import upload_datapoints
 import parsers.getter.brent as brent
 import parsers.getter.cbr_fx as cbr_fx
 import parsers.getter.kep as kep
-#TODO: use ust function below
 import parsers.getter.ust as ust
 
 
@@ -28,14 +27,14 @@ class ParserBase:
         self.start, self.end = get_dates(self.observation_start_date, start, end)
             
     def all_items(self):
-        pass
+        raise NotImplemented
     
     @property
     def items(self):
         # assumes self.all_items() is present in child class
         for item in self.all_items():            
             dt = make_date(item['date'])        
-            if dt >= self.start and dt <= self.end:
+            if self.start <= dt <= self.end:
                 yield item
                 
     def upload(self):
@@ -114,33 +113,34 @@ class BrentEIA(ParserBase):
                      {'date': '2017-09-14', 'freq': 'd', 'name': 'BRENT', 'value': 56.76},
                      {'date': '2017-09-13', 'freq': 'd', 'name': 'BRENT', 'value': 55.52}]
                     )
-# TODO:
-# class USTbonds(ParserBase):
-#    """Brent oil price from US EIA"""
-#    freq = 'd'
-#    observation_start_date = DateHelper.make_date('1987-05-15')
-#    source_url = "https://www.eia.gov/opendata/qb.php?category=241335"
-#
-#    def __init__(self, start=None):
-#        if start is None:
-#            self.start = self.observation_start_date
-#        else:
-#            self.start = DateHelper.make_date(start)
-#
-#    def yield_dicts(self):
-#        for p in brent.yield_brent_dicts():
-#            if DateHelper.make_date(p['date']) >= self.start:
-#                yield p
-#
-#    def sample(self):
-#        """Yield a few dictionaries with datapoints."""
-#        return iter([{'date': '2017-09-18', 'freq': 'd', 'name': 'BRENT', 'value': 55.5},
-#                     {'date': '2017-09-15', 'freq': 'd', 'name': 'BRENT', 'value': 56.18},
-#                     {'date': '2017-09-14', 'freq': 'd', 'name': 'BRENT', 'value': 56.76},
-#                     {'date': '2017-09-13', 'freq': 'd', 'name': 'BRENT', 'value': 55.52},
-#                     {'date': '2017-09-12', 'freq': 'd', 'name': 'BRENT', 'value': 55.06},
-#                     {'date': '2017-09-11', 'freq': 'd', 'name': 'BRENT', 'value': 54.2}]
-#                    )
+
+
+class USTbonds(ParserBase):
+    """Import interest rates for US treasuries"""
+    freq = 'd'
+    observation_start_date = make_date('1990-01-02')
+    source_url = "https://www.treasury.gov/resource-center/data-chart-center/interest-rates/Pages/TextView.aspx?data=yield"
+
+    def all_items(self):
+        return ust.yield_ust_dict(self.start)
+
+    def sample(self):
+        """Yield a few dictionaries with datapoints."""
+        return iter([{'date': '2017-09-18', 'freq': 'd', 'name': 'UST_1MONTH', 'value': 55.5},
+                     {'date': '2017-09-15', 'freq': 'd', 'name': 'UST_1MONTH', 'value': 56.18},
+                     {'date': '2017-01-03', 'freq': 'd', 'name': 'UST_1MONTH', 'value': 0.52},
+                     {'date': '2017-01-03', 'freq': 'd', 'name': 'UST_3MONTH', 'value': 0.53},
+                     {'date': '2017-01-03', 'freq': 'd', 'name': 'UST_6MONTH', 'value': 0.65},
+                     {'date': '2017-01-03', 'freq': 'd', 'name': 'UST_1YEAR', 'value': 0.89},
+                     {'date': '2017-01-03', 'freq': 'd', 'name': 'UST_2YEAR', 'value': 1.22},
+                     {'date': '2017-01-03', 'freq': 'd', 'name': 'UST_3YEAR', 'value': 1.50},
+                     {'date': '2017-01-03', 'freq': 'd', 'name': 'UST_5YEAR', 'value': 1.94},
+                     {'date': '2017-01-03', 'freq': 'd', 'name': 'UST_7YEAR', 'value': 2.26},
+                     {'date': '2017-01-03', 'freq': 'd', 'name': 'UST_10YEAR', 'value': 2.45},
+                     {'date': '2017-01-03', 'freq': 'd', 'name': 'UST_20YEAR', 'value': 2.78},
+                     {'date': '2017-01-03', 'freq': 'd', 'name': 'UST_30YEAR', 'value': 3.04},
+                     {'date': '2017-01-03', 'freq': 'd', 'name': 'UST_30YEARDISPLAY', 'value': 3.04}]
+                    )
 
 
 class Dataset:
@@ -151,7 +151,7 @@ class Dataset:
                RosstatKEP_Annual,
                CBR_USD,
                BrentEIA,
-               # USTbonds
+               USTbonds
                ]
 
     def as_markdown():
@@ -198,4 +198,3 @@ if __name__ == "__main__":
     kep_m = list(RosstatKEP_Monthly('2017-06-01').items)
     
     print(Dataset.as_markdown())
-    
