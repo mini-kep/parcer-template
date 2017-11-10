@@ -25,7 +25,7 @@ Full dataset can be obtained using code below.
 ```python 
 from runner import Dataset
 
-gen = Dataset.items()
+gen = Dataset.all_items()
 
 ```
 
@@ -41,14 +41,14 @@ gen = CBR_USD(start='2017-09-01').items
 and so can ```Dataset```:
 
 ```
-gen = Dataset.items(start='2017-09-01')
+gen = Dataset(start='2017-09-01').items
 ```
 
 Uploading to database is done by calling ```upload()``` method: 
 
 ```
 CBR_USD(start='2017-11-01').upload()
-Dataset.upload('2017-11-01')
+Dataset('2017-11-01').upload()
 
 ```
 
