@@ -25,7 +25,7 @@ Full dataset can be obtained using code below.
 ```python 
 from runner import Dataset
 
-gen = Dataset.items()
+gen = Dataset.all_items()
 
 ```
 
