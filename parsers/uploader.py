@@ -1,5 +1,5 @@
 # FIXME: change endpoint
-UPLOAD_URL = 'https://minikep-db.herokuapp.com/api/incoming'
+UPLOAD_URL = 'https://minikep-db.herokuapp.com/api/datapoints'
 
 # FIXME: unsecure
 UPLOAD_API_TOKEN = '123'
