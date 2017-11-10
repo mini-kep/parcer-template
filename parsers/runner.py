@@ -143,7 +143,7 @@ class USTbonds(ParserBase):
                     )
 
 
-class Dataset:
+class Dataset(ParserBase):
     """Operations related to all parsers."""
 
     parsers = [RosstatKEP_Monthly,
@@ -160,22 +160,17 @@ class Dataset:
     def sample():
         return [datapoint for parser in Dataset.parsers
                           for datapoint in parser().sample()]
-
-    def items(start=None, end=None):
-        for parser_cls in Dataset.parsers:            
-            parser = parser_cls(start, end)
+    def all_items(self):
+        for parser_cls in Dataset.parsers:
+            parser = parser_cls(self.start, self.end)
             for datapoint in parser.items:
-                # convert to float
-                datapoint['value'] = float(datapoint['value'])                
-                yield datapoint
+                datapoint.all_items()
 
-    def upload(start=None, end=None):
-        gen = Dataset.items(start, end)
-        return upload_datapoints(gen)        
+
         
     def save_json(filename='dataset.json', start=None, end=None,
                   fmt={'separators': (',', ': '), 'indent': 4}):            
-        gen = Dataset.items(start, end)
+        gen = Dataset.items.getter(start, end)
         with open(filename, 'w') as f:
             json.dump(list(gen), f, **fmt)
             
