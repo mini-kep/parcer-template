@@ -27,7 +27,7 @@ class ParserBase:
         self.start, self.end = get_dates(self.observation_start_date, start, end)
             
     def all_items(self):
-        raise NotImplemented
+        raise NotImplementedError
     
     @property
     def items(self):

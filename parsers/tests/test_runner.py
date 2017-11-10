@@ -54,6 +54,11 @@ def test_items_method_is_callable(cls):
     validate_datapoint(a)
 
 
+def test_parser_base_all_items_property_omitted_and_raises_not_implemented_error():
+    with pytest.raises(NotImplementedError):
+        ParserBase().all_items()
+
+
 @pytest.mark.parametrize("datapoint", [datapoint for datapoint in 
     [cls().sample() for cls in PARSER_CLASSES]])
 def validate_datapoint(datapoint):
