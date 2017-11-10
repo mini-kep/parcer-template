@@ -48,7 +48,7 @@ Uploading to database is done by calling ```upload()``` method:
 
 ```
 CBR_USD(start='2017-11-01').upload()
-Dataset.upload('2017-11-01')
+Dataset('2017-11-01').upload()
 
 ```
 
