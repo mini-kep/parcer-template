@@ -41,7 +41,7 @@ gen = CBR_USD(start='2017-09-01').items
 and so can ```Dataset```:
 
 ```
-gen = Dataset.items(start='2017-09-01')
+gen = Dataset(start='2017-09-01').items()
 ```
 
 Uploading to database is done by calling ```upload()``` method: 
