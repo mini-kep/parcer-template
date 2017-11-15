@@ -179,8 +179,8 @@ class Dataset(ParserBase):
         
     def all_items(self):
         for parser_cls in Dataset.parsers:
-            parser = parser_cls(helpers.as_string(self.start),
-                                helpers.as_string(self.end))
+            parser = parser_cls(as_string(self.start),
+                                as_string(self.end))
             for datapoint in parser.items:
                 yield datapoint
         
