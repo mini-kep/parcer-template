@@ -188,8 +188,12 @@ if __name__ == "__main__":
     pprint(Dataset.sample())
 
     # sample subsets
-    fx = list(CBR_USD('2017-09-01').items)
-    oil = list(BrentEIA('2017-09-01').items)
-    kep_m = list(RosstatKEP_Monthly('2017-06-01').items)
+    # fx = list(CBR_USD('2017-09-01').items)
+    # oil = list(BrentEIA('2017-09-01').items)
+    # kep_m = list(RosstatKEP_Monthly('2017-06-01').items)
     
     print(Dataset.as_markdown())
+
+    print(CBR_USD('2017-09-01').upload())
+    print(RosstatKEP_Monthly('2017-06').upload))
+    
