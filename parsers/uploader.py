@@ -8,6 +8,7 @@ UPLOAD_API_TOKEN = '123'
 import requests
 import json
 import decimal
+from time import sleep
 
 
 def convert_decimal_to_float(obj):
@@ -35,15 +36,23 @@ def post(data, endpoint=UPLOAD_URL, token=UPLOAD_API_TOKEN):
                          headers={'API_TOKEN': token})
 
 
-def upload_datapoints(gen, upload_func=post):
-    """Save data from generator *gen* to database endpoint.
+def upload_datapoints(ust_data, upload_func=post):
+    """Save data from the ust data list by chunks to database endpoint.
     
        Returns:
           True on success (status code 200),
           False otherwise
     """
-    response = upload_func(data=to_json(gen))
-    if response.status_code == 200:
-        return True
-    else:
-        return False
+    ust_data_chunks = [ust_data[i:i + 1000] for i in range(0, len(ust_data), 1000)]
+    for ust in ust_data_chunks:
+        json_ust_data = to_json(ust)
+        num_of_attempts = 0
+        while(num_of_attempts < 5):
+            response = upload_func(data=json_ust_data)
+            if response.status_code == 200:
+                break
+            num_of_attempts += 1
+            if num_of_attempts == 5:
+                return False
+            sleep(10)
+    return True
