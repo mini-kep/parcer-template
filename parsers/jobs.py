@@ -15,14 +15,9 @@ assert runner.RosstatKEP_Quarterly(dt).upload()
 assert runner.RosstatKEP_Annual(dt).upload() 
 print("Uploaded dataset:", round(time() - start, 1), "sec")
 
-# FIMXE: code below fails with 
-
-#  File "C:\Users\Евгений\Documents\GitHub\parser-template\parsers\helpers.py", line 27, in make_date
-#    return datetime.strptime(date_string, fmt).date()
-#   TypeError: strptime() argument 1 must be str, not datetime.date
 
 start = time()
-Dataset('2017-09-01').upload()
+Dataset('2017-11-01').upload()
 print("Uploaded dataset:", round(time() - start, 1), "sec")
 
 
@@ -46,4 +41,10 @@ print("Uploaded dataset:", round(time() - start, 1), "sec")
 
 #
 #    4. how risky and how long is this: Dataset(dt).upload() ?
-    
+
+#                                                                                              #
+#    5. is kep being uploaded?
+
+#                                                                                              #
+#    6. webhook idea for kep
+

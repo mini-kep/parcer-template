@@ -50,7 +50,7 @@ def test_parser_instance_has_callable_repr_method(cls):
 @pytest.mark.parametrize("cls", PARSER_CLASSES)
 def test_items_method_is_callable(cls):
     gen = cls().items
-    a = next(gen)
+    a = gen[0]
     validate_datapoint(a)
 
 

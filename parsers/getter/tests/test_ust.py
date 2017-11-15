@@ -5,7 +5,7 @@ from decimal import Decimal
 from parsers.getter.ust import (make_year,
                                 make_url,
                                 parse_xml,
-                                yield_ust_dict)
+                                get_ust_dict)
 
 
 class Test_make_year:
@@ -36,7 +36,7 @@ XML_DOC_1 =  """<?xml ><pre>
   
 def test_parse_xml_with_valid_xml_input():
     gen = parse_xml(XML_DOC_1)
-    d = next(gen)
+    d = gen[0]
     assert d['date'] == '2017-01-03'
     assert d['value'] == Decimal('0.52')
     assert d['freq'] == 'd'
@@ -77,10 +77,10 @@ def test_parse_valid_xml_with_null():
 def fake_fetch(url=None):
     return XML_DOC_1 
 
-def test_yield_ust_dic():
+def test_get_ust_dic():
     start_date = date(2017, 1, 1)
-    gen = yield_ust_dict(start_date, downloader=fake_fetch)
-    d = next(gen)
+    gen = get_ust_dict(start_date, downloader=fake_fetch)
+    d = gen[0]
     assert d['date'] == '2017-01-03'
     assert d['value'] == Decimal('0.52')
     assert d['freq'] == 'd'

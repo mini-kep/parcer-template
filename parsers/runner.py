@@ -51,7 +51,8 @@ class ParserBase:
         
     @property
     def items(self):
-        return filter(self.date_filter, self.all_items())
+        gen = filter(self.date_filter, self.all_items())
+        return list(gen)
                 
     def upload(self):
         return upload_datapoints(self.items)
@@ -138,7 +139,7 @@ class USTbonds(ParserBase):
     source_url = "https://www.treasury.gov/resource-center/data-chart-center/interest-rates/Pages/TextView.aspx?data=yield"
 
     def all_items(self):
-        return ust.yield_ust_dict(self.start)
+        return ust.get_ust_dict(self.start)
 
     def sample(self):
         """Yield a few dictionaries with datapoints."""
