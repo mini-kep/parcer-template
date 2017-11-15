@@ -48,3 +48,7 @@ print("Uploaded dataset:", round(time() - start, 1), "sec")
 #                                                                                              #
 #    6. webhook idea for kep
 
+#                                                                                              #
+#    7. heroku's actual cron - deploys nothing yet
+
+#    8. hide token

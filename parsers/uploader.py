@@ -1,4 +1,3 @@
-# FIXME: change endpoint
 UPLOAD_URL = 'https://minikep-db.herokuapp.com/api/datapoints'
 
 # FIXME: unsecure
@@ -37,22 +36,26 @@ def post(data, endpoint=UPLOAD_URL, token=UPLOAD_API_TOKEN):
 
 
 def upload_datapoints(gen, upload_func=post, chunk_size=1000, max_attempts=5, delay=10):
-    """Save data from the ust data list by chunks to database endpoint.
+    """Save data from *gen* list or interator by chunks to database endpoint.
     
-       Returns:
-          True on success (status code 200),
-          False otherwise
+     Args:
+         chunk_size - number of datapoints to send at one time
+         max_attempts - how many times should uploaed try to upload
+         delay - sleep time between attempts, ms
+     Returns:
+         True on success (status code 200 revieved from server),
+         False otherwise
     """
-    ust_data_chunks = [gen[i:i + chunk_size] for i in range(0, len(gen), chunk_size)]
-    for ust in ust_data_chunks:
-        json_ust_data = to_json(ust)
+    data_chunks = [gen[i:i + chunk_size] for i in range(0, len(gen), chunk_size)]
+    for block in data_chunks:
+        json_block = to_json(block)
         num_of_attempts = 0
         while(num_of_attempts < max_attempts):
-            response = upload_func(data=json_ust_data)
+            response = upload_func(data=json_block)
             if response.status_code == 200:
                 break
             num_of_attempts += 1
-            if num_of_attempts == 5:
+            if num_of_attempts == max_attempts:
                 return False
             sleep(delay)
     return True
