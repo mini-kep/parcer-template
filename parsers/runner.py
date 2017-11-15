@@ -31,11 +31,13 @@ class ParserBase:
     
     @property
     def items(self):
+        all_items = []
         # assumes self.all_items() is present in child class
         for item in self.all_items():            
             dt = make_date(item['date'])        
             if self.start <= dt <= self.end:
-                yield item
+                all_items.append(item)
+        return all_items
                 
     def upload(self):
         return upload_datapoints(self.items)
@@ -122,7 +124,7 @@ class USTbonds(ParserBase):
     source_url = "https://www.treasury.gov/resource-center/data-chart-center/interest-rates/Pages/TextView.aspx?data=yield"
 
     def all_items(self):
-        return ust.yield_ust_dict(self.start)
+        return ust.get_ust_dict(self.start)
 
     def sample(self):
         """Yield a few dictionaries with datapoints."""

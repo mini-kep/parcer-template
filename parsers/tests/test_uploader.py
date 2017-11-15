@@ -12,7 +12,7 @@ def test_convert_decimal_to_float_return_float():
 # FIXME: refine test to close to actual data
 # https://docs.pytest.org/en/latest/parametrize.html#pytest-mark-parametrize-parametrizing-test-functions
 @pytest.mark.parametrize("gen,s", [
-    (iter([Decimal(1.01)]), '[1.01]'),
+    ([Decimal('1.01')], '[1.01]'),
     ([Decimal('1.0100000000000000088817841970012523233890533447265625')], '[1.01]'),
     ])
 def test_to_json(gen, s):
@@ -26,8 +26,8 @@ def test_upload_to_database_returns_code_200():
     def mock_post(*arg, **kwarg):        
         return MockResponse()
     
-    gen = iter([1,2,3])
-    assert upload_datapoints(gen, upload_func=mock_post)    
+    test_data = [1,2,3]
+    assert upload_datapoints(test_data, upload_func=mock_post)
 
 
 if __name__ == '__main__':
