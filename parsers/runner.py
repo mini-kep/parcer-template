@@ -9,6 +9,7 @@ import parsers.getter.brent as brent
 import parsers.getter.cbr_fx as cbr_fx
 import parsers.getter.kep as kep
 import parsers.getter.ust as ust
+import helpers
 
 
 def get_dates(observation_start_date, start=None, end=None):
@@ -16,6 +17,16 @@ def get_dates(observation_start_date, start=None, end=None):
    end = make_date(end) or today() 
    return start, end 
 
+class DateViewer:   
+    def __init__(self, observation_start_date, start=None, end=None):
+        self.start = make_date(start) or observation_start_date    
+        self.end = make_date(end) or today() 
+    
+    def make_date_filter(self):
+        def is_in_date_range(item):
+            dt = make_date(item['date'])        
+            return self.start <= dt and dt <= self.end
+        return is_in_date_range
 
 class ParserBase:
     """Parent class for parser runner."""
@@ -24,18 +35,23 @@ class ParserBase:
     source_url = ''
     
     def __init__(self, start=None, end=None):
-        self.start, self.end = get_dates(self.observation_start_date, start, end)
-            
+        dv = DateViewer(self.observation_start_date, start, end)
+        self.start = dv.start
+        self.end = dv.end
+        self.date_filter = dv.make_date_filter()
+        
+    def make_date_filter(self):
+        def is_in_date_range(item):
+            dt = make_date(item['date'])        
+            return self.start <= dt and dt <= self.end
+        return is_in_date_range
+
     def all_items(self):
         raise NotImplementedError
-    
+        
     @property
     def items(self):
-        # assumes self.all_items() is present in child class
-        for item in self.all_items():            
-            dt = make_date(item['date'])        
-            if self.start <= dt <= self.end:
-                yield item
+        return filter(self.date_filter, self.all_items())
                 
     def upload(self):
         return upload_datapoints(self.items)
@@ -160,13 +176,13 @@ class Dataset(ParserBase):
     def sample():
         return [datapoint for parser in Dataset.parsers
                           for datapoint in parser().sample()]
+        
     def all_items(self):
         for parser_cls in Dataset.parsers:
-            parser = parser_cls(self.start, self.end)
+            parser = parser_cls(helpers.as_string(self.start),
+                                helpers.as_string(self.end))
             for datapoint in parser.items:
-                datapoint.all_items()
-
-
+                yield datapoint
         
     def save_json(filename='dataset.json', start=None, end=None,
                   fmt={'separators': (',', ': '), 'indent': 4}):            
@@ -188,12 +204,8 @@ if __name__ == "__main__":
     pprint(Dataset.sample())
 
     # sample subsets
-    # fx = list(CBR_USD('2017-09-01').items)
-    # oil = list(BrentEIA('2017-09-01').items)
-    # kep_m = list(RosstatKEP_Monthly('2017-06-01').items)
+    fx = list(CBR_USD('2017-09-01').items)
+    oil = list(BrentEIA('2017-09-01').items)
+    kep_m = list(RosstatKEP_Monthly('2017-06-01').items)
     
     print(Dataset.as_markdown())
-
-    print(CBR_USD('2017-09-01').upload())
-    print(RosstatKEP_Monthly('2017-06').upload))
-    
