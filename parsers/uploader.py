@@ -36,23 +36,23 @@ def post(data, endpoint=UPLOAD_URL, token=UPLOAD_API_TOKEN):
                          headers={'API_TOKEN': token})
 
 
-def upload_datapoints(ust_data, upload_func=post):
+def upload_datapoints(gen, upload_func=post, chunk_size=1000, max_attempts=5, delay=10):
     """Save data from the ust data list by chunks to database endpoint.
     
        Returns:
           True on success (status code 200),
           False otherwise
     """
-    ust_data_chunks = [ust_data[i:i + 1000] for i in range(0, len(ust_data), 1000)]
+    ust_data_chunks = [gen[i:i + chunk_size] for i in range(0, len(gen), chunk_size)]
     for ust in ust_data_chunks:
         json_ust_data = to_json(ust)
         num_of_attempts = 0
-        while(num_of_attempts < 5):
+        while(num_of_attempts < max_attempts):
             response = upload_func(data=json_ust_data)
             if response.status_code == 200:
                 break
             num_of_attempts += 1
             if num_of_attempts == 5:
                 return False
-            sleep(10)
+            sleep(delay)
     return True
