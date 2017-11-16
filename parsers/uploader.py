@@ -30,32 +30,48 @@ def to_json(gen):
 
 def post(data, endpoint=UPLOAD_URL, token=UPLOAD_API_TOKEN):
     """Post *data* json to API endpoint."""
+    json_data = to_json(data)
     return requests.post(url=endpoint,
-                         data=data,                             
+                         data=json_data,                             
                          headers={'API_TOKEN': token})
 
 
-def upload_datapoints(gen, upload_func=post, chunk_size=1000, max_attempts=5, delay=10):
+def safe_post(data_chunk, upload_func=post, max_attempts=5, delay=10):
+    num_of_attempts = 0
+    while(num_of_attempts < max_attempts):
+        response = upload_func(data=data_chunk)
+        if response.status_code == 200:
+            break
+        num_of_attempts += 1
+        if num_of_attempts == max_attempts:
+            return False
+        sleep(delay)
+    return True    
+ 
+    
+def yield_chunks(gen, chunk_size=1000):
+    """
+    Args:
+        gen - list or generator of datapoints to send 
+        chunk_size - number of datapoints to send at one time
+    """
+    gen = list(gen)
+    for i in range(0, len(gen), chunk_size):        
+        yield gen[i:i + chunk_size]    
+  
+   
+def upload_datapoints(gen, upload_func=post, max_attempts=5, delay=10):
     """Save data from *gen* list or interator by chunks to database endpoint.
     
      Args:
-         chunk_size - number of datapoints to send at one time
-         max_attempts - how many times should uploaed try to upload
-         delay - sleep time between attempts, ms
+         gen - list or generator of datapoints to send         
+         max_attempts - how many times should uploaed try to upload (default: 5)
+         delay - sleep time between attempts, ms (default: 10 )
      Returns:
-         True on success (status code 200 revieved from server),
+         True on success (status code 200 reсieved from server)
          False otherwise
-    """
-    data_chunks = [gen[i:i + chunk_size] for i in range(0, len(gen), chunk_size)]
-    for block in data_chunks:
-        json_block = to_json(block)
-        num_of_attempts = 0
-        while(num_of_attempts < max_attempts):
-            response = upload_func(data=json_block)
-            if response.status_code == 200:
-                break
-            num_of_attempts += 1
-            if num_of_attempts == max_attempts:
-                return False
-            sleep(delay)
+    """    
+    for chunk in yield_chunks(gen):        
+        if not safe_post(chunk):
+            return False
     return True
