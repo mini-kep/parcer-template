@@ -23,9 +23,7 @@ print("Uploaded dataset:", round(time() - start, 1), "sec")
 
 # Suggestions (to discuss):
  
-     0.     
-    
-    
+#    0.  splitting larger fucntions to smaller ones - need to check 
     
 #    1. can have a verbose version what prints results:
 #
@@ -34,26 +32,19 @@ print("Uploaded dataset:", round(time() - start, 1), "sec")
 #
 #       may introduce timing as decorator
 
-#
 #    2. WONTFIX: can have a less restrictive BaseParser interface for the dates, eg accept
 #       '2000-06', (2000, 6), 2000
 #
 #       can be done with 'arrow' 
 
-#
 #    3. NOT TODO:  generator vs list?
 
-#
 #    4. how risky and how long is this: Dataset(dt).upload() ?
 
-#                                                                                              #
 #    5. is kep being uploaded?
 
-#                                                                                              #
 #    6. webhook idea for kep
 
-#                                                                                              #
 #    7. heroku's actual cron - deploys nothing yet
 
-#
 #    8. hide token
