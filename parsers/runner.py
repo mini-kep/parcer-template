@@ -9,7 +9,6 @@ import parsers.getter.brent as brent
 import parsers.getter.cbr_fx as cbr_fx
 import parsers.getter.kep as kep
 import parsers.getter.ust as ust
-import helpers
 
 
 def get_dates(observation_start_date, start=None, end=None):
