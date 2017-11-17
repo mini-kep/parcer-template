@@ -1,12 +1,16 @@
-import arrow
 import pytest
+
+import arrow
+import random 
 from datetime import date
+
 from decimal import Decimal
 from parsers.getter.ust import (make_year,
                                 make_url,
                                 parse_xml,
                                 get_ust_dict,
-                                extract_date)
+                                extract_date,
+                                valid_years)
 
 
 class Test_make_year:
@@ -36,6 +40,11 @@ XML_DOC_1 = """<?xml ><pre>
                <d:NEW_DATE>2017-01-03T00:00:00</d:NEW_DATE>
                <d:BC_1MONTH>0.52</d:BC_1MONTH>"""
 
+
+def test_parse_xml_returns_list():
+    assert isinstance(parse_xml(""), list)
+    
+
 def test_parse_xml_with_valid_xml_input():
     gen = parse_xml(XML_DOC_1)
     d = gen[0]
@@ -44,6 +53,15 @@ def test_parse_xml_with_valid_xml_input():
     assert d['freq'] == 'd'
     assert d['name'] == 'UST_1MONTH'
     
+            
+def test_parse_xml_on_skipped_value():
+    result = parse_xml("""<?xml ><pre>
+               <m:properties>
+               <d:NEW_DATE>2017-01-03T00:00:00</d:NEW_DATE>
+               <d:BC_1MONTH></d:BC_1MONTH>""")         
+    assert len(result) == 0   
+    
+            
 # testing on larger input            
 def test_parse_xml_with_valid_xml_input_2():
     xml_doc = ("""<?xml ><pre>
@@ -57,7 +75,7 @@ def test_parse_xml_with_valid_xml_input_2():
         </content>
     </entry></pre>
     """)
-    result = list(parse_xml(xml_doc))
+    result = parse_xml(xml_doc)
     assert len(result) == 1
     assert result[0]['date'] == '2010-10-11'
     assert result[0]['value'] == Decimal('1.72')
@@ -89,6 +107,14 @@ scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
 """
 
 
+def test_parse_xml_on_randomised_year_reads_whole_year_data():
+    years = valid_years()
+    year = random.choice(years)
+    dt = arrow.get(year,1,1).date()
+    result = get_ust_dict(dt)
+    assert len(result) >= 1
+
+
 def test_parse_valid_xml_with_zero_value_on_April_14_2017_is_exluded():
     xml_doc = (XML_14_APRIL_2017)
     result = parse_xml(xml_doc)
@@ -108,7 +134,7 @@ def test_parse_valid_xml_with_zero_value_on_day_other_than_April_14_2017():
         </content>
     </entry></pre>
     """)
-    result = list(parse_xml(xml_doc))
+    result = parse_xml(xml_doc)
     assert len(result) >= 1
 
 def fake_fetch(url=None):
@@ -116,8 +142,8 @@ def fake_fetch(url=None):
 
 def test_get_ust_dic():
     start_date = date(2017, 1, 1)
-    gen = get_ust_dict(start_date, downloader=fake_fetch)
-    d = gen[0]
+    result = get_ust_dict(start_date, downloader=fake_fetch)
+    d = result[0]
     assert d['date'] == '2017-01-03'
     assert d['value'] == Decimal('0.52')
     assert d['freq'] == 'd'

@@ -21,6 +21,10 @@ import parsers.getter.util as util
 import bs4
 
 
+def valid_years():
+    cur_year = datetime.today().year
+    return list(range(1990, cur_year + 1))                       
+
 def make_year(start_date):
     """Extract year form *start_date*
 
@@ -31,7 +35,7 @@ def make_year(start_date):
     """
     year = start_date.year
     cur_year = datetime.today().year
-    if year not in [x for x in range(1990, cur_year + 1)]:
+    if year not in valid_years():
         raise ValueError(f"<{year}> not in [1990, {cur_year}]")
     return year
 
@@ -57,7 +61,7 @@ def parse_xml_raw(content: str):
                 "value": util.format_value(child.text)}
                  for prop in properties
                  for child in prop.findChildren()
-                 if child.name.startswith('BC_')]
+                 if child.name.startswith('BC_') and child.text]
     return content
 
 
@@ -73,3 +77,6 @@ def get_ust_dict(start_date, downloader=util.fetch):
     url = make_url(year)
     content = downloader(url)
     return parse_xml(content)
+
+# ERROR: an start_Date - loads just one year, not all years from that date on
+
