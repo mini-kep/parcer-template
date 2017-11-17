@@ -21,6 +21,8 @@ Dataset('2017-11-01').upload()
 print("Uploaded dataset:", round(time() - start, 1), "sec")
 
 
+runner.CBR_USD().upload()
+
 # Suggestions (to discuss):
  
 #    0.  splitting larger fucntions to smaller ones - need to check 

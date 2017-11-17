@@ -75,7 +75,7 @@ def yield_chunks(gen, chunk_size=1000):
         yield gen[i:i + chunk_size]    
   
    
-def upload_datapoints(gen, upload_func=safe_post, upload_kwarg={}):
+def upload_datapoints(gen, upload_func=safe_post):
     """Save data from *gen* list or iterator to database endpoint 
        via *upload_func* function. 
        
@@ -88,6 +88,6 @@ def upload_datapoints(gen, upload_func=safe_post, upload_kwarg={}):
          False otherwise
     """    
     for chunk in yield_chunks(gen):        
-        if not upload_func(chunk, upload_kwarg):
+        if not upload_func(chunk):
             return False
     return True
