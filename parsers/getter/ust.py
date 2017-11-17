@@ -46,19 +46,13 @@ def make_url(year):
 def parse_xml(content: str):
     soup = bs4.BeautifulSoup(content, "xml")
     properties = soup.find_all('properties')
-    content = []
-    for prop in properties:
-        date_str = prop.find('NEW_DATE').text
-        date = util.format_date(date_str, fmt='%Y-%m-%dT%H:%M:%S')
-        children = prop.findChildren()
-        for child in children:
-            if child.name.startswith('BC_') and child.text != '':
-                price = util.format_value(child.text)
-                name = child.name.replace("BC_", "UST_")
-                content.append({"date": date,
-                       "freq": "d",
-                       "name": name,
-                       "value": price})
+    content = [{"date": util.format_date(prop.find('NEW_DATE').text, fmt='%Y-%m-%dT%H:%M:%S'),
+                  "freq": "d",
+                  "name": child.name.replace("BC_", "UST_"),
+                  "value": util.format_value(child.text)}
+                 for prop in properties
+                 for child in prop.findChildren()
+                 if child.name.startswith('BC_') and child.text not in ('', '0')]
     return content
 
 
