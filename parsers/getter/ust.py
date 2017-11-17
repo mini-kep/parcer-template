@@ -16,7 +16,7 @@ Yield a stream of datapoint dictionaries like:
 {'date': '2017-01-03', 'freq': 'd', 'name': 'UST_30YEARDISPLAY', 'value': Decimal('3.04')}
 """
 
-from datetime import datetime, date
+from datetime import datetime
 import parsers.getter.util as util
 import bs4
 
@@ -32,7 +32,7 @@ def make_year(start_date):
     year = start_date.year
     cur_year = datetime.today().year
     if year not in [x for x in range(1990, cur_year + 1)]:
-        raise ValueError(f"Year <{year}> must be in [1990, {cur_year}] range.")
+        raise ValueError(f"<{year}> not in [1990, {cur_year}]")
     return year
 
 
@@ -43,31 +43,33 @@ def make_url(year):
             "XmlView.aspx?data=yieldyear&year={}".format(year))
 
 
-def parse_xml(content: str):
+def extract_date(date_str):
+    """Returns string like '2017-04-14'."""
+    return util.format_date(date_str, fmt='%Y-%m-%dT%H:%M:%S')
+
+
+def parse_xml_raw(content: str):
     soup = bs4.BeautifulSoup(content, "xml")
     properties = soup.find_all('properties')
-    content = [{"date": util.format_date(prop.find('NEW_DATE').text, fmt='%Y-%m-%dT%H:%M:%S'),
-                  "freq": "d",
-                  "name": child.name.replace("BC_", "UST_"),
-                  "value": util.format_value(child.text)}
+    content = [{"date": extract_date(prop.find('NEW_DATE').text),
+                "freq": "d",
+                "name": child.name.replace("BC_", "UST_"),
+                "value": util.format_value(child.text)}
                  for prop in properties
                  for child in prop.findChildren()
-                 if child.name.startswith('BC_') and child.text not in ('', '0')]
+                 if child.name.startswith('BC_')]
     return content
 
 
+def parse_xml(content: str):
+    exclude_date = '2017-04-14' 
+    return [d for d in parse_xml_raw(content) if d['date'] != exclude_date] 
+
+
+# IDEA: maybe add a vaidation decorator for all getter fucntions?
 def get_ust_dict(start_date, downloader=util.fetch):
-    """
-    Yeild UST datapoints as dict
-    """
+    """Return UST datapoints as list of dictionaries, based on *start_date*."""
     year = make_year(start_date)
     url = make_url(year)
     content = downloader(url)
     return parse_xml(content)
-
-
-if __name__ == "__main__":
-    s = date(2017, 1, 1)
-    gen = get_ust_dict(s)
-    for i in range(14):
-        print(next(gen))
