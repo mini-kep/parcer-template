@@ -1,9 +1,31 @@
 import arrow
 from time import time        
-from datetime import date 
+from datetime import date, datetime
+from decimal import Decimal  
 
+
+import requests
 from parsers.uploader import upload_datapoints
-import parsers.getter.util as util
+
+
+def format_date(date_string: str, fmt):
+    """Convert *date_string* to YYYY-MM-DD"""
+    return datetime.strptime(date_string, fmt).strftime("%Y-%m-%d")
+
+
+def format_value(value_string: str, precision=2):
+    return round(Decimal(value_string), precision)
+
+
+def fetch(url):
+    """Fetch content from *url* from internet."""
+    content = requests.get(url).text
+    if "Error" in content:
+        raise ValueError(f"Cannot read from URL <{url}>")
+    if 'Error in parameters' in content:
+        raise Exception(f'Error in parameters: {url}')
+    return content
+
 
 def make_date(x):
     if '-' in str(x):
@@ -11,20 +33,21 @@ def make_date(x):
     else:
         return date(int(x), 1, 1)
 
+
 class ParserBase(object):
-    """
-    Three things must be customised:
-        observation_start_date 
-        url 
-        parse_response        
+    """   
+    Must customise in child class:
+       - observation_start_date 
+       - url
+       - parse_response        
     """
     
     # must change this to actual parser start date
-    observation_start_date = '1990-01-01'
+    observation_start_date = '1990-01-02'
                                                                   
     def __init__(self, start_date=None, end_date=None):
-        self.start_date= (make_date(start_date) 
-                          or make_date(self.observation_start_date))    
+        self.start_date = (make_date(start_date) 
+                           or make_date(self.observation_start_date))    
         if end_date is None: 
             self.end_date = date.today()
         else: 
@@ -40,7 +63,7 @@ class ParserBase(object):
     def parse_response(self):
         raise NotImplementedError
     
-    def _extract(self, downloader=util.fetch):
+    def _extract(self, downloader=fetch):
         self.response = downloader(self.url)
         self.parsing_result = self.parse_response(self.response) 
         return self
@@ -49,7 +72,8 @@ class ParserBase(object):
         start_time = time() 
         self._extract()
         self.elapsed = round(time() - start_time, 2)
-        print(f'Read data from: {self.url}\nTime elapsed: {self.elapsed} sec.')
+        print(f'Read data from: {self.url}\n'
+              f'Time elapsed: {self.elapsed} sec.')
         return self
         
     @property

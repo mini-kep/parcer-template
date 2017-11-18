@@ -81,13 +81,7 @@ def parse_xml(content: str):
 #        will disregars end dates beyond start +  1 year
          
 class UST(ParserBase):
-    """Datapoints from US Treasury. Behaves as list after .extract() call.
-    
-    Three things are customised:
-        observation_start_date 
-        url 
-        parse_response        
-    """
+    """US Treasury bonds interest rates."""
 
     observation_start_date = '1990-01-01'
                                                                   
@@ -104,6 +98,4 @@ if __name__ == '__main__':
    u.extract()
    print(len(u.items))
    assert u.items[0]
-   #for t in VALID_YEARS:
-   #   UST(t).extract().upload()
     
