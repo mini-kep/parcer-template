@@ -3,46 +3,59 @@ import pytest
 import arrow
 import random 
 from datetime import date
-
 from decimal import Decimal
-from parsers.getter.ust import (make_year,
-                                make_url,
-                                parse_xml,
-                                get_ust_dict,
-                                extract_date,
-                                valid_years)
 
+
+import parsers.getter.ust as ust
+from parsers.getter.ust import parse_xml
+
+
+def test_VALID_YEARS():
+    assert ust.VALID_YEARS[0] == 1990
+    assert ust.VALID_YEARS[-1] >= 2017                      
 
 class Test_make_year:
     def test_make_year_on_good_date(self):
-        assert make_year(date(2017, 1, 1)) == 2017
+        assert ust.make_year(date(2017, 1, 1)) == 2017
 
     def test_make_year_on_year_out_of_range_raises_ValueError(self):
         with pytest.raises(ValueError):
-            make_year(date(1965, 1, 1))
+            ust.make_year(date(1965, 1, 1))
 
     def test_make_year_on_Non_date_parameter_raises_AttributeError(self):
         with pytest.raises(AttributeError):
-            make_year(None)
+            ust.make_year(None)
 
 def test_make_url():
     year = 2000
-    url = make_url(year)
+    url = ust.make_url(year)
     assert str(year) in url
     assert url.startswith("http")
 
+
 def test_extract_date():
-    assert extract_date('2017-01-03T00:00:00') == \
+    assert ust.extract_date('2017-01-03T00:00:00') == \
                        arrow.get('2017-01-03').format('YYYY-MM-DD')
 
-XML_DOC_1 = """<?xml ><pre>
-               <m:properties>
-               <d:NEW_DATE>2017-01-03T00:00:00</d:NEW_DATE>
-               <d:BC_1MONTH>0.52</d:BC_1MONTH>"""
+# NOTE: space in <?xml > is critical
+XML_DOC_1 = ('<?xml ><pre>'
+             '<m:properties>'
+             '<d:NEW_DATE>2017-01-03T00:00:00</d:NEW_DATE>'
+             '<d:BC_1MONTH>0.52</d:BC_1MONTH>')
+
+
+def generate_xml(date, value, key='1MONTH'):
+    return ('<?xml ><pre><m:properties>'
+            f'<d:NEW_DATE>{date}T00:00:00</d:NEW_DATE>'
+            f'<d:BC_{key}>{value}</d:BC_{key}>')
+    
+
+def test_selftest_generate_xml():
+    assert generate_xml('2017-01-03', '0.52') == XML_DOC_1
 
 
 def test_parse_xml_returns_list():
-    assert isinstance(parse_xml(""), list)
+    assert isinstance(parse_xml(''), list)
     
 
 def test_parse_xml_with_valid_xml_input():
@@ -52,7 +65,7 @@ def test_parse_xml_with_valid_xml_input():
     assert d['value'] == Decimal('0.52')
     assert d['freq'] == 'd'
     assert d['name'] == 'UST_1MONTH'
-    
+                   
             
 def test_parse_xml_on_skipped_value():
     result = parse_xml("""<?xml ><pre>
@@ -61,8 +74,13 @@ def test_parse_xml_on_skipped_value():
                <d:BC_1MONTH></d:BC_1MONTH>""")         
     assert len(result) == 0   
     
+def test_parse_xml_on_skipped_value_by_gen():
+    xml_str = generate_xml('2017-01-03', '', key='1MONTH')
+    result = parse_xml(xml_str)         
+    assert len(result) == 0   
+
             
-# testing on larger input            
+# testing on larger input + checking more values           
 def test_parse_xml_with_valid_xml_input_2():
     xml_doc = ("""<?xml ><pre>
     <entry xmlns="http://www.w3.org/2005/Atom">
@@ -106,15 +124,6 @@ scheme="http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"/>
 </m:properties></content></entry>
 """
 
-
-def test_parse_xml_on_randomised_year_reads_whole_year_data():
-    years = valid_years()
-    year = random.choice(years)
-    dt = arrow.get(year,1,1).date()
-    result = get_ust_dict(dt)
-    assert len(result) >= 1
-
-
 def test_parse_valid_xml_with_zero_value_on_April_14_2017_is_exluded():
     xml_doc = (XML_14_APRIL_2017)
     result = parse_xml(xml_doc)
@@ -137,17 +146,66 @@ def test_parse_valid_xml_with_zero_value_on_day_other_than_April_14_2017():
     result = parse_xml(xml_doc)
     assert len(result) >= 1
 
-def fake_fetch(url=None):
+def fake_fetch(url):
     return XML_DOC_1
 
-def test_get_ust_dic():
-    start_date = date(2017, 1, 1)
-    result = get_ust_dict(start_date, downloader=fake_fetch)
-    d = result[0]
+def test_UST_on_fake_fetch():
+    g = ust.UST(date(2017, 1, 1), None, downloader=fake_fetch)
+    g.extract()
+    d = g[0]
     assert d['date'] == '2017-01-03'
     assert d['value'] == Decimal('0.52')
     assert d['freq'] == 'd'
     assert d['name'] == 'UST_1MONTH'
+
+# FIXME: split into two tests
+def test_UST_on_real_call():
+    g = ust.UST(date(2017, 1, 1), None)
+    assert g[0] is None
+    g.extract()
+    assert g[0] == {'date': '2017-01-03',
+                    'freq': 'd',
+                    'name': 'UST_1MONTH',
+                    'value': Decimal('0.52')}
+
+def test_UST_on_randomised_year_reads_whole_year_data():    
+    year = random.choice(ust.VALID_YEARS)
+    dt = date(year, 1, 1)
+    result = ust.UST(dt, None).extract()
+    assert len(result) >= 1
+
+
+# TODO: make test with actual datapoints    
+#   {'date': '2017-01-03', 'freq': 'd', 'name': 'UST_30YEAR', 'value': 3.04},
+#   {'date': '2017-09-18', 'freq': 'd', 'name': 'UST_1MONTH', 'value': 55.5},
+#   {'date': '2017-09-15', 'freq': 'd', 'name': 'UST_1MONTH', 'value': 56.18},
+
+   
+# TODO: test for UST class 
+
+#class UST():
+#    
+#    def __init__(self, start_date, end_date, downloader=util.fetch):
+#        # FIXME: in this particulr parser may restrict period to one year only
+#        #        raise error when end_date is further away from start_Date than 
+#        self.start_date, self.end_date = start_date, end_date
+#        self.response = None
+#        self.parsing_result = []
+#        self.downloader = downloader
+#    
+#    @property
+#    def url(self):
+#        return make_url(make_year(self.start_date))
+#    
+#    def extract(self):
+#        self.response = self.downloader(self.url)
+#        self.parsing_result = list(parse_xml(self.response))
+#        return self
+#        
+#    def __getitem__(self, i):
+#        if self.parsing_result:
+#            return self.parsing_result[i]
+#        return None
 
 
 if __name__ == "__main__":
