@@ -17,7 +17,7 @@ Yield a stream of datapoint dictionaries like:
 """
 
 import parsers.getter.util as util
-from parsers.ust.base import ParserBase
+from parsers.getter2.base import ParserBase
 
 import bs4
 from datetime import date

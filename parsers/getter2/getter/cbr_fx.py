@@ -1,7 +1,7 @@
 """ Download USD RUR official exchange rate from Bank of Russia web site."""
 
 
-from parsers.ust.base import ParserBase, format_date, format_value, fetch
+from parsers.getter2.base import ParserBase, format_date, format_value, fetch
 import xml.etree.ElementTree as ET
 
 
@@ -48,8 +48,8 @@ def get_cbr_er(start_date, end_date, downloader=fetch):
     return map(transform, xml_text_to_stream(xml_text))
 
 
-class USDRUR_CB(ParserBase):
-    """EIA Brent oil price."""
+class USDRUR(ParserBase):
+    """Official USD/RUR exchange rate by Bank of Russia."""
 
     observation_start_date = '1992-07-01'
                                                                   

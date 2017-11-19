@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-from parsers.ust.base import ParserBase, format_value
+from parsers.getter2.base import ParserBase, format_value
 import io
 
 def make_url(freq):
@@ -72,7 +72,7 @@ class KEP_Annual(KEP):
 class KEP_Monthly(KEP):
     freq = 'm'
 
-class KEP_Quarterly(KEP):
+class KEP_Qtr(KEP):
     freq = 'q'
 
 if __name__ == "__main__":

@@ -12,8 +12,8 @@ The data is sevral days behind (Oct 5, 2017):
 
 import json
 import parsers.getter.util as util
-from parsers.config import EIA_ACCESS_KEY
-from parsers.ust.base import ParserBase
+from .config import EIA_ACCESS_KEY
+from .base import ParserBase
 
 def make_url(access_key=EIA_ACCESS_KEY):
     series_id = 'PET.RBRTE.D'

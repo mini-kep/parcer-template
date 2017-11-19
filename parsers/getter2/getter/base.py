@@ -34,6 +34,24 @@ def make_date(x):
         return date(int(x), 1, 1)
 
 
+class Timer:
+    def __init__(self):
+        self.start()     
+        
+    def start(self):
+        self.start = time()
+        self.elapsed = 0
+
+    def stop(self):
+        self.elapsed = time() - self.start
+        return self
+
+    def __repr__(self):
+        #FIXME: add formatting to f-string
+        t = round(self.elapsed, 2)
+        return f'Time elapsed: {t} sec.'
+        
+
 class ParserBase(object):
     """   
     Must customise in child class:
@@ -52,8 +70,9 @@ class ParserBase(object):
             self.end_date = date.today()
         else: 
            self.end_date = make_date(end_date)
+
         self.response = None
-        self.elapsed = None
+        self.timer = Timer()
         self.parsing_result = []
    
     @property
@@ -63,17 +82,22 @@ class ParserBase(object):
     def parse_response(self):
         raise NotImplementedError
     
-    def _extract(self, downloader=fetch):
+    @property
+    def elapsed(self): 
+        return self.timer.elapsed
+        
+    def _extract(self, downloader=fetch, verbose=False):
+        if verbose:            
+             print(f'Reading data from: {self.url}')
         self.response = downloader(self.url)
         self.parsing_result = self.parse_response(self.response) 
         return self
     
     def extract(self):
-        start_time = time() 
-        self._extract()
-        self.elapsed = round(time() - start_time, 2)
-        print(f'Read data from: {self.url}\n'
-              f'Time elapsed: {self.elapsed} sec.')
+        self.timer.start() 
+        self._extract(verbose=True)
+        self.timer.stop()
+        print(self.timer)
         return self
         
     @property
@@ -86,12 +110,23 @@ class ParserBase(object):
                 result.append(item)
         return result        
 
-    def upload(self):
+    def _upload(self):
         return upload_datapoints(self.items)
+        
+    def upload(self):
+        self.timer.start()
+        result_bool = self._upload()
+        self.timer.stop()
+        print(f'Uploaded {len(self.parsing_result)} datapoints')
+        print(self.timer)
+        return result_bool 
     
     def __repr__(self):
         def isodate(dt):
             return dt.strftime("%Y-%m-%d")
+        def par(s):            
+            return x.join(["\'"])
+        class_name = self.__class__.__name__    
         start = isodate(self.start_date)
         end = isodate(self.end_date)
-        return f'{self.__class__.__name__}(\'{start}\', \'{end}\')'
+        return f'{class_name}({start}, {end})'    
