@@ -1,6 +1,7 @@
 """Import interest rates for US treasuries at different durations.
 
-Yield a stream of datapoint dictionaries like:
+
+Extract a stream of datapoint dictionaries like:
 
 {'date': '2017-01-03', 'freq': 'd', 'name': 'UST_1MONTH', 'value': Decimal('0.52')}
 {'date': '2017-01-03', 'freq': 'd', 'name': 'UST_3MONTH', 'value': Decimal('0.53')}
@@ -16,10 +17,10 @@ Yield a stream of datapoint dictionaries like:
 {'date': '2017-01-03', 'freq': 'd', 'name': 'UST_30YEARDISPLAY', 'value': Decimal('3.04')}
 """
 
-import parsers.getter.util as util
 import bs4
 from datetime import date
-from time import time         
+
+from parsers.getter.base import ParserBase, format_date, format_value
            
 VALID_YEARS = list(range(1990, date.today().year + 1))   
 
@@ -39,14 +40,14 @@ def make_year(start_date):
 
 def make_url(year):
     """Create urls based on *year*."""
-    return ("https://www.treasury.gov/resource-center/"
+    return ("http://www.treasury.gov/resource-center/"
             "data-chart-center/interest-rates/pages/"
             "XmlView.aspx?data=yieldyear&year={}".format(year))
 
 
 def extract_date(date_str):
     """Returns string like '2017-04-14' from '2017-01-03T00:00:00'"""
-    return util.format_date(date_str, fmt='%Y-%m-%dT%H:%M:%S')
+    return format_date(date_str, fmt='%Y-%m-%dT%H:%M:%S')
 
 
 def parse_xml_raw(content: str):
@@ -55,85 +56,44 @@ def parse_xml_raw(content: str):
     result = [{"date": extract_date(prop.find('NEW_DATE').text),
                 "freq": "d",
                 "name": child.name.replace("BC_", "UST_"),
-                "value": util.format_value(child.text)}
+                "value": format_value(child.text)}
                  for prop in properties
                  for child in prop.findChildren()
                  if child.name.startswith('BC_') and child.text]
     return result
 
 
+def must_include(d):
+    flag = True
+    if (d['date'] == '2017-04-14' or
+        d['name'] == 'UST_30YEARDISPLAY'):
+        flag = False
+    return flag    
+
+assert must_include(dict(date='2017-04-14', name='UST_30YEARDISPLAY')) is False
+
 def parse_xml(content: str):
     result = parse_xml_raw(content)
-    # exclude date 2017-04-14
-    return [d for d in result if d['date'] != '2017-04-14'] 
+    return [d for d in result if must_include(d)] 
 
-
-# TODO: can elapsed time be calculated in a lcass method decorator?
-
-class Getter(object):
-    """Datapoints from US Treasury. Behaves as list after .extract() call."""
-                                                                  
-    def __init__(self, start_date, end_date, downloader=util.fetch):
-        # FIXME: in this parser we may restrict period to one year only
-        #        raise error when end_date - start_date  > 1 year 
-        self.start_date, self.end_date = start_date, end_date
-        self.response = None
-        self.elapsed = None
-        self.parsing_result = []
-        self.downloader = downloader
-    
-    @property
-    def url(self):
-        raise NotImplementedError
-        #return make_url(make_year(self.start_date))
-    
-    def extract(self):
-        start_time = time() 
-        self.response = self.downloader(self.url)
-        self.parsing_result = None
-        raise NotImplementedError
-        self.elapsed = round(time() - start_time , 1)
-        return self
-        
-    # 'magics' to make this class behave like a list 
-    def __getitem__(self, i):
-        if self.parsing_result:
-            return self.parsing_result[i]
-        return None
-
-    def __len__(self):
-        return len(self.parsing_result)
-
-                  
 # FIXME: in this parser we may restrict period to one year only
 #        raise error when end_date - start_date  > 1 year 
-class UST(object):
-    """Datapoints from US Treasury. Behaves as list after .extract() call."""
+#        will disregars end dates beyond start +  1 year
+         
+class UST(ParserBase):
+    """US Treasuries interest rates (UST)"""
+    observation_start_date = '1990-01-01'
                                                                   
-    def __init__(self, start_date, end_date, downloader=util.fetch):
-        self.start_date, self.end_date = start_date, end_date
-        self.response = None
-        self.elapsed = None
-        self.parsing_result = []
-        self.downloader = downloader
-    
     @property
     def url(self):
         return make_url(make_year(self.start_date))
     
-    def extract(self):
-        start_time = time() 
-        self.response = self.downloader(self.url)
-        self.parsing_result = list(parse_xml(self.response))
-        self.elapsed = round(time() - start_time, 1)
-        return self
-        
-    # 'magics' to make this class behave like a list 
-    def __getitem__(self, i):
-        if self.parsing_result:
-            return self.parsing_result[i]
-        return None
-
-    def __len__(self):
-        return len(self.parsing_result)
+    def parse_response(self, response):
+        return parse_xml(response) 
+    
+if __name__ == '__main__':
+   u = UST(2017)
+   u.extract()
+   print(len(u.items))
+   assert u.items[0]
     

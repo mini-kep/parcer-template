@@ -1,19 +1,20 @@
 import arrow
-from time import time        
 from datetime import date, datetime
 from decimal import Decimal  
-
-
 import requests
+
+
 from parsers.uploader import upload_datapoints
+from parsers.timer import Timer 
 
 
 def format_date(date_string: str, fmt):
-    """Convert *date_string* to YYYY-MM-DD"""
+    """Convert *date_string* with format *fmt* to YYYY-MM-DD."""
     return datetime.strptime(date_string, fmt).strftime("%Y-%m-%d")
 
 
 def format_value(value_string: str, precision=2):
+    """Convert float to Decimal."""
     return round(Decimal(value_string), precision)
 
 
@@ -27,77 +28,66 @@ def fetch(url):
     return content
 
 
-def make_date(x):
-    if '-' in str(x):
-        return arrow.get(x).date() 
+def make_date(s):
+    """Convert string s to datetime.date under flexible rules.
+    Args:
+        s - can be ISO date string (ex: '2017-01-01') 
+            or int year (ex: 2017). Year always coerced to Jan 1. 
+    Returns:        
+        datetime.date
+    """ 
+    if s is None:
+        return None
+    elif '-' in str(s):
+        return arrow.get(s).date() 
     else:
-        return date(int(x), 1, 1)
+        return date(int(s), 1, 1)
 
-
-class Timer:
-    def __init__(self):
-        self.start()     
-        
-    def start(self):
-        self.start = time()
-        self.elapsed = 0
-
-    def stop(self):
-        self.elapsed = time() - self.start
-        return self
-
-    def __repr__(self):
-        #FIXME: add formatting to f-string
-        t = round(self.elapsed, 2)
-        return f'Time elapsed: {t} sec.'
-        
 
 class ParserBase(object):
-    """   
-    Must customise in child class:
+    """Must customise in child class:
        - observation_start_date 
        - url
        - parse_response        
     """
     
     # must change this to actual parser start date
-    observation_start_date = '1990-01-02'
+    observation_start_date = NotImplementedError("Must be a string like '1990-01-15'")
                                                                   
     def __init__(self, start_date=None, end_date=None):
-        self.start_date = (make_date(start_date) 
-                           or make_date(self.observation_start_date))    
+        obs = make_date(self.observation_start_date)
+        self.start_date = (make_date(start_date) or obs)    
         if end_date is None: 
             self.end_date = date.today()
         else: 
            self.end_date = make_date(end_date)
-
         self.response = None
-        self.timer = Timer()
         self.parsing_result = []
-   
-    @property
-    def url(self):
-        raise NotImplementedError
-    
-    def parse_response(self):
-        raise NotImplementedError
-    
+        self.timer = Timer()
+
     @property
     def elapsed(self): 
         return self.timer.elapsed
-        
-    def _extract(self, downloader=fetch, verbose=False):
+
+    @property
+    def url(self):
+        raise NotImplementedError('Must return string with URL')
+    
+    def parse_response(self):
+        raise NotImplementedError('Must return list or generator of dictionaries,' 
+                                  'each dicttionary has keys: name, date, freq, value')
+   
+    def extract(self, downloader=fetch, verbose=False):
+        self.timer.start() 
         if verbose:            
-             print(f'Reading data from: {self.url}')
+             print(f'Reading from {self.url}')
+        # main worker
         self.response = downloader(self.url)
         self.parsing_result = self.parse_response(self.response) 
-        return self
-    
-    def extract(self):
-        self.timer.start() 
-        self._extract(verbose=True)
+        # end
         self.timer.stop()
-        print(self.timer)
+        if verbose:
+             print(self.timer)
         return self
         
     @property
@@ -108,25 +98,24 @@ class ParserBase(object):
             dt = make_date(item['date'])        
             if self.start_date <= dt <= self.end_date:
                 result.append(item)
-        return result        
+        return result  
 
-    def _upload(self):
-        return upload_datapoints(self.items)
-        
-    def upload(self):
+    #TODO: should upload function be injected too here? 
+
+    def upload(self, verbose=False):
         self.timer.start()
-        result_bool = self._upload()
+        # main worker
+        result_bool = upload_datapoints(self.items)
+        # end
         self.timer.stop()
-        print(f'Uploaded {len(self.parsing_result)} datapoints')
-        print(self.timer)
+        if verbose:
+            print(f'Uploaded {len(self.parsing_result)} datapoints')
+            print(self.timer)
         return result_bool 
     
     def __repr__(self):
         def isodate(dt):
-            return dt.strftime("%Y-%m-%d")
-        def par(s):            
-            return x.join(["\'"])
-        class_name = self.__class__.__name__    
+            return f"'{dt.strftime('%Y-%m-%d')}'"
         start = isodate(self.start_date)
         end = isodate(self.end_date)
-        return f'{class_name}({start}, {end})'    
+        return f'{self.__class__.__name__}({start}, {end})'

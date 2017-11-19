@@ -79,27 +79,10 @@ def test_parse_xml_on_skipped_value_by_gen():
     result = parse_xml(xml_str)         
     assert len(result) == 0   
 
-            
-# testing on larger input + checking more values           
-def test_parse_xml_with_valid_xml_input_2():
-    xml_doc = ("""<?xml ><pre>
-    <entry xmlns="http://www.w3.org/2005/Atom">
-        <content type="application/xml">
-            <m:properties xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata">
-                <d:Id xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" m:type="Edm.Int32">3458</d:Id>
-                <d:NEW_DATE xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" m:type="Edm.DateTime">2010-10-11T00:00:00</d:NEW_DATE>
-                <d:BC_30YEARDISPLAY xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" m:type="Edm.Double">1.72</d:BC_30YEARDISPLAY>
-            </m:properties>
-        </content>
-    </entry></pre>
-    """)
-    result = parse_xml(xml_doc)
-    assert len(result) == 1
-    assert result[0]['date'] == '2010-10-11'
-    assert result[0]['value'] == Decimal('1.72')
-    assert result[0]['freq'] == 'd'
-    assert result[0]['name'] == 'UST_30YEARDISPLAY'
-
+def test_parse_xml_on_UST_30YEARDISPLAY_returns_None():
+    xml_str = generate_xml('2017-01-03', '', key='1MONTH')
+    result = parse_xml(xml_str)         
+    assert len(result) == 0   
 
 XML_14_APRIL_2017 = """<entry><id>http://data.treasury.gov/Feed.svc/DailyTreasuryYieldCurveRateData(6832)
 </id><title type="text"/><updated>2017-11-08T21:11:43Z</updated><author><name/>
@@ -150,9 +133,9 @@ def fake_fetch(url):
     return XML_DOC_1
 
 def test_UST_on_fake_fetch():
-    g = ust.UST(date(2017, 1, 1), None, downloader=fake_fetch)
-    g.extract()
-    d = g[0]
+    g = ust.UST(date(2017, 1, 1), None)
+    g.extract(downloader=fake_fetch)
+    d = g.items[0]
     assert d['date'] == '2017-01-03'
     assert d['value'] == Decimal('0.52')
     assert d['freq'] == 'd'
@@ -161,9 +144,9 @@ def test_UST_on_fake_fetch():
 # FIXME: split into two tests
 def test_UST_on_real_call():
     g = ust.UST(date(2017, 1, 1), None)
-    assert g[0] is None
+    assert not g.items
     g.extract()
-    assert g[0] == {'date': '2017-01-03',
+    assert g.items[0] == {'date': '2017-01-03',
                     'freq': 'd',
                     'name': 'UST_1MONTH',
                     'value': Decimal('0.52')}
@@ -171,7 +154,7 @@ def test_UST_on_real_call():
 def test_UST_on_randomised_year_reads_whole_year_data():    
     year = random.choice(ust.VALID_YEARS)
     dt = date(year, 1, 1)
-    result = ust.UST(dt, None).extract()
+    result = ust.UST(dt, None).extract().items
     assert len(result) >= 1
 
 
@@ -202,10 +185,7 @@ def test_UST_on_randomised_year_reads_whole_year_data():
 #        self.parsing_result = list(parse_xml(self.response))
 #        return self
 #        
-#    def __getitem__(self, i):
-#        if self.parsing_result:
-#            return self.parsing_result[i]
-#        return None
+
 
 
 if __name__ == "__main__":

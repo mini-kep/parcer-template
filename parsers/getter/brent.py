@@ -11,9 +11,8 @@ The data is sevral days behind (Oct 5, 2017):
 """
 
 import json
-import parsers.getter.util as util
 from parsers.config import EIA_ACCESS_KEY
-
+from parsers.getter.base import ParserBase, format_date, format_value
 
 def make_url(access_key=EIA_ACCESS_KEY):
     series_id = 'PET.RBRTE.D'
@@ -28,22 +27,35 @@ def parse_response(text):
     return json_data["series"][0]["data"]
 
 
-def yield_brent_dicts(downloader=util.fetch):
-    """Yeilds datapoints as dicts.
+def yield_brent_dicts(response_text):
+    """Yields datapoints as dicts.
 
     Args:
         downloader(function) - function used to retrieve URL
     """
-    url = make_url()
-    text = downloader(url)
-    for row in parse_response(text):
-        yield {"date": util.format_date(row[0], fmt="%Y%m%d"),
+    rows = parse_response(response_text)
+    for row in rows:
+        yield {"date": format_date(row[0], fmt="%Y%m%d"),
                "freq": "d",
                "name": "BRENT",
-               "value": util.format_value(row[1])}
+               "value": format_value(row[1])}
 
 
-if __name__ == "__main__":
-    gen = yield_brent_dicts()
-    for i in range(14):
-        print(next(gen))
+class Brent(ParserBase):
+    """Brent oil price (EIA)"""
+    observation_start_date = '1987-05-20'
+                                                                  
+    @property
+    def url(self):
+        return make_url()
+    
+    def parse_response(self, response):
+        return list(yield_brent_dicts(response)) 
+    
+if __name__ == '__main__':
+   u = Brent(1992)
+   u.extract()
+   print(len(u.items))
+   assert u.items[0]
+   print(u.items[0])
+

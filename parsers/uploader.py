@@ -1,17 +1,13 @@
-"""Upload data from parsers to database."""
+﻿"""Upload data from parsers to database."""
 import requests
 import json
 import decimal
 from time import sleep
 
+from parsers.config import HEROKU_API_KEY as UPLOAD_API_TOKEN
 
-UPLOAD_URL = 'https://minikep-db.herokuapp.com/api/datapoints'
-
-# FIXME: unsecure as a constant
-UPLOAD_API_TOKEN = '123'
-
-# COMMENTS (NOT TODO):
-#    many list() calls
+# TODO: change back to 'https'
+UPLOAD_URL = 'http://minikep-db.herokuapp.com/api/datapoints'
 
 def convert_decimal_to_float(obj):
     """Helper function to serilaise Decimals to float type.
@@ -37,8 +33,6 @@ def post(data, token=UPLOAD_API_TOKEN, endpoint=UPLOAD_URL):
     return requests.post(url=endpoint,
                          data=json_data,                             
                          headers={'API_TOKEN': token})
-
-# COMMENT: may return server response instead of bool
     
 def safe_post(data_chunk, upload_func=post, max_attempts=5, delay=10):
     """Repeat attempts for upload_func=post().
@@ -91,3 +85,65 @@ def upload_datapoints(gen, upload_func=safe_post):
         if not upload_func(chunk):
             return False
     return True
+
+# TODO: make Sender/Uploader classes
+#       - add mock posters
+#       - add timer
+
+# code nelow not used / not imported
+
+class Sender():
+    def __init__(self, data_chunk):
+        self.gen = list(data_chunk)
+        # add timer
+        #self.elapsed = 0
+        self.attempts = 0 
+        self.max_attempts = 3 # times
+        self.delay = 5 # seconds 
+        self.code_200_received = False              
+        
+    def post(self):
+        for self.attempts in range(1, self.max_attempts+1):
+            response = post(data=self.data_chunk)
+            if response.status_code == 200:
+                self.code_200_received = True
+                break
+            sleep(self.delay)
+        self.code_200_received = False     
+    
+    @property
+    def status(self):
+        return dict(datapoints=len(self.gen),
+                    uploaded=self.code_200_received,
+                    attempts=self.attempts)
+
+    def __repr__(self):
+        return f'Sender: {self.status}'
+    
+class Uploader:
+    def __init__(self, gen, chunk_size=1000):
+        gen = list(gen)
+        self.size = len(gen)
+        chunks = yield_chunks(gen, chunk_size)
+        self.senders = [Sender(chunk) for chunk in chunks]
+        
+    @property    
+    def elapsed(self):
+        return sum([sender.elapsed for sender in self.senders])
+
+    def run(self):
+        for sender in self.senders:
+            sender.post()
+
+    @property
+    def status(self):
+        return [sender.status for sender in self.senders]
+            
+    def __repr__(self):        
+        return (f'Uploader: {self.size} datapoints'
+                 ', '
+                f'{len(self.senders)} chunks'
+                 '\n'
+                f'{self.status}')
+
+        
