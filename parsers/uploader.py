@@ -1,31 +1,11 @@
 ﻿"""Upload data from parsers to database."""
 import requests
-import json
-import decimal
 from time import sleep
 
 from parsers.config import HEROKU_API_KEY as UPLOAD_API_TOKEN
-
+from parsers.serialiser import to_json
 
 UPLOAD_URL = 'https://minikep-db.herokuapp.com/api/datapoints'
-
-
-def convert_decimal_to_float(obj):
-    """Helper function to serilaise Decimals to float type.
-       Used inside to_json(). 
-    """
-    if isinstance(obj, decimal.Decimal):
-        return float(obj)
-    raise TypeError
-
-
-def to_json(gen): 
-    """Convert generator *gen* to json string.    
-    
-    Returns:
-        string
-    """
-    return json.dumps(list(gen), default=convert_decimal_to_float)
 
 
 def post(data, token=UPLOAD_API_TOKEN, endpoint=UPLOAD_URL):
