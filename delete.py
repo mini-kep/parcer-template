@@ -34,5 +34,5 @@ for name in names:
     
 params = dict(freq='d', 
               name='UST_30YEARDISPLAY')
-#response = delete(d, token)
+response = delete(params, token)
     
