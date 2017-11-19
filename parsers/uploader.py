@@ -106,7 +106,7 @@ def upload_datapoints(gen, upload_func=safe_post):
 
 # code nelow not used / not imported
 
-class Sender():
+class Sender(): #pragma: no cover
     def __init__(self, data_chunk):
         self.gen = list(data_chunk)
         # add timer
@@ -134,7 +134,7 @@ class Sender():
     def __repr__(self):
         return f'Sender: {self.status}'
     
-class Uploader:
+class Uploader: #pragma: no cover
     def __init__(self, gen, chunk_size=1000):
         gen = list(gen)
         self.size = len(gen)
