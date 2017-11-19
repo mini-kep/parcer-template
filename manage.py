@@ -8,6 +8,7 @@ from parsers.markdown import as_markdown
 def shift(**kwargs):
     return arrow.now().shift(**kwargs).format("YYYY-MM-DD")
 
+    
 JOBS = dict(a=shift(years=-1),
             q=shift(quarters=-1), 
             m=shift(months=-4),
@@ -31,17 +32,20 @@ def markdown_descriptions(parsers=PARSERS):
     return '\n\n'.join([as_markdown(p) for p in parsers])
 
 
-def upload_latest(freq):
+def updates(freq):
     dt = JOBS[freq]
     d = Dataset(PARSERS_DICT[freq], dt)
     d.extract()
     return d.upload()
     
 
-if __name__ == '__main__':
-    #assert save_reference_dataset() == 'test_data_2016H2.json'    
-    assert markdown_descriptions()
+def update():
     for freq in 'aqmd':
-        print('\nLoading latest values for frequency:', freq)
-        print()
-        assert upload_latest(freq)
+        assert updates(freq)   
+    return True
+
+
+if __name__ == '__main__':
+    assert save_reference_dataset() == 'test_data_2016H2.json'    
+    assert markdown_descriptions()
+    assert update()
