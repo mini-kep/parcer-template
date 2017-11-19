@@ -87,6 +87,7 @@ class ParserBase(object):
         # end
         self.timer.stop()
         if verbose:
+             print(f'Obtained {len(self.parsing_result)} datapoints')
              print(self.timer)
         return self
         
@@ -109,7 +110,7 @@ class ParserBase(object):
         # end
         self.timer.stop()
         if verbose:
-            print(f'Uploaded {len(self.parsing_result)} datapoints')
+            print(f'Uploaded {len(self.items)} datapoints')
             print(self.timer)
         return result_bool 
     

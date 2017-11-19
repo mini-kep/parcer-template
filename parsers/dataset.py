@@ -10,6 +10,8 @@ class Dataset(object):
         self.end_date = make_date(end_date) or date.today()
         self.elapsed = 0   
 
+
+    # FIXME: must do chaining of genertors
     @property    
     def items(self):
         for parser_cls in self.parsers:

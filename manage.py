@@ -1,24 +1,35 @@
+import arrow
 from parsers.getter import PARSERS
 from parsers.dataset import Dataset 
 from parsers.markdown import as_markdown
 
-
-def save_reference_dataset(): 
-    dataset = Dataset(parsers=PARSERS, start='2016-06-01', end='2016-12-31')
-    dataset.save_json('test_data_2016H2.json')
+# FIXME: not working
+#def save_reference_dataset(): 
+#    dataset = Dataset(parsers=PARSERS, start_date='2016-06-01', 
+#                      end_date='2016-12-31')
+#    dataset.save_json('test_data_2016H2.json')
     
 def print_markdown_descriptions(parsers=PARSERS):
     for p in parsers:
         print(as_markdown(p))
         print()
-
-def upload_latest(parsers=PARSERS):
-    d = Dataset(parsers, '2017-11-01')
+        
+def upload_latest(parsers=PARSERS, dt=None):
+    if dt is None:
+       dt = arrow.now().shift(weeks=-2).format("YYYY-MM-DD")
+    d = Dataset(parsers, dt)
     d.upload()
 
 
 if __name__ == '__main__':
-    print_markdown_descriptions()
+    #save_reference_dataset()
+    #print_markdown_descriptions()
+    #upload_latest()
+    pass
+
+    d = Dataset(parsers=PARSERS, start_date='2016-06-01', 
+                                 end_date='2016-12-31')   
+    a = list(d.items)
   
 
 # COMMENT: longest time for last parser 
