@@ -41,7 +41,13 @@ def post(data, token=UPLOAD_API_TOKEN, endpoint=UPLOAD_URL):
     return requests.post(url=endpoint,
                          data=json_data,                             
                          headers={'API_TOKEN': token})
-    
+                         
+def delete(params, token, endpoint=UPLOAD_URL):
+    """Delete method."""
+    return requests.delete(url=endpoint,
+                           params=params,                             
+                           headers={'API_TOKEN': token})
+                         
 def safe_post(data_chunk, upload_func=post, max_attempts=5, delay=10):
     """Repeat attempts for upload_func=post().
     
