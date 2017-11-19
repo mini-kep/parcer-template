@@ -18,6 +18,7 @@ class Timer:
         
     def stop(self):
         self.total_time = self.elapsed
-
+        self.is_running = False
+        
     def __repr__(self):
         return f'Time elapsed: {self.elapsed:.2f} sec'
