@@ -32,6 +32,6 @@ def test_Timer_elapsed_property_retruns_expected_float_after_stop():
     assert isinstance(t.elapsed, float)
     assert t.elapsed >= delay      
     
-def test_Timer_elapsed_property_retruns_expected_float():
+def test_Timer_repr():
     t = Timer()
     assert t.__repr__()    
