@@ -1,7 +1,7 @@
 import pytest
 from decimal import Decimal
 
-from parsers.uploader import convert_decimal_to_float, to_json, upload_datapoints
+from parsers.uploader import upload_datapoints
 
        
 def test_upload_to_database_returns_code_200():
