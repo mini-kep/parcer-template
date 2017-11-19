@@ -34,7 +34,7 @@ class Dataset(object):
               f' in {t.elapsed:.2f} sec')
         return True
         
-if __name__ == '__main__':
+if __name__ == '__main__': #pragma: no cover
     from parsers.getter.cbr_fx import USDRUR
     from parsers.getter.brent import Brent
     d = Dataset([USDRUR, Brent], '2017-11-13')
