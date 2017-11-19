@@ -2,7 +2,7 @@ import arrow
 from datetime import date, datetime
 from decimal import Decimal  
 import requests
-
+from urllib.parse import urlparse
 
 from parsers.uploader import upload_datapoints
 from parsers.timer import Timer 
@@ -73,6 +73,10 @@ class ParserBase(object):
     def url(self):
         raise NotImplementedError('Must return string with URL')
     
+    @property    
+    def site(self):
+        return urlparse(self.url).netloc
+    
     def parse_response(self):
         raise NotImplementedError('Must return list or generator of dictionaries,' 
                                   'each dicttionary has keys: name, date, freq, value')
@@ -80,15 +84,15 @@ class ParserBase(object):
     def extract(self, downloader=fetch, verbose=False):
         self.timer.start() 
         if verbose:            
-             print(f'Reading from {self.url}')
+             print(f'Reading {self.site}...')
         # main worker
         self.response = downloader(self.url)
         self.parsing_result = self.parse_response(self.response) 
         # end
         self.timer.stop()
         if verbose:
-             print(f'Obtained {len(self.parsing_result)} datapoints')
-             print(self.timer)
+             print(f'Obtained {len(self.parsing_result):5} datapoints', 
+                   f'in {self.timer.elapsed:.2f} sec')
         return self
         
     @property
@@ -110,8 +114,8 @@ class ParserBase(object):
         # end
         self.timer.stop()
         if verbose:
-            print(f'Uploaded {len(self.items)} datapoints')
-            print(self.timer)
+            print(f'Uploaded {len(self.items):5} datapoints',
+                  f'in {self.timer.elapsed:.2f} sec')
         return result_bool 
     
     def __repr__(self):

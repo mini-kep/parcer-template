@@ -3,11 +3,12 @@ from parsers.getter import PARSERS
 from parsers.dataset import Dataset 
 from parsers.markdown import as_markdown
 
-# FIXME: not working
-#def save_reference_dataset(): 
-#    dataset = Dataset(parsers=PARSERS, start_date='2016-06-01', 
-#                      end_date='2016-12-31')
-#    dataset.save_json('test_data_2016H2.json')
+def save_reference_dataset(): 
+    dataset = Dataset(parsers=PARSERS, 
+                      start_date='2016-06-01', 
+                      end_date='2016-12-31')
+    dataset.extract()
+    dataset.save_json('test_data_2016H2.json')
     
 def print_markdown_descriptions(parsers=PARSERS):
     for p in parsers:
@@ -24,13 +25,8 @@ def upload_latest(parsers=PARSERS, dt=None):
 if __name__ == '__main__':
     #save_reference_dataset()
     #print_markdown_descriptions()
-    #upload_latest()
+    upload_latest()
     pass
-
-    d = Dataset(parsers=PARSERS, start_date='2016-06-01', 
-                                 end_date='2016-12-31')   
-    a = list(d.items)
-  
 
 # COMMENT: longest time for last parser 
 

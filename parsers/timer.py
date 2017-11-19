@@ -13,4 +13,4 @@ class Timer:
         return self
 
     def __repr__(self):
-        return f'Time elapsed: {self.elapsed:.2f} sec.'
+        return f'Time elapsed: {self.elapsed:.2f} sec'

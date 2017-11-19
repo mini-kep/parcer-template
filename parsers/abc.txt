@@ -1,0 +1,38 @@
+[
+    {
+        "date": "2017-11-14",
+        "freq": "d",
+        "name": "USDRUR_CB",
+        "value": 59.1823
+    },
+    {
+        "date": "2017-11-15",
+        "freq": "d",
+        "name": "USDRUR_CB",
+        "value": 59.6207
+    },
+    {
+        "date": "2017-11-16",
+        "freq": "d",
+        "name": "USDRUR_CB",
+        "value": 60.249
+    },
+    {
+        "date": "2017-11-17",
+        "freq": "d",
+        "name": "USDRUR_CB",
+        "value": 59.9898
+    },
+    {
+        "date": "2017-11-18",
+        "freq": "d",
+        "name": "USDRUR_CB",
+        "value": 59.6325
+    },
+    {
+        "date": "2017-11-13",
+        "freq": "d",
+        "name": "BRENT",
+        "value": 62.94
+    }
+]
