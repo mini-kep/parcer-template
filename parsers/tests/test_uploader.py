@@ -3,20 +3,6 @@ from decimal import Decimal
 
 from parsers.uploader import convert_decimal_to_float, to_json, upload_datapoints
 
-
-def test_convert_decimal_to_float_return_float():
-    decimal_number = Decimal(1)
-    assert convert_decimal_to_float(decimal_number) == float(decimal_number)
-
-
-# FIXME: refine test to close to actual data
-@pytest.mark.parametrize("gen,s", [
-    ([Decimal('1.01')], '[1.01]'),
-    ([Decimal('1.0100000000000000088817841970012523233890533447265625')], '[1.01]'),
-    ])
-def test_to_json(gen, s):
-    assert to_json(gen) == s
-                          
        
 def test_upload_to_database_returns_code_200():
     class MockResponse:
