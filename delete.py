@@ -21,12 +21,18 @@ names = ["UST_10YEAR",
   "UST_7YEAR"
 ]
 
+
+token = None
+
 for name in names:
     d = dict(freq='d', 
              name=name, 
              start_date='2017-04-14', 
              end_date='2017-04-14')
-    print(d)
-    token = None
-    response = delete(d, token)
-    print(response)
+    #response = delete(d, token)
+    
+    
+params = dict(freq='d', 
+              name='UST_30YEARDISPLAY')
+#response = delete(d, token)
+    
