@@ -54,7 +54,7 @@ class ParserBase(object):
     # must change this to actual parser start date
     observation_start_date = NotImplementedError("Must be a string like '1990-01-15'")
                                                                   
-    def __init__(self, start_date=None, end_date=None):
+    def __init__(self, start_date=None, end_date=None, silent=True):
         obs = make_date(self.observation_start_date)
         self.start_date = (make_date(start_date) or obs)    
         if end_date is None: 
@@ -64,6 +64,10 @@ class ParserBase(object):
         self.response = None
         self.parsing_result = []
         self.timer = Timer()
+        self.silent = silent
+        if not self.silent:
+            print(self.__class__.__doc__)
+            print('Date range:', self.start_date, self.end_date)
 
     @property
     def elapsed(self): 
@@ -81,19 +85,21 @@ class ParserBase(object):
         raise NotImplementedError('Must return list or generator of dictionaries,' 
                                   'each dicttionary has keys: name, date, freq, value')
    
-    def extract(self, downloader=fetch, verbose=False):
+    def extract(self, downloader=fetch):
         self.timer.start() 
-        if verbose:            
-             print(f'Reading {self.site}...')
+        if not self.silent:            
+             print(f'Source: {self.site}')
         # main worker
         self.response = downloader(self.url)
         self.parsing_result = self.parse_response(self.response) 
         # end
         self.timer.stop()
-        if verbose:
-             print(f'Obtained {len(self.parsing_result):5} datapoints', 
-                   f'in {self.timer.elapsed:.2f} sec')
-        return self
+        if not self.silent:
+             print(f'{len(self.parsing_result):5} datapoints read', 
+                      f'in {self.timer.elapsed:.2f} sec')
+             print(f'{len(self.items):5} datapoints in date range')
+             print()
+        return True
         
     @property
     def items(self):
@@ -105,15 +111,22 @@ class ParserBase(object):
                 result.append(item)
         return result  
 
-    #TODO: should upload function be injected too here? 
+    #IDEA: should upload function be injected too, same as in extract()? 
 
-    def upload(self, verbose=False):
+    def upload(self):
+        if not self.items:
+            if not self.silent:
+                print(f'No datapoints to upload in this date range')
+            if self.parsing_result:    
+                return True    
+            else:
+                return False
         self.timer.start()
         # main worker
         result_bool = upload_datapoints(self.items)
         # end
         self.timer.stop()
-        if verbose:
+        if not self.silent:
             print(f'Uploaded {len(self.items):5} datapoints',
                   f'in {self.timer.elapsed:.2f} sec')
         return result_bool 

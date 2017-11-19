@@ -1,1 +1,1 @@
-from .getter import PARSERS
+from .getter import PARSERS, PARSERS_DICT

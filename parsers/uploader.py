@@ -7,7 +7,15 @@ from time import sleep
 from parsers.config import HEROKU_API_KEY as UPLOAD_API_TOKEN
 
 # TODO: change back to 'https'
-UPLOAD_URL = 'http://minikep-db.herokuapp.com/api/datapoints'
+UPLOAD_URL = 'https://minikep-db.herokuapp.com/api/datapoints'
+
+# changed endpoint url to http, not https: on this error
+
+# Error on bad SSL connection
+# SSLError: HTTPSConnectionPool(host='minikep-db.herokuapp.com', port=443): 
+#    Max retries exceeded with url: /api/datapoints 
+#    (Caused by SSLError(SSLError("bad handshake: Error([('SSL routines', 
+#    'tls_process_server_certificate', 'certificate verify failed')],)",),))
 
 def convert_decimal_to_float(obj):
     """Helper function to serilaise Decimals to float type.
