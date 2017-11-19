@@ -37,7 +37,7 @@ def test_extract_date():
     assert ust.extract_date('2017-01-03T00:00:00') == \
                        arrow.get('2017-01-03').format('YYYY-MM-DD')
 
-# NOTE: space in <?xml > is critical
+# WARNING: space in <?xml > is critical
 XML_DOC_1 = ('<?xml ><pre>'
              '<m:properties>'
              '<d:NEW_DATE>2017-01-03T00:00:00</d:NEW_DATE>'
@@ -133,9 +133,9 @@ def fake_fetch(url):
     return XML_DOC_1
 
 def test_UST_on_fake_fetch():
-    g = ust.UST(date(2017, 1, 1), None)
-    g.extract(downloader=fake_fetch)
-    d = g.items[0]
+    u = ust.UST(2017, None)
+    u.extract(downloader=fake_fetch)
+    d = u.items[0]
     assert d['date'] == '2017-01-03'
     assert d['value'] == Decimal('0.52')
     assert d['freq'] == 'd'
@@ -143,49 +143,25 @@ def test_UST_on_fake_fetch():
 
 # FIXME: split into two tests
 def test_UST_on_real_call():
-    g = ust.UST(date(2017, 1, 1), None)
-    assert not g.items
-    g.extract()
-    assert g.items[0] == {'date': '2017-01-03',
+    u = ust.UST(2017, None)
+    assert not u.items
+    u.extract()
+    assert u.items[0] == {'date': '2017-01-03',
                     'freq': 'd',
                     'name': 'UST_1MONTH',
                     'value': Decimal('0.52')}
-
+    
+@pytest.mark.skip("This will test runs too long")
 def test_UST_on_randomised_year_reads_whole_year_data():    
     year = random.choice(ust.VALID_YEARS)
-    dt = date(year, 1, 1)
-    result = ust.UST(dt, None).extract().items
-    assert len(result) >= 1
-
+    p = ust.UST(year, None)
+    p.extract()
+    assert len(p.items) >= 1
 
 # TODO: make test with actual datapoints    
 #   {'date': '2017-01-03', 'freq': 'd', 'name': 'UST_30YEAR', 'value': 3.04},
 #   {'date': '2017-09-18', 'freq': 'd', 'name': 'UST_1MONTH', 'value': 55.5},
 #   {'date': '2017-09-15', 'freq': 'd', 'name': 'UST_1MONTH', 'value': 56.18},
-
-   
-# TODO: test for UST class 
-
-#class UST():
-#    
-#    def __init__(self, start_date, end_date, downloader=util.fetch):
-#        # FIXME: in this particulr parser may restrict period to one year only
-#        #        raise error when end_date is further away from start_Date than 
-#        self.start_date, self.end_date = start_date, end_date
-#        self.response = None
-#        self.parsing_result = []
-#        self.downloader = downloader
-#    
-#    @property
-#    def url(self):
-#        return make_url(make_year(self.start_date))
-#    
-#    def extract(self):
-#        self.response = self.downloader(self.url)
-#        self.parsing_result = list(parse_xml(self.response))
-#        return self
-#        
-
 
 
 if __name__ == "__main__":

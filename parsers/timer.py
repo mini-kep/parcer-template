@@ -7,14 +7,17 @@ class Timer:
     def start(self):
         self.start_time = time()
         self.total_time = 0
+        self.is_running = True
 
     @property
     def elapsed(self):
-        return time() - self.start_time
+        if self.is_running:
+            return time() - self.start_time
+        else:
+            return self.total_time
         
     def stop(self):
         self.total_time = self.elapsed
-        return self
 
     def __repr__(self):
         return f'Time elapsed: {self.elapsed:.2f} sec'
