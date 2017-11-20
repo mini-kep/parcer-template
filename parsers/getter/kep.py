@@ -80,7 +80,7 @@ class KEP_Monthly(KEP):
     freq = 'm'
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": #pragma:  no cover
     u = KEP_Monthly(2016)
     u.extract()
     print(u.items[0])
