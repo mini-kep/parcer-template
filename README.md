@@ -25,16 +25,16 @@ Same data structure is used to upload data to database.
 
 # Individual parsers
 
-#### Parser contruction
+#### Parser construction
 
 Each parser is a child of `parsers.getter.base.ParserBase` class.
 
-A parser has its own:
+To make a new parser - inherit from `ParserBase` and change:
 - observation start date (class attribute) 
 - url constructor (property)
 - response parsing function (method)
 
-To make a new parser one must inherit from `ParserBase` and redefined the items above. 
+#### Parser methods
 
 Parsers have `.extract()` and `.upload()` methods:
   - `.extract()` changes `.parsing_result`
@@ -48,6 +48,9 @@ parser = KEP_Annual()
 parser.extract()
 parser.upload()
 ```
+
+#### Arguments
+
 Creating a parser without arguments forces parser to scan full dataset.
 , which is a burden on the original sources. Thus, parsers can return 
 datapoints from a specific date to present: 
@@ -73,7 +76,6 @@ from parsers import PARSERS
 
 d = Dataset(PARSERS, start_date, end_date) 
 d.extract()
-d.items
 d.upload()
 d.save_json(filename)
 ```
@@ -85,7 +87,6 @@ d.save_json(filename)
    - save reference dataset as json file
    - print parser descriptions in markdown 
    
-
 # Parser descriptions
 
 Current list of parsers:
