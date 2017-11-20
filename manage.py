@@ -5,6 +5,7 @@ from parsers.timer import Timer
 from parsers.dataset import Dataset 
 from parsers.markdown import as_markdown
 
+
 def shift(**kwargs):
     return arrow.now().shift(**kwargs).format("YYYY-MM-DD")
 
@@ -16,15 +17,14 @@ JOBS = dict(a=shift(years=-1),
 
 
 def save_reference_dataset(filename='test_data_2016H2.json'): 
-    t = Timer()
-    dataset = Dataset(parsers=PARSERS, 
-                      start_date='2016-06-01', 
-                      end_date='2016-12-31',
-                      silent=True)
-    dataset.extract()
-    dataset.save_json(filename)
-    print('Saved reference dataset:', filename)
-    print(t)
+    with Timer() as t: 
+        dataset = Dataset(parsers=PARSERS, 
+                          start_date='2016-06-01', 
+                          end_date='2016-12-31',
+                          silent=True)
+        dataset.extract()
+        dataset.save_json(filename)
+    print(f'Saved reference dataset to {filename} ({t.elapsed} sec)')
     return filename
 
     

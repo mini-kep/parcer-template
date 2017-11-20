@@ -63,11 +63,11 @@ class ParserBase(object):
            self.end_date = make_date(end_date)
         self.response = None
         self.parsing_result = []
-        self.timer = Timer()
-        self.silent = silent
-        if not self.silent:
-            print(self.__class__.__doc__)
-            print('Date range:', self.start_date, self.end_date)
+        self.silent = silent      
+        # tell abou class
+        self.echo()
+        self.echo(self.__class__.__doc__)
+        self.echo(f'Date range: {self.start_date} {self.end_date}')
 
     @property
     def elapsed(self): 
@@ -86,19 +86,15 @@ class ParserBase(object):
                                   'each dicttionary has keys: name, date, freq, value')
    
     def extract(self, downloader=fetch):
-        self.timer.start() 
-        if not self.silent:            
-             print(f'Source: {self.site}')
+        self.echo(f'Source: {self.site}')
         # main worker
-        self.response = downloader(self.url)
-        self.parsing_result = self.parse_response(self.response) 
-        # end
-        self.timer.stop()
-        if not self.silent:
-             print(f'{len(self.parsing_result):5} datapoints read', 
-                      f'in {self.timer.elapsed:.2f} sec')
-             print(f'{len(self.items):5} datapoints in date range')
-             print()
+        with Timer() as t:
+            self.response = downloader(self.url)
+            self.parsing_result = self.parse_response(self.response) 
+        #end    
+        self.echo(f'Datapoints read in {t.elapsed:.2f} sec')
+        self.echo(f'{len(self.parsing_result):5} datapoints total')
+        self.echo(f'{len(self.items):5} in date range')
         return True
         
     @property
@@ -114,22 +110,24 @@ class ParserBase(object):
     #IDEA: should upload function be injected too, same as in extract()? 
 
     def upload(self):
+        # nothing to uplaod?
         if not self.items:
-            if not self.silent:
-                print(f'No datapoints to upload in this date range')
+            self.echo(f'No datapoints to upload in this date range')
             if self.parsing_result:    
                 return True    
             else:
                 return False
-        self.timer.start()
         # main worker
-        result_bool = upload_datapoints(self.items)
+        with Timer() as t:
+            result_bool = upload_datapoints(self.items)
         # end
-        self.timer.stop()
-        if not self.silent:
-            print(f'Uploaded {len(self.items):5} datapoints',
-                  f'in {self.timer.elapsed:.2f} sec')
+        self.echo(f'{len(self.items):5} datapoints uploaded'
+                  f' in {t.elapsed:.2f} sec')
         return result_bool 
+    
+    def echo(self, msg=''):
+        if not self.silent:
+            print(msg)
     
     def __repr__(self):
         def isodate(dt):
