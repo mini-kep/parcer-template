@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from parsers.markdown import Markdown, as_markdown
+from parsers.markdown import Markdown, as_markdown, interpret_frequency
 from parsers.getter.base import ParserBase
+
+def test_interpret_frequency():
+    assert interpret_frequency('d') = 'Daily'
 
 
 @pytest.fixture
