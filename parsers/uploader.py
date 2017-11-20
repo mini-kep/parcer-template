@@ -2,10 +2,8 @@
 import requests
 from time import sleep
 
-from parsers.config import HEROKU_API_KEY as UPLOAD_API_TOKEN
+from parsers.config import HEROKU_API_KEY as UPLOAD_API_TOKEN, UPLOAD_URL
 from parsers.serialiser import to_json
-
-UPLOAD_URL = 'https://minikep-db.herokuapp.com/api/datapoints'
 
 
 def post(data, token=UPLOAD_API_TOKEN, endpoint=UPLOAD_URL):
