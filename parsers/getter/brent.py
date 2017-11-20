@@ -52,7 +52,7 @@ class Brent(ParserBase):
     def parse_response(self, response):
         return list(yield_brent_dicts(response)) 
     
-if __name__ == '__main__':
+if __name__ == '__main__': #pragma: no cover
    u = Brent(1992)
    u.extract()
    print(len(u.items))
