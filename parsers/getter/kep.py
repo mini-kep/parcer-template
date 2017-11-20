@@ -46,10 +46,6 @@ def is_valid(d):
     return not any(negative_conditions)
 
 
-def yield_kep_dicts(freq):
-    return filter(is_valid, yield_all_dicts(freq))
-
-
 class KEP(ParserBase):
     """KEP dataset."""
 
