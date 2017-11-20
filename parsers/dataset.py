@@ -28,8 +28,8 @@ class Dataset(object):
         Path(filename).write_text(self.json)
         
     def upload(self):
-        t = Timer()
-        upload_datapoints(self.items)
+        with Timer() as t:
+            upload_datapoints(self.items)
         print(f'{len(self.items):5} datapoints uploaded'
               f' in {t.elapsed:.2f} sec')
         return True
