@@ -61,7 +61,7 @@ class USDRUR(ParserBase):
         return list(gen)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": #pragma: no cover
     dt = '1992-07-01'
     u = USDRUR(dt, dt)
     u.extract()
