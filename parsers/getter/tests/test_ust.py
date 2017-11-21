@@ -141,7 +141,9 @@ def test_UST_on_fake_fetch():
     assert d['freq'] == 'd'
     assert d['name'] == 'UST_1MONTH'
 
+
 # FIXME: split into two tests
+@pytest.mark.webtest
 def test_UST_on_real_call():
     u = ust.UST(2017, None)
     assert not u.items
@@ -150,7 +152,9 @@ def test_UST_on_real_call():
                     'freq': 'd',
                     'name': 'UST_1MONTH',
                     'value': Decimal('0.52')}
-    
+
+
+@pytest.mark.webtest
 @pytest.mark.skip("This will test runs too long")
 def test_UST_on_randomised_year_reads_whole_year_data():    
     year = random.choice(ust.VALID_YEARS)

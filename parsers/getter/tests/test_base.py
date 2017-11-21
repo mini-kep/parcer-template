@@ -68,6 +68,7 @@ def mocked_content():
     with requests_mock.mock() as m:
         yield m
 
+@pytest.mark.webtest
 class Test_fetch():    
     # urls does not affect the test in this setup
     url = "http://..."
@@ -215,9 +216,10 @@ class Test_make_date:
 
 class ParserBaseChild(ParserBase):    
     observation_start_date = '1990-01-01'
-    
-class Test_ParserBaseChild:    
 
+
+@pytest.mark.webtest
+class Test_ParserBaseChild:
     def test_dates_on_init_without_args(self):  
         pb = ParserBaseChild() 
         assert pb.start_date == date(1990, 1, 1)

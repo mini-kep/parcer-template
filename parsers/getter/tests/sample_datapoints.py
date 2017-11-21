@@ -26,7 +26,7 @@ class DateViewer:
     def make_date_filter(self):
         def is_in_date_range(item):
             dt = make_date(item['date'])        
-            return self.start <= dt and dt <= self.end
+            return self.start <= dt <= self.end
         return is_in_date_range
 
 class ParserBase0:
@@ -44,7 +44,7 @@ class ParserBase0:
     def make_date_filter(self):
         def is_in_date_range(item):
             dt = make_date(item['date'])        
-            return self.start <= dt and dt <= self.end
+            return self.start <= dt <= self.end
         return is_in_date_range
 
     def all_items(self):
@@ -125,7 +125,7 @@ class ParserBase:
         """Returns a function which is used in filtering dates""" 
         def f(item):
             dt = make_date(item['date'])        
-            return self.start <= dt and dt <= self.end
+            return self.start <= dt <= self.end
         return f
         
     def get_parsing_result(self):

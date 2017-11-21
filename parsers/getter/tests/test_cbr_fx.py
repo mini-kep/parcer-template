@@ -62,6 +62,8 @@ class Test_transform:
         with pytest.raises(TypeError) as e:
             transform(datapoint)
 
+
+@pytest.mark.webtest
 def test_get_cbr_er():
     start_str = date(1992, 7, 1)
     end_str = date(2017, 10, 4)
