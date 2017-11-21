@@ -133,8 +133,8 @@ def fake_fetch(url):
     return XML_DOC_1
 
 def test_UST_on_fake_fetch():
-    u = ust.UST(2017, None)
-    u.extract(downloader=fake_fetch)
+    u = ust.UST(2017, None, download_func=fake_fetch)
+    u.extract()
     d = u.items[0]
     assert d['date'] == '2017-01-03'
     assert d['value'] == Decimal('0.52')

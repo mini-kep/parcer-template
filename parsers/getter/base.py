@@ -22,9 +22,9 @@ def fetch(url):
     """Fetch content from *url* from internet."""
     content = requests.get(url).text
     if "Error" in content:
-        raise ValueError(f"Cannot read from URL <{url}>")
+        raise ValueError(f"Cannot read from: {url}")
     if 'Error in parameters' in content:
-        raise Exception(f'Error in parameters: {url}')
+        raise ValueError(f'Error in url parameters: {url}')
     return content
 
 
@@ -44,60 +44,121 @@ def make_date(s):
         return date(int(s), 1, 1)
 
 
+class Logger(object):
+    
+    def __init__(self, silent=True):
+        self.silent = silent
+    
+    def echo(self, msg=''):
+        if not self.silent:
+            print(msg)            
+
+
+class Scrapper(object):    
+    def __init__(self, download_func, silent=True):
+        self.download_func = download_func
+        self.logger = Logger(silent)
+    
+    @staticmethod        
+    def site(url):
+        return urlparse(url).netloc
+        
+    def get(self, url):  
+        with Timer() as t:
+            response = self.download_func(url)
+        self.logger.echo(f'Read data from: {self.site(url)}')
+        self.logger.echo(t)       
+        return response
+
+class Uploader(object):
+    def __init__(self, upload_func, silent=True):
+        self.upload_func = upload_func
+        self.logger = Logger(silent)    
+        
+    def post(self, data):  
+        with Timer() as t:
+            result_bool = self.upload_func(data)
+        self.logger.echo(f'{len(data)} datapoints uploaded')
+        self.logger.echo(t)        
+        return result_bool
+    
+# TODO: move to tests        
+s = Scrapper(lambda x: x)
+assert '123' == s.get('123')
+
+u = Uploader(lambda x: True)
+assert u.post([])
+    
+DATE_FLOOR = make_date(1864) 
+
 class ParserBase(object):
     """Must customise in child class:
        - observation_start_date 
        - url
-       - parse_response        
+       - get_datapoints        
     """
     
-    # must change this to actual parser start date
+    # in child class must change this to actual parser start date - 
+    # the earlier date on which the parser can return data
     observation_start_date = NotImplementedError("Must be a string like '1990-01-15'")
-                                                                  
-    def __init__(self, start_date=None, end_date=None, silent=True):
-        obs = make_date(self.observation_start_date)
-        self.start_date = (make_date(start_date) or obs)    
-        if end_date is None: 
-            self.end_date = date.today()
-        else: 
-           self.end_date = make_date(end_date)
-        self.response = None
-        self.parsing_result = []
-        self.silent = silent      
-        # tell abou class
-        self.echo()
-        self.echo(self.__class__.__doc__)
-        self.echo(f'Date range: {self.start_date} {self.end_date}')
+     
+    def _init_start(self, start_date):
+        # HACK: make this class testable 
+        try:
+            obs = make_date(self.observation_start_date)
+        except NotImplementedError:
+            obs = DATE_FLOOR  
+        return make_date(start_date) or obs        
 
-    @property
-    def elapsed(self): 
-        return self.timer.elapsed
+    def _init_end(self, end_date):
+        if end_date:
+            return make_date(end_date)
+        else:           
+            return date.today()
+                                                             
+    def __init__(self, start_date=None, 
+                       end_date=None, 
+                       silent=True,
+                       download_func = fetch,
+                       upload_func = upload_datapoints):
+        self.logger = Logger(silent)
+        self.scrapper = Scrapper(download_func, silent)
+        self.uploader =  Uploader(upload_func, silent)
+        self.parsing_result = []
+        self.start_date = self._init_start(start_date)
+        self.end_date = self._init_end(end_date)
+        # tell about class init        
+        self.logger.echo(self.__class__.__doc__)
+        self.logger.echo(f'Date range: {self.start_date} {self.end_date}')
 
     @property
     def url(self):
-        raise NotImplementedError('Must return string with URL')
+        raise NotImplementedError('Must return string with URL, '
+                                  'usually based on start and end date '
+                                  'or frequency.')
     
-    @property    
-    def site(self):
-        return urlparse(self.url).netloc
+    @staticmethod
+    def get_datapoints(response_str):
+        raise NotImplementedError('Must return list or generator of dictionaries. ' 
+                                  'Each dicttionary has keys: '
+                                  'name, date, freq, value')
     
-    def parse_response(self, x):
-        if not isinstance(x, str):
-            raise TypeError(x) 
-        raise NotImplementedError('Must return list or generator of dictionaries,' 
-                                  'each dicttionary has keys: name, date, freq, value')
+    def parse_response(self, response_str):
+        if not isinstance(response_str, str):
+            raise TypeError(response_str) 
+        return self.get_datapoints(response_str)   
    
-    def extract(self, downloader=fetch):
-        # main worker
-        with Timer() as t:
-            self.response = downloader(self.url)
-            self.parsing_result = self.parse_response(self.response) 
-        #end    
-        self.echo(f'Source: {self.site}')
-        self.echo(f'Datapoints read in {t.elapsed:.2f} sec')
-        self.echo(f'{len(self.parsing_result):5} datapoints total')
-        self.echo(f'{len(self.items):5} in date range')
+    def extract(self):
+        response = self.scrapper.get(self.url)
+        self.parsing_result = self.parse_response(response) 
+        self.log_extract_result()
         return True
+    
+    def log_extract_result(self):
+        #logging
+        n = len(self.parsing_result)
+        k = len(self.items)
+        self.logger.echo(f'{n} datapoints extracted, {k} in date range')
     
     def is_in_date_range(self, item):
         dt = make_date(item['date'])        
@@ -108,27 +169,15 @@ class ParserBase(object):
         """Return subset of parsing result bound by start and end date"""
         return [d for d in self.parsing_result if self.is_in_date_range(d)]
 
-    #IDEA: should upload function be injected too, same as in extract()? 
-
     def upload(self):
-        # nothing to uplaod?
+        # nothing to upload?
+        if not self.parsing_result:
+            self.logger.echo('No datapoints or parser not run.')
+            return False
         if not self.items:
-            self.echo(f'No datapoints to upload in this date range')
-            if self.parsing_result:    
-                return True    
-            else:
-                return False
-        # main worker
-        with Timer() as t:
-            result_bool = upload_datapoints(self.items)
-        # end
-        self.echo(f'{len(self.items):5} datapoints uploaded'
-                  f' in {t.elapsed:.2f} sec')
-        return result_bool 
-    
-    def echo(self, msg=''):
-        if not self.silent:
-            print(msg)
+            self.logger.echo(f'No datapoints in date range')
+            return False        
+        return self.uploader.post(self.items)        
     
     def __repr__(self):
         def isodate(dt):
