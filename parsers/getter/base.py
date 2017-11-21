@@ -23,8 +23,8 @@ def fetch(url):
     content = requests.get(url).text
     if "Error" in content:
         raise ValueError(f"Cannot read from: {url}")
-    if 'Error in parameters' in content:
-        raise ValueError(f'Error in url parameters: {url}')
+    #if 'Error in parameters' in content:
+    #    raise ValueError(f'Error in url parameters: {url}')
     return content
 
 

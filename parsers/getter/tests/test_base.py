@@ -83,7 +83,7 @@ class Test_fetch():
         with pytest.raises(ValueError):
             fetch(self.url)
 
-    def test_fetch_returns_Error_in_parameters_raises_Exception(self, mocked_content):
+    def test_fetch_on_Error_in_parameters(self, mocked_content):
         mocked_content.get(self.url, text="Error in parameters")
         with pytest.raises(ValueError):
             fetch(self.url)
