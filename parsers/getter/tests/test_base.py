@@ -68,8 +68,7 @@ def mocked_content():
     with requests_mock.mock() as m:
         yield m
 
-@pytest.mark.webtest
-class Test_fetch():    
+class Test_fetch():
     # urls does not affect the test in this setup
     url = "http://..."
     
