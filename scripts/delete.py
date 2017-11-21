@@ -4,8 +4,21 @@ Delete datapoints based on parameters.
 WARNING: use with caution!
 
 """
+import sys
+from pathlib import Path
 
-from parsers.uploader import delete
+class PathContext():
+    def __init__(self):
+        self.path = str(Path(__file__).parent)
+
+    def __enter__(self):
+        sys.path.insert(0, self.path)
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        sys.path.remove(self.path)
+
+with PathContext():
+    from parsers.uploader import delete
 
 names = ["UST_10YEAR", 
   "UST_1MONTH", 
