@@ -81,31 +81,32 @@ class ParserBase(object):
     def site(self):
         return urlparse(self.url).netloc
     
-    def parse_response(self):
+    def parse_response(self, x):
+        if not isinstance(x, str):
+            raise TypeError(x) 
         raise NotImplementedError('Must return list or generator of dictionaries,' 
                                   'each dicttionary has keys: name, date, freq, value')
    
     def extract(self, downloader=fetch):
-        self.echo(f'Source: {self.site}')
         # main worker
         with Timer() as t:
             self.response = downloader(self.url)
             self.parsing_result = self.parse_response(self.response) 
         #end    
+        self.echo(f'Source: {self.site}')
         self.echo(f'Datapoints read in {t.elapsed:.2f} sec')
         self.echo(f'{len(self.parsing_result):5} datapoints total')
         self.echo(f'{len(self.items):5} in date range')
         return True
+    
+    def is_in_date_range(self, item):
+        dt = make_date(item['date'])        
+        return self.start_date <= dt <= self.end_date
         
     @property
     def items(self):
-        """Parsing result bound by start and end date"""
-        result = []
-        for item in self.parsing_result:
-            dt = make_date(item['date'])        
-            if self.start_date <= dt <= self.end_date:
-                result.append(item)
-        return result  
+        """Return subset of parsing result bound by start and end date"""
+        return [d for d in self.parsing_result if self.is_in_date_range(d)]
 
     #IDEA: should upload function be injected too, same as in extract()? 
 

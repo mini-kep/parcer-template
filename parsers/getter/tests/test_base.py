@@ -204,28 +204,36 @@ class Test_make_date:
 #    def __repr__(self):
 #        # .. code changed
 
+#class Test_ParserBase:    
+#    
+#    p = ParserBase(2017, 2018)
+#    
+#    def test_url(self):
+#        pass
 
-class ParserBaseStartable(ParserBase):    
+
+
+class ParserBaseChild(ParserBase):    
     observation_start_date = '1990-01-01'
     
-class Test_ParserBase:    
+class Test_ParserBaseChild:    
 
     def test_dates_on_init_without_args(self):  
-        pb = ParserBaseStartable() 
+        pb = ParserBaseChild() 
         assert pb.start_date == date(1990, 1, 1)
         assert pb.end_date == date.today()
     
     def test_dates_on_init_with_one_arg(self):  
-        pb = ParserBaseStartable(2017) 
+        pb = ParserBaseChild(2017) 
         assert pb.start_date == date(2017, 1, 1)
         assert pb.end_date == date.today()
     
     def test_repr_returns_string(self):  
-        pb = ParserBaseStartable(2017) 
+        pb = ParserBaseChild(2017) 
         assert pb.__repr__().startswith("ParserBase")
 
     def test_items(self):  
-        pb = ParserBaseStartable('2017-01-01', '2017-11-19') 
+        pb = ParserBaseChild('2017-01-01', '2017-11-19') 
         pb.parsing_result = [dict(date='2016-12-31'), 
                              dict(date='2017-01-01'),
                              dict(date='2017-06-01'), 
