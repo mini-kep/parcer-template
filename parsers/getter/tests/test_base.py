@@ -77,15 +77,19 @@ class Test_fetch():
         mocked_content.get(self.url, text='{value: 1}')
         assert fetch(self.url) == '{value: 1}'
 
+    # TODO: must parametrise
+    
     def test_fetch_with_non_readable_URL_raises_ValueError(self, mocked_content):
         mocked_content.get(self.url, text="Error reponse")
         with pytest.raises(ValueError):
             fetch(self.url)
 
-    def test_fetch_returns_Error_in_parameters_raises_Exception(self, mocked_content):
+    def test_fetch_on_Error_in_parameters(self, mocked_content):
         mocked_content.get(self.url, text="Error in parameters")
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             fetch(self.url)
+            
+    # ------------------------        
 
 #def make_date(x):
 #    if '-' in str(x):
@@ -216,11 +220,29 @@ class Test_make_date:
 
 class ParserBaseChild(ParserBase):    
     observation_start_date = '1990-01-01'
+    
+    @property
+    def url(self):
+        return 'http://localhost'
+    
+    @staticmethod
+    def get_datapoints(response_str):
+        return [{}, {}]        
+    
+class Test_ParserBaseChild:    
+    
+    def test_parse_response_on_non_string_raises_error(self):
+        p = ParserBaseChild() 
+        with pytest.raises(TypeError):
+            p.parse_response(1)                       
 
-
-@pytest.mark.webtest
-class Test_ParserBaseChild:
-    def test_dates_on_init_without_args(self):  
+    def test_parse_response_on_string_returns_list_of_dicts(self):
+        p = ParserBaseChild() 
+        out = p.parse_response('abc')           
+        assert isinstance(out, list)
+        assert all([isinstance(x, dict) for x in out])
+        
+    def test_date_attributes_on_init_without_args(self):
         pb = ParserBaseChild() 
         assert pb.start_date == date(1990, 1, 1)
         assert pb.end_date == date.today()

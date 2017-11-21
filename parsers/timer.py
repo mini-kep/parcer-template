@@ -22,8 +22,8 @@ from time import time
 #        
 #    def __repr__(self):
 #        return f'Time elapsed: {self.elapsed:.2f} sec'
-#    
-#    
+
+  
 def now():
     return time()
     
@@ -40,4 +40,10 @@ class Timer:
         return (self.e - self.t)
 
     def __repr__(self):
-        return f'{self.elapsed:.3}'    
+        return f'Elapsed {self.elapsed:.2} sec'    
+
+if '__main__' == __name__: # pragma: no cover  
+    from time import sleep
+    with Timer() as t:
+        sleep(0.01)
+    print(t)    
