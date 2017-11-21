@@ -45,7 +45,7 @@ def make_date(s):
 
 
 class Logger(object):
-    
+    """Print comments to console."""    
     def __init__(self, silent=True):
         self.silent = silent
     
@@ -55,6 +55,7 @@ class Logger(object):
 
 
 class Scrapper(object):    
+    """Download data from url."""    
     def __init__(self, download_func, silent=True):
         self.download_func = download_func
         self.logger = Logger(silent)
@@ -71,6 +72,7 @@ class Scrapper(object):
         return response
 
 class Uploader(object):
+    """Post to database."""  
     def __init__(self, upload_func, silent=True):
         self.upload_func = upload_func
         self.logger = Logger(silent)    
@@ -155,7 +157,6 @@ class ParserBase(object):
         return True
     
     def log_extract_result(self):
-        #logging
         n = len(self.parsing_result)
         k = len(self.items)
         self.logger.echo(f'{n} datapoints extracted, {k} in date range')

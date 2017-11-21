@@ -42,7 +42,7 @@ class Timer:
     def __repr__(self):
         return f'Elapsed {self.elapsed:.2} sec'    
 
-if '__main__' == __name__:   
+if '__main__' == __name__: # pragma: no cover  
     from time import sleep
     with Timer() as t:
         sleep(0.01)
