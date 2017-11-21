@@ -70,7 +70,7 @@ def mocked_content():
 
 class Test_fetch():
     # urls does not affect the test in this setup
-    url = "http://..."
+    url = "http://example.com"
     
     def test_fetch_good_response(self, mocked_content):
         mocked_content.get(self.url, text='{value: 1}')
