@@ -1,24 +1,27 @@
 import pytest
-from decimal import Decimal
+from parsers.uploader import Uploader
 
-from parsers.uploader import upload_datapoints, Uploader
 
-       
-def test_upload_to_database_returns_code_200():
-    class MockResponse:
-        status_code = 200
+#TODO: make test for poster
+
+class MockPoster:
+    status_message = ''
+    is_success = True
     
-    def mock_post(*arg, **kwarg):        
-        return MockResponse()
+    def __init__(self, x):
+        pass
     
-    test_data = [1,2,3]
-    assert upload_datapoints(test_data, upload_func=mock_post)
+    def post(self):
+        return 1 
+
 
 
 def test_Uploader():
-    u = Uploader(lambda x: True)
+    u = Uploader(poster_class=MockPoster)
     assert u.post([])    
-    
-    
+
 if __name__ == '__main__':
     pytest.main([__file__])
+    u = Uploader(poster_class=MockPoster)
+    assert u.post([1, 2, 3])   
+    assert u.is_success

@@ -2,7 +2,7 @@ import arrow
 from datetime import date, datetime
 from decimal import Decimal  
 
-from parsers.uploader import upload_datapoints, Uploader
+from parsers.uploader import Uploader
 from parsers.scrapper import fetch, Scrapper
 from parsers.helpers.logger import Logger
 
@@ -63,11 +63,11 @@ class ParserBase(object):
     def __init__(self, start_date=None, 
                        end_date=None, 
                        silent=True,
-                       download_func = fetch,
-                       upload_func = upload_datapoints):
+                       download_func = fetch):
         self.logger = Logger(silent)
+        # TODO: must change this
         self.scrapper = Scrapper(download_func, silent)
-        self.uploader =  Uploader(upload_func, silent)
+        self.uploader = Uploader(silent=silent)
         self.parsing_result = []
         self.start_date = self._init_start(start_date)
         self.end_date = self._init_end(end_date)
@@ -116,7 +116,7 @@ class ParserBase(object):
     def upload(self):
         # nothing to upload?
         if not self.parsing_result:
-            self.logger.echo('No datapoints or parser not run.')
+            self.logger.echo('No datapoints or parser not run')
             return False
         if not self.items:
             self.logger.echo(f'No datapoints in date range')
