@@ -51,8 +51,8 @@ parser.upload()
 
 #### Arguments
 
-Creating a parser without arguments forces parser to scan full dataset.
-, which is a burden on the original sources. Thus, parsers can return 
+Creating a parser without arguments forces parser to scan full dataset, 
+and it is a burden on the original sources. Thus, parsers can return 
 datapoints from a specific date to present: 
 
 ```python
