@@ -8,7 +8,7 @@ Parsers extract data from sources (static files or other APIs) to upload them to
 # Data structure
 
 Parsing result is a list of dictionaries. Each dictionary represents one observation in time for a variable (datapoint).
-Datapoint dictionary has `date`, `freq`, `name` and `value` keys. 
+Datapoint dictionary has `date`, `freq`, `name` and `value` keys. Same data structure is used to upload data to database.
 
 Example:
 
@@ -19,15 +19,13 @@ Example:
   'value': Decimal(57.566)},
 ```
 
-Same data structure is used to upload data to database.
-
 # Individual parsers
 
 #### Parser construction
 
 Each parser is a child of `parsers.getter.base.ParserBase` class.
 
-To make a new parser - inherit from `ParserBase` and change:
+Each parser has itw own:
 - observation start date (class attribute) 
 - url constructor (property)
 - response parsing function (staticmethod)
@@ -35,7 +33,8 @@ To make a new parser - inherit from `ParserBase` and change:
 
 #### Work cycle 
 
-Sample parser job:
+Sample parser job - upload all annual data from KEP:
+
 ```python
 parser = KEP_Annual()
 parser.extract()
