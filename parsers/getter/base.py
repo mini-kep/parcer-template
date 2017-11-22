@@ -1,11 +1,10 @@
 import arrow
 from datetime import date, datetime
 from decimal import Decimal  
-import requests
-from urllib.parse import urlparse
 
-from parsers.uploader import upload_datapoints
-from parsers.timer import Timer 
+from parsers.uploader import upload_datapoints, Uploader
+from parsers.scrapper import fetch, Scrapper
+from parsers.helpers.logger import Logger
 
 
 def format_date(date_string: str, fmt):
@@ -16,16 +15,6 @@ def format_date(date_string: str, fmt):
 def format_value(value_string: str, precision=2):
     """Convert float to Decimal."""
     return round(Decimal(value_string), precision)
-
-
-def fetch(url):
-    """Fetch content from *url* from internet."""
-    content = requests.get(url).text
-    if "Error" in content:
-        raise ValueError(f"Cannot read from: {url}")
-    #if 'Error in parameters' in content:
-    #    raise ValueError(f'Error in url parameters: {url}')
-    return content
 
 
 def make_date(s):
@@ -43,53 +32,6 @@ def make_date(s):
     else:
         return date(int(s), 1, 1)
 
-
-class Logger(object):
-    """Print comments to console."""    
-    def __init__(self, silent=True):
-        self.silent = silent
-    
-    def echo(self, msg=''):
-        if not self.silent:
-            print(msg)            
-
-
-class Scrapper(object):    
-    """Download data from url."""    
-    def __init__(self, download_func, silent=True):
-        self.download_func = download_func
-        self.logger = Logger(silent)
-    
-    @staticmethod        
-    def site(url):
-        return urlparse(url).netloc
-        
-    def get(self, url):  
-        with Timer() as t:
-            response = self.download_func(url)
-        self.logger.echo(f'Read data from: {self.site(url)}')
-        self.logger.echo(t)       
-        return response
-
-class Uploader(object):
-    """Post to database."""  
-    def __init__(self, upload_func, silent=True):
-        self.upload_func = upload_func
-        self.logger = Logger(silent)    
-        
-    def post(self, data):  
-        with Timer() as t:
-            result_bool = self.upload_func(data)
-        self.logger.echo(f'{len(data)} datapoints uploaded')
-        self.logger.echo(t)        
-        return result_bool
-    
-# TODO: move to tests        
-s = Scrapper(lambda x: x)
-assert '123' == s.get('123')
-
-u = Uploader(lambda x: True)
-assert u.post([])
     
 DATE_FLOOR = make_date(1864) 
 
@@ -129,9 +71,10 @@ class ParserBase(object):
         self.parsing_result = []
         self.start_date = self._init_start(start_date)
         self.end_date = self._init_end(end_date)
-        # tell about class init        
+        # tell about class init 
+        self.logger.echo()        
         self.logger.echo(self.__class__.__doc__)
-        self.logger.echo(f'Date range: {self.start_date} {self.end_date}')
+        self.logger.echo(f'Date range {self.start_date} {self.end_date}')
 
     @property
     def url(self):

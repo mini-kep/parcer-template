@@ -16,9 +16,9 @@ class PathContext():
 with PathContext():
     from parsers import PARSERS
     from parsers import PARSERS_DICT
-    from parsers.timer import Timer
+    from parsers.helpers.timer import Timer
     from parsers.dataset import Dataset 
-    from parsers.markdown import as_markdown
+    from parsers.helpers.markdown import as_markdown
 
 
 def shift(**kwargs):
@@ -62,5 +62,5 @@ def update():
 
 if __name__ == '__main__':
     #assert save_reference_dataset() == 'test_data_2016H2.json'    
-    assert markdown_descriptions()
-    #assert update()
+    #assert markdown_descriptions()
+    assert update()

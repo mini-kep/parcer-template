@@ -1,5 +1,5 @@
 import pytest                               
-from parsers.timer import Timer                           
+from parsers.helpers.timer import Timer                           
 from time import sleep               
                  
 def test_Timer_elapsed_property_retruns_expected_float():

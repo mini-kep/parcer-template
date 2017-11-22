@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from parsers.markdown import Markdown, as_markdown, interpret_frequency
+from parsers.helpers.markdown import Markdown, as_markdown, interpret_frequency
 from parsers.getter.base import ParserBase
 
 def test_interpret_frequency():

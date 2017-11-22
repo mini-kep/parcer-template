@@ -4,6 +4,8 @@ from time import sleep
 
 from parsers.config import HEROKU_API_KEY as UPLOAD_API_TOKEN, UPLOAD_URL
 from parsers.serialiser import to_json
+from parsers.helpers.logger import Logger
+from parsers.helpers.timer import Timer
 
 
 def post(data, token=UPLOAD_API_TOKEN, endpoint=UPLOAD_URL):
@@ -71,11 +73,23 @@ def upload_datapoints(gen, upload_func=safe_post):
             return False
     return True
 
+class Uploader(object):
+    """Post to database."""  
+    def __init__(self, upload_func, silent=True):
+        self.upload_func = upload_func
+        self.logger = Logger(silent)    
+        
+    def post(self, data):  
+        with Timer() as t:
+            result_bool = self.upload_func(data)
+        self.logger.echo(f'{len(data)} datapoints uploaded', t)
+        return result_bool
+    
 # TODO: make Sender/Uploader classes
 #       - add mock posters
 #       - add timer
 
-# code below not used / not imported
+# code below is experimental, not used / not imported
 
 class Sender(): #pragma: no cover
     def __init__(self, data_chunk):
@@ -104,8 +118,11 @@ class Sender(): #pragma: no cover
 
     def __repr__(self):
         return f'Sender: {self.status}'
-    
-class Uploader: #pragma: no cover
+ 
+
+
+ 
+class TrialUploader: #pragma: no cover
     def __init__(self, gen, chunk_size=1000):
         gen = list(gen)
         self.size = len(gen)

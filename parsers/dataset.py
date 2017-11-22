@@ -1,7 +1,6 @@
 from pathlib import Path
 from parsers.serialiser import to_json
-from parsers.uploader import upload_datapoints
-from parsers.timer import Timer
+from parsers.uploader import Uploader, upload_datapoints
 
 class Dataset(object):
     def __init__(self, parsers, start_date, end_date=None, silent=False):
@@ -28,11 +27,8 @@ class Dataset(object):
         Path(filename).write_text(self.json)
         
     def upload(self):
-        with Timer() as t:
-            upload_datapoints(self.items)
-        print(f'{len(self.items):5} datapoints uploaded'
-              f' in {t.elapsed:.2f} sec')
-        return True
+        return Uploader(upload_datapoints, silent=False).post(self.items)
+        
         
 if __name__ == '__main__': #pragma: no cover
     from parsers.getter.cbr_fx import USDRUR
