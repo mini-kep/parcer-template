@@ -148,4 +148,8 @@ class TrialUploader: #pragma: no cover
                  '\n'
                 f'{self.status}')
 
+if __name__ == "__main__":
+    assert post([]).status_code == 200
+    
+    
         
