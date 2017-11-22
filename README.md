@@ -76,7 +76,7 @@ d.save_json(filename)
 
 # Typical scripts
 
-`manage.py` has functions for typical parser jobs:
+`scripts/manage.py` has functions for typical parser jobs:
    - upload latest values to database 
    - save reference dataset as json file
    - print parser descriptions in markdown 
