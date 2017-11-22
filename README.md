@@ -91,6 +91,8 @@ d.save_json(filename)
 
 Current list of parsers:
 
+`getter.PARSERS`:
+
  - parsers.getter.kep.KEP_Annual,
  - parsers.getter.kep.KEP_Qtr,
  - parsers.getter.kep.KEP_Monthly,
@@ -98,7 +100,7 @@ Current list of parsers:
  - parsers.getter.cbr_fx.USDRUR,
  - parsers.getter.ust.UST
 
-Use ```manage.print_markdown_descriptions()``` to update. 
+Use ```manage.markdown_descriptions()``` to update. 
 
 | Parser | KEP_Annual |
 | ------ | ---------- |
@@ -130,12 +132,6 @@ Use ```manage.print_markdown_descriptions()``` to update.
 | Description | US Treasuries interest rates (UST) |
 | Start date | 1990-01-01 |
 
-Parser types
-============
-
-**repo** (*'heavy'*, *'dirty'*) - some parsers are styled to download the data, transform it and provide the output in local folder or URL. These ususally work on bad formats of data, eg Word, and require a lot of work to extract data because the source data is not structured well. 
-
-*'thin'* (*'clean'*, *'API-parcer'*) - some parsers can do the job on query, yield datapoints and die fast and easily because source data is clean. These parsers usually do not require disk space to store intermeduate parsing result. 
 
 Parser list
 ===========
@@ -164,3 +160,13 @@ Todo:
 
 #### repo: data-rosstat-isep
 <https://github.com/mini-kep/data-rosstat-isep>
+
+
+Glossary
+========
+
+Types of parsers:
+
+**repo** (*'heavy'*, *'dirty'*) - some parsers are styled to download the data, transform it and provide the output in local folder or URL. These ususally work on bad formats of data, eg Word, and require a lot of work to extract data because the source data is not structured well. 
+
+*'thin'* (*'clean'*, *'API-parcer'*) - some parsers can do the job on query, yield datapoints and die fast and easily because source data is clean. These parsers usually do not require disk space to store intermeduate parsing result. 
