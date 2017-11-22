@@ -28,8 +28,7 @@ class Dataset(object):
     def __init__(self, parsers, start_date, end_date=None):
         self.parsers = parsers
         self.start, self.end = start_date, end_date
-        self.items = []
-        
+        self.items = []        
 
     def extract(self):
         self.items = []
@@ -49,8 +48,7 @@ class Dataset(object):
         Path(filename).write_text(self.json)
         
     def upload(self):
-        return Uploader(upload_datapoints, silent=False).post(self.items)
-        
+        return Uploader(upload_datapoints, silent=False).post(self.items)        
         
 if __name__ == '__main__': #pragma: no cover
     from parsers.getter.cbr_fx import USDRUR
