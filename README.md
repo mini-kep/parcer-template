@@ -3,12 +3,11 @@
 
 # Concept
 
-Parsers extract data from sources to upload them to database. 
+Parsers extract data from sources (static files or other APIs) to upload them to database. 
 
 # Data structure
 
-Parsers are used to scan a data source (file or other API) and emit a list of dictionaries.
-Each dictionary represents one observation on a variable in time (datapoint).
+Parseing result is a list of dictionaries. Each dictionary represents one observation in time for a variable.
 
 Datapoint dictionary has `date`, `freq`, `name` and `value` keys. 
 
@@ -32,15 +31,10 @@ Each parser is a child of `parsers.getter.base.ParserBase` class.
 To make a new parser - inherit from `ParserBase` and change:
 - observation start date (class attribute) 
 - url constructor (property)
-- response parsing function (method)
+- response parsing function (staticmethod)
 
-#### Parser methods
 
-Parsers have `.extract()` and `.upload()` methods:
-  - `.extract()` changes `.parsing_result`
-  - `.upload()` changes `.items`
-
-#### Parser work cycle 
+#### Work cycle 
 
 Sample parser job:
 ```python
@@ -80,7 +74,7 @@ d.upload()
 d.save_json(filename)
 ```
 
-# Typical jobs
+# Typical scripts
 
 `manage.py` has functions for typical parser jobs:
    - upload latest values to database 
