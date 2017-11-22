@@ -127,27 +127,8 @@ Use ```manage.markdown_descriptions()``` to update.
 | Start date | 1990-01-01 |
 
 
-Parser list
-===========
-
-#### repo: rosstat-kep
-Produces output in <https://github.com/mini-kep/parser-rosstat-kep/tree/master/data/processed/latest>
-
-Other parsers code is moved to this repo from following original sources:
-
-#### API parcer: cbr-usd (CB)
-<https://github.com/ru-stat/parser-cbr-usd>
-
-#### API parcer: Brent (EIA)
-<https://github.com/epogrebnyak/data-fx-oil/blob/master/brent.py>
-result: <https://github.com/epogrebnyak/data-fx-oil/blob/master/brent_daily.txt>
-
-#### API parcer: yield curve (Treausry)
-<https://github.com/epogrebnyak/ust>
-result: <https://raw.githubusercontent.com/epogrebnyak/ust/master/ust.csv> (1.1 Mb)
-
-
-Todo:
+TODO
+====
 
 #### repo: rosstat-806-regional
 <https://github.com/epogrebnyak/data-rosstat-806-regional>
