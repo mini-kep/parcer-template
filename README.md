@@ -7,8 +7,7 @@ Parsers extract data from sources (static files or other APIs) to upload them to
 
 # Data structure
 
-Parseing result is a list of dictionaries. Each dictionary represents one observation in time for a variable.
-
+Parsing result is a list of dictionaries. Each dictionary represents one observation in time for a variable (datapoint).
 Datapoint dictionary has `date`, `freq`, `name` and `value` keys. 
 
 Example:
