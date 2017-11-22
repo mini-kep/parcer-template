@@ -1,5 +1,3 @@
-import arrow
-
 import sys
 from pathlib import Path
 
@@ -15,21 +13,9 @@ class PathContext():
 
 with PathContext():
     from parsers import PARSERS
-    from parsers import PARSERS_DICT
-    from parsers.helpers.timer import Timer
-    from parsers.dataset import Dataset 
+    from parsers.dataset import update, Dataset 
     from parsers.helpers.markdown import as_markdown
-
-
-def shift(**kwargs):
-    return arrow.now().shift(**kwargs).format("YYYY-MM-DD")
-
-    
-JOBS = dict(a=shift(years=-1),
-            q=shift(quarters=-1), 
-            m=shift(months=-4),
-            d=shift(weeks=-1))  
-
+    from parsers.helpers.timer import Timer
 
 def save_reference_dataset(filename='test_data_2016H2.json'): 
     with Timer() as t: 
@@ -47,20 +33,13 @@ def markdown_descriptions(parsers=PARSERS):
     return '\n\n'.join([as_markdown(p) for p in parsers])
 
 
-def updates(freq):
-    dt = JOBS[freq]
-    d = Dataset(PARSERS_DICT[freq], dt)
-    d.extract()
-    return d.upload()
-    
-
-def update():
+def update_all():
     for freq in 'aqmd':
-        assert updates(freq)   
+        assert update(freq)   
     return True
 
 
 if __name__ == '__main__':
     #assert save_reference_dataset() == 'test_data_2016H2.json'    
     #assert markdown_descriptions()
-    assert update()
+    assert update_all()

@@ -1,18 +1,40 @@
+import arrow
 from pathlib import Path
+
+from parsers import PARSERS_DICT
 from parsers.serialiser import to_json
 from parsers.uploader import Uploader, upload_datapoints
 
+
+def shift(**kwargs):
+    return arrow.now().shift(**kwargs).format("YYYY-MM-DD")
+
+def get_start_date(freq):
+    d = dict(a=shift(years=-1),
+            q=shift(quarters=-1), 
+            m=shift(months=-4),
+            d=shift(weeks=-1))  
+    return d[freq]
+
+def update(freq):
+    dt = get_start_date(freq)
+    parsers = PARSERS_DICT[freq]
+    d = Dataset(parsers, dt)
+    d.extract()
+    return d.upload()
+    
+
 class Dataset(object):
-    def __init__(self, parsers, start_date, end_date=None, silent=False):
+    def __init__(self, parsers, start_date, end_date=None):
         self.parsers = parsers
         self.start, self.end = start_date, end_date
         self.items = []
-        self.silent = silent
+        
 
     def extract(self):
         self.items = []
         for parser_cls in self.parsers:
-            parser = parser_cls(self.start, self.end, self.silent)
+            parser = parser_cls(self.start, self.end, silent=False)
             parser.extract()
             for datapoint in parser.items:
                 self.items.append(datapoint)
