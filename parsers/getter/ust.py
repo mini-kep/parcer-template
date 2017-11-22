@@ -88,7 +88,8 @@ class UST(ParserBase):
     def url(self):
         return make_url(make_year(self.start_date))
     
-    def parse_response(self, response):
+    @staticmethod
+    def get_datapoints(response):
         return parse_xml(response) 
     
 if __name__ == '__main__': # pragma: no cover

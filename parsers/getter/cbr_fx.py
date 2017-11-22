@@ -56,8 +56,9 @@ class USDRUR(ParserBase):
     def url(self):
         return make_url(self.start_date, self.end_date)
     
-    def parse_response(self, response_text):
-        gen = map(transform, xml_text_to_stream(response_text))
+    @staticmethod
+    def get_datapoints(response):
+        gen = map(transform, xml_text_to_stream(response))
         return list(gen)
 
 

@@ -2,11 +2,12 @@ import pytest
 import pandas as pd
 from io import StringIO
 from decimal import Decimal
+from parsers.getter.kep import KEP_Annual as KEP
 from parsers.getter.kep import (make_url,
                                 read_csv,
                                 get_dataframe_from_repo,
                                 yield_all_dicts,
-                                is_valid, KEP)
+                                is_valid)
 url_a = ('https://raw.githubusercontent.com/mini-kep/'
          'parser-rosstat-kep/master/data/processed/latest/dfa.csv')
 

@@ -1,8 +1,9 @@
 import pandas as pd
 import numpy as np
-
-from .base import ParserBase, format_value
 import io
+
+from parsers.getter.base import ParserBase, format_value
+
 
 def make_url(freq):
     return ('https://raw.githubusercontent.com/mini-kep/'
@@ -36,19 +37,17 @@ def yield_all_dicts(df, freq):
             
 
 def is_valid(d):
-    negative_conditions = []
     # no datapoints with year, qtr or month - these are supplementary variables
     # we exclide them here
-    negative_conditions.append(d['name'] in ['year', 'qtr', 'month'])
+    negative_conditions = [d['name'] in ['year', 'qtr', 'month']]
     # no NaN values
     negative_conditions.append(np.isnan(float(d['value'])))
     # are any negative conditions met?
     return not any(negative_conditions)
 
 
-class KEP(ParserBase):
-    """KEP dataset."""
-
+class KEP_Annual(ParserBase):
+    """Annual data from KEP publication (Rosstat)"""
     observation_start_date = '1999-01-01'
     freq = 'a'      
                                         
@@ -57,21 +56,17 @@ class KEP(ParserBase):
         return make_url(self.freq)
     
     def parse_response(self, response_text):
-        self.df = read_csv(io.StringIO(response_text))
-        self.gen = list(yield_all_dicts(self.df, self.freq))
-        gen = filter(is_valid, self.gen)
+        df = read_csv(io.StringIO(response_text))
+        gen = filter(is_valid, yield_all_dicts(df, self.freq))
         return list(gen)
 
 
-class KEP_Annual(KEP):
-    """Annual data from KEP publication (Rosstat)"""
-    freq = 'a'
-    
-class KEP_Qtr(KEP):
+class KEP_Qtr(KEP_Annual):
     """Quarterly data from KEP publication (Rosstat)"""
     freq = 'q'
+
     
-class KEP_Monthly(KEP):
+class KEP_Monthly(KEP_Annual):
     """Monthly data from KEP publication (Rosstat)"""
     freq = 'm'
 

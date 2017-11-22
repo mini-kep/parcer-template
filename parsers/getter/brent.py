@@ -49,7 +49,8 @@ class Brent(ParserBase):
     def url(self):
         return make_url()
     
-    def parse_response(self, response):
+    @staticmethod
+    def get_datapoints(response):
         return list(yield_brent_dicts(response)) 
     
 if __name__ == '__main__': #pragma: no cover
