@@ -14,7 +14,7 @@ def fetch(url):
     
 class Scrapper(object):    
     """Download data from url."""    
-    def __init__(self, download_func, silent=True):
+    def __init__(self, download_func=fetch, silent=True):
         self.download_func = download_func
         self.logger = Logger(silent)
     

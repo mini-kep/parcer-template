@@ -5,7 +5,7 @@
 
 Parsers extract data from sources (static files or other APIs) to upload them to database. 
 
-# Data structure
+# Output data structure
 
 Parsing result is a list of dictionaries. Each dictionary represents one observation in time for a variable (datapoint).
 Datapoint dictionary has `date`, `freq`, `name` and `value` keys. Same data structure is used to upload data to database.
@@ -26,25 +26,19 @@ Example:
 Each parser is a child of `parsers.getter.base.ParserBase` class.
 
 Each parser has itw own:
-- observation start date (class attribute) 
+- observation start date (class attribute)
+- frequency (class attribute) 
 - url constructor (property)
 - response parsing function (staticmethod)
 
-
-#### Work cycle 
-
-Sample parser job - upload all annual data from KEP:
-
-```python
-parser = KEP_Annual()
-parser.extract()
-parser.upload()
-```
+Parsers are stored in `parsers.getter` folder.
 
 #### Arguments
 
 Creating a parser without arguments forces parser to scan full dataset, 
-and it is a burden on the original sources. Thus, parsers can return 
+and it is a burden on the original sources. 
+
+Parsers can return 
 datapoints from a specific date to present: 
 
 ```python
@@ -59,6 +53,17 @@ from parsers.getter.brent import Brent
 parser = Brent('2017-09-15', '2017-10-17')
 ```
 
+#### Work cycle example
+
+Upload all annual data from KEP publication:
+
+```python
+parser = KEP_Annual()
+parser.extract()
+parser.upload()
+```
+
+
 # Parser collection 
 
 ```Dataset``` class used to manipulate a group of parsers.
@@ -72,27 +77,10 @@ d.upload()
 d.save_json(filename)
 ```
 
-# Typical scripts
-
-`scripts/manage.py` has functions for typical parser jobs:
-   - upload latest values to database 
-   - save reference dataset as json file
-   - print parser descriptions in markdown 
    
 # Parser descriptions
 
-Current list of parsers:
-
-`getter.PARSERS`:
-
- - parsers.getter.kep.KEP_Annual,
- - parsers.getter.kep.KEP_Qtr,
- - parsers.getter.kep.KEP_Monthly,
- - parsers.getter.brent.Brent,
- - parsers.getter.cbr_fx.USDRUR,
- - parsers.getter.ust.UST
-
-Use ```manage.markdown_descriptions()``` to update. 
+Use ```dataset.ReadmeTable()``` to update. 
 
 | Parser | KEP_Annual |
 | ------ | ---------- |

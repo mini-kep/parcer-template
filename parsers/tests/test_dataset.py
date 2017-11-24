@@ -1,12 +1,29 @@
 import pytest
+from parsers.getter.base import ParserBase
 from parsers.getter.cbr_fx import USDRUR
 from parsers.getter.brent import Brent
-from parsers.dataset import Dataset
+from parsers.dataset import Dataset, ReadmeTable
 from pathlib import Path
 
 #TODO: test save_json() on temp file + delete this temp file file in teardown method 
 
-#TODO: separate below to class
+@pytest.fixture
+def mock_parser():
+    MockParser = ParserBase
+    MockParser.observation_start_date = '1965-01-01'
+    MockParser.__doc__ = 'Short text'
+    MockParser.freq = 'd'
+    return MockParser
+
+
+class Test_ReadmeTable:
+    
+    def test_as_markdown_returns_string(self, mock_parser):
+            result = ReadmeTable(parsers = [mock_parser]).__repr__()
+            assert '| Class | Description | Frequency | Start date |' in result
+            assert '| ----- | ----------- | --------- | ---------- |' in result
+            assert '| ParserBase | Short text | d | 1965-01-01 |' in result
+
 
 @pytest.mark.webtest
 class Test_Dataset:
@@ -15,6 +32,7 @@ class Test_Dataset:
         self.sample_dataset.extract()
         self.temp_file = 'temp.json'
 
+    # TODO:  
     def test_dataset(self):
         assert self.sample_dataset.items[0]['name'] == 'USDRUR_CB'
         assert isinstance(self.sample_dataset.json, str)

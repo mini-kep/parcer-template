@@ -3,7 +3,7 @@ from datetime import date, datetime
 from decimal import Decimal  
 
 from parsers.uploader import Uploader
-from parsers.scrapper import fetch, Scrapper
+from parsers.scrapper import Scrapper
 from parsers.helpers.logger import Logger
 
 
@@ -38,6 +38,7 @@ DATE_FLOOR = make_date(1864)
 class ParserBase(object):
     """Must customise in child class:
        - observation_start_date 
+       - freq
        - url
        - get_datapoints        
     """
@@ -45,6 +46,7 @@ class ParserBase(object):
     # in child class must change this to actual parser start date - 
     # the earlier date on which the parser can return data
     observation_start_date = NotImplementedError("Must be a string like '1990-01-15'")
+    freq = 'z'
      
     def _init_start(self, start_date):
         # HACK: make this class testable 
@@ -61,13 +63,12 @@ class ParserBase(object):
             return date.today()
                                                              
     def __init__(self, start_date=None, 
-                       end_date=None, 
-                       silent=True,
-                       download_func = fetch):
-        self.logger = Logger(silent)
-        # TODO: must change this
-        self.scrapper = Scrapper(download_func, silent)
-        self.uploader = Uploader(silent=silent)
+                       end_date=None,
+                       scrap_with=Scrapper,
+                       upload_with=Uploader):
+        self.logger = Logger(silent=False)
+        self.scrapper = scrap_with(silent=False)
+        self.uploader = upload_with(silent=False)
         self.parsing_result = []
         self.start_date = self._init_start(start_date)
         self.end_date = self._init_end(end_date)

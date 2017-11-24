@@ -1,7 +1,7 @@
 """ Download USD RUR official exchange rate from Bank of Russia web site."""
 
 
-from parsers.getter.base import ParserBase, format_date, format_value, fetch
+from parsers.getter.base import ParserBase, format_date, format_value
 import xml.etree.ElementTree as ET
 
 
@@ -36,21 +36,17 @@ def xml_text_to_stream(xml_text):
 
 def transform(datapoint):
     """Divide values before 1997-12-30 by 1000."""
-    # FIXME: compare by strings is not so good
+    # FIXME: compare by strings is not good
     if datapoint['date'] <= "1997-12-30":
         datapoint['value'] = round(datapoint['value'] / 1000, 4)
     return datapoint
 
 
-def get_cbr_er(start_date, end_date, downloader=fetch):
-    url = make_url(start_date, end_date)
-    xml_text = downloader(url)
-    return map(transform, xml_text_to_stream(xml_text))
-
 
 class USDRUR(ParserBase):
     """Official USD/RUR exchange rate (Bank of Russia)"""
     observation_start_date = '1992-07-01'
+    freq = 'd'
                                                                   
     @property
     def url(self):

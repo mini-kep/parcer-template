@@ -44,6 +44,7 @@ def yield_brent_dicts(response_text):
 class Brent(ParserBase):
     """Brent oil price (EIA)"""
     observation_start_date = '1987-05-20'
+    freq = 'd'
                                                                   
     @property
     def url(self):

@@ -1,37 +1,18 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from parsers.helpers.markdown import Markdown, as_markdown, interpret_frequency
+from parsers.helpers.markdown import Markdown
 from parsers.getter.base import ParserBase
 
 def test_interpret_frequency():
-    assert interpret_frequency('d') == 'Daily'
+    assert Markdown.interpret_frequency('d') == 'Daily'
 
 
-@pytest.fixture
-def mock_parser():
-    MockParser = ParserBase
-    MockParser.observation_start_date = '1965-01-01'
-    MockParser.__doc__ = 'Short text'
-    return MockParser
-
-
-class Test_as_markdown:
-    
-    class Test_Formatter:
-
-        def test_as_markdown_returns_string(self, mock_parser):
-            result = as_markdown(mock_parser)
-            expected = '\n'.join(['| Parser | ParserBase |',
-                        '| ------ | ---------- |',
-                        '| Description | Short text |',
-                        '| Start date | 1965-01-01 |'])
-            assert result == expected
-             
+            
 class Test_Markdown:
 
     def test_add_dividers(self):
-        assert Markdown.add_dividers(['Branch', 'Commit']) \
+        assert Markdown._add_dividers(['Branch', 'Commit']) \
             == '| Branch | Commit |'
 
 

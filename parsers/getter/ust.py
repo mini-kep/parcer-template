@@ -83,6 +83,7 @@ def parse_xml(content: str):
 class UST(ParserBase):
     """US Treasuries interest rates (UST)"""
     observation_start_date = '1990-01-01'
+    freq = 'd'
                                                                   
     @property
     def url(self):
