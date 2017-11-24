@@ -83,8 +83,6 @@ d.save_json(filename)
 
 Current list of parsers:
 
-`getter.PARSERS`:
-
  - parsers.getter.kep.KEP_Annual,
  - parsers.getter.kep.KEP_Qtr,
  - parsers.getter.kep.KEP_Monthly,
@@ -92,38 +90,16 @@ Current list of parsers:
  - parsers.getter.cbr_fx.USDRUR,
  - parsers.getter.ust.UST
 
-Use ```manage.markdown_descriptions()``` to update. 
+| Class | Description | Frequency | Start date |
+| ----- | ----------- | --------- | ---------- |
+| KEP_Annual | Annual data from KEP publication (Rosstat) | a | 1999-01-01 |
+| KEP_Qtr | Quarterly data from KEP publication (Rosstat) | q | 1999-01-01 |
+| KEP_Monthly | Monthly data from KEP publication (Rosstat) | m | 1999-01-01 |
+| Brent | Brent oil price (EIA) | d | 1987-05-20 |
+| USDRUR | Official USD/RUR exchange rate (Bank of Russia) | d | 1992-07-01 |
+| UST | US Treasuries interest rates (UST) | d | 1990-01-01 |
 
-| Parser | KEP_Annual |
-| ------ | ---------- |
-| Description | Annual data from KEP publication (Rosstat) |
-| Start date | 1999-01-01 |
-
-| Parser | KEP_Qtr |
-| ------ | ------- |
-| Description | Quarterly data from KEP publication (Rosstat) |
-| Start date | 1999-01-01 |
-
-| Parser | KEP_Monthly |
-| ------ | ----------- |
-| Description | Monthly data from KEP publication (Rosstat) |
-| Start date | 1999-01-01 |
-
-| Parser | Brent |
-| ------ | ----- |
-| Description | Brent oil price (EIA) |
-| Start date | 1987-05-20 |
-
-| Parser | USDRUR |
-| ------ | ------ |
-| Description | Official USD/RUR exchange rate (Bank of Russia) |
-| Start date | 1992-07-01 |
-
-| Parser | UST |
-| ------ | --- |
-| Description | US Treasuries interest rates (UST) |
-| Start date | 1990-01-01 |
-
+Use ```Dataset.md_descriptions``` to update. 
 
 TODO
 ====
