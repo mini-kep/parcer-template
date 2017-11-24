@@ -1,11 +1,13 @@
 [![Build Status](https://travis-ci.org/mini-kep/parsers.svg?branch=master)](https://travis-ci.org/mini-kep/parsers)
 [![Coverage badge](https://codecov.io/gh/mini-kep/parsers/branch/master/graphs/badge.svg)](https://codecov.io/gh/mini-kep/parsers)
 
-# Concept
+Concept
+=======
 
 Parsers extract data from sources (static files or other APIs) to upload them to database. 
 
-# Output data structure
+Output data structure
+=====================
 
 Parsing result is a list of dictionaries. Each dictionary represents one observation in time for a variable (datapoint).
 Datapoint dictionary has `date`, `freq`, `name` and `value` keys. Same data structure is used to upload data to database.
@@ -19,9 +21,8 @@ Example:
   'value': Decimal(57.566)},
 ```
 
-# Individual parsers
-
-
+Individual parsers
+==================
 
 | Class | Description | Frequency | Start date |
 | ----- | ----------- | --------- | ---------- |
@@ -67,7 +68,8 @@ from parsers.getter.brent import Brent
 parser = Brent('2017-09-15', '2017-10-17')
 ```
 
-# Running  
+Running
+=======
 
 Run individual parser:
 
@@ -83,13 +85,14 @@ parser.upload()
 
 ```python
 from parser import Dataset
-from parsers import PARSERS
 
-d = Dataset(start_date, end_date) 
+d = Dataset(start_date='2016-12-31') 
 d.extract()
 d.upload()
-d.save_json(filename)
+d.save_json(filename='dump.txt')
 ```
+
+`dataset.update()` invoked by scheduler. 
    
                           
 TODO
