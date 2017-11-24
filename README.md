@@ -32,7 +32,7 @@ Example:
 | USDRUR | Official USD/RUR exchange rate (Bank of Russia) | d | 1992-07-01 |
 | UST | US Treasuries interest rates (UST) | d | 1990-01-01 |
 
-(Use ```dataset.ReadmeTable()``` to update) 
+Use ```dataset.ReadmeTable()``` to update. 
 
 
 #### Parser construction
