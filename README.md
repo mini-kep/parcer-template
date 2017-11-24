@@ -92,7 +92,7 @@ d.upload()
 d.save_json(filename='dump.txt')
 ```
 
-`dataset.update()` invoked by scheduler. 
+Scheduler invokes `dataset.update()` function for uploading latest values. 
    
                           
 TODO
