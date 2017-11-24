@@ -24,7 +24,7 @@ class ReadmeTable:
 
 
 class Dataset(object):
-    def __init__(self, parsers, start_date, end_date=None):
+    def __init__(self, start_date, end_date=None, parsers=PARSERS):
         self.parsers = parsers
         self.start, self.end = start_date, end_date
         self.items = []
@@ -77,7 +77,7 @@ def get_start_date(freq):
 def update(freq):
      dt = get_start_date(freq)
      parsers = PARSERS_DICT[freq]
-     d = Dataset(parsers, dt)
+     d = Dataset(start_date=dt, parsers = parsers)
      d.extract()
      return d.upload()
 
@@ -85,7 +85,7 @@ def update(freq):
 if __name__ == '__main__': #pragma: no cover
 #    from parsers.getter.cbr_fx import USDRUR
 #    from parsers.getter.brent import Brent
-#    d = Dataset([USDRUR, Brent], '2017-11-13')
+#    d = Dataset('2017-11-13', [USDRUR, Brent])
 #    #d.extract()
 #    assert d.items[0]['name'] == 'USDRUR_CB'
 #    assert isinstance(d.json, str)

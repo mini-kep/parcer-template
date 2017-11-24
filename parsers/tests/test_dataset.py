@@ -28,7 +28,7 @@ class Test_ReadmeTable:
 @pytest.mark.webtest
 class Test_Dataset:
     def setup(self):
-        self.sample_dataset = Dataset([USDRUR, Brent], '2017-11-13')
+        self.sample_dataset = Dataset('2017-11-13', parsers=[USDRUR, Brent])
         self.sample_dataset.extract()
         self.temp_file = 'temp.json'
 

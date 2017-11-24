@@ -67,24 +67,25 @@ from parsers.getter.brent import Brent
 parser = Brent('2017-09-15', '2017-10-17')
 ```
 
-#### Work cycle example
+# Running  
 
-Upload all annual data from KEP publication:
+Run individual parser:
 
 ```python
+from parsers.getter import KEP_Annual
+
 parser = KEP_Annual()
 parser.extract()
 parser.upload()
 ```
 
-# Parser collection 
-
 ```Dataset``` class used to manipulate a group of parsers.
 
 ```python
+from parser import Dataset
 from parsers import PARSERS
 
-d = Dataset(PARSERS, start_date, end_date) 
+d = Dataset(start_date, end_date) 
 d.extract()
 d.upload()
 d.save_json(filename)
