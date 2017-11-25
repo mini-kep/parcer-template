@@ -47,7 +47,7 @@ class Dataset(object):
         Path(filename).write_text(self.json)
         
     def upload(self):
-        return Uploader().post(self.items)
+        return Uploader(self.items).post()
  
 
 def save_reference_dataset(filename='test_data_2016H2.json'): 
