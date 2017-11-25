@@ -66,7 +66,7 @@ class FakeScrapper(Scrapper):
 def test_get_cbr_er():
     start = date(1992, 7, 1)
     end = date(2017, 10, 4)
-    result = USDRUR(start, end, scrap_with=FakeScrapper)
+    result = USDRUR(start, end, scrapper_class=FakeScrapper)
     result.extract()
     d = result.items[0]
     assert d['date'] == '1992-07-01'

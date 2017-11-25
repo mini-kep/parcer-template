@@ -17,12 +17,6 @@ def post(data, token=UPLOAD_API_TOKEN, endpoint=UPLOAD_URL):
                          data=json_data,                             
                          headers={'API_TOKEN': token}).status_code
                          
-def delete(params, token, endpoint=UPLOAD_URL):
-    """Delete method."""
-    return requests.delete(url=endpoint,
-                           params=params,                             
-                           headers={'API_TOKEN': token})
- 
     
 def yield_chunks(gen, chunk_size=1000):
     """Split generator or list into smaller parts.
@@ -43,37 +37,47 @@ class Poster():
      - collects response status 
      - holds number of attempts     
     """
-    max_attempts = 3  # times
-    delay = 5  # seconds
+    max_attempts = 3  # times    
+    delay = 5  # seconds    
+    timer = None
     
-    def __init__(self, data_chunk, post_func=post, silent=True):
-        self.gen = list(data_chunk)
+    def __init__(self, data_chunk, post_func=post, delay=None):
+        self.data = list(data_chunk)
         self.post_func = post_func
+        if delay: # override default delay time 
+            self.delay = delay
         self.attempts = 0
         self.status_code = None
+        self.elapsed = 0
 
     def post(self):
         """Posts chunk of data to database using self.post()."""
-        for self.attempts in range(1, self.max_attempts + 1):
-            self.status_code = self.post_func(data=self.gen)
-            if self.status_code == 200:
-                break
-            sleep(self.delay)
-            
+        with Timer() as t:
+            for self.attempts in range(1, self.max_attempts + 1):
+                self.status_code = self.post_func(data=self.data)
+                if self.status_code == 200:
+                    break
+                sleep(self.delay)
+        self.elapsed = t.elapsed        
+                
     @property            
     def is_success(self):
         return self.status_code == 200
+    
+    def __len__(self):
+        return len(self.data)
         
     @property
     def status_message(self):
-        n = len(self.gen)
+        n = len(self)
         if self.is_success:
             return f'Uploaded {n} datapoints in {self.attempts} attempt(s)'
         else:
             return f'Failed to upload {n} datapoints in {self.attempts} attempt(s)'
 
     def __repr__(self):
-        return f'Poster: {self.attempts} attempts, status code {self.status_code}'
+        cls_name = self.__class__.__name__ 
+        return f'{cls_name}: {self.attempts} attempts, status code {self.status_code}'
 
 
 class Uploader(object):
@@ -86,18 +90,17 @@ class Uploader(object):
     - provide logging to console
     - provide collection of posting results (number of attempts of each sender)
     """
-    def __init__(self, poster_class=Poster, silent=False):
-        self.logger = Logger(silent)   
-        self.poster_class = poster_class
-        self.posters = []
-        self.logger = Logger(silent)
+    def __init__(self, data, poster_class=Poster):
+        self.posters = self.make_queue(data, poster_class)
+        self.logger = Logger(silent=False)
+    
+    @staticmethod    
+    def make_queue(data, poster_class):
+        return [poster_class(data_chunk) for data_chunk in yield_chunks(data)]
         
-    def make_queue(self, data):
-        return [self.poster_class(data_chunk) for data_chunk in yield_chunks(data)]
-        
-    def post(self, data):        
+    def post(self):     
+        # Not todo: timer behaviour + logging
         with Timer() as t:
-            self.posters = self.make_queue(data) 
             for poster in self.posters:
                 poster.post()    
                 self.logger.echo(poster.status_message)                         
@@ -128,7 +131,7 @@ if __name__ == "__main__":
     p.post()
     assert p.status_code == 200
     
-    u = Uploader()
-    u.post(data)
+    u = Uploader(data)
+    u.post()
     for sender in u.posters:
         assert sender.status_code == 200

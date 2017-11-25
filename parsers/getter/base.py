@@ -64,11 +64,11 @@ class ParserBase(object):
                                                              
     def __init__(self, start_date=None, 
                        end_date=None,
-                       scrap_with=Scrapper,
-                       upload_with=Uploader):
+                       scrapper_class=Scrapper,
+                       uploader_class=Uploader):
         self.logger = Logger(silent=False)
-        self.scrapper = scrap_with(silent=False)
-        self.uploader = upload_with(silent=False)
+        self.scrapper = scrapper_class
+        self.uploader = uploader_class
         self.parsing_result = []
         self.start_date = self._init_start(start_date)
         self.end_date = self._init_end(end_date)
@@ -95,7 +95,7 @@ class ParserBase(object):
         return self.get_datapoints(response_str)   
    
     def extract(self):
-        response = self.scrapper.get(self.url)
+        response = self.scrapper().get(self.url)
         self.parsing_result = self.parse_response(response) 
         self.log_extract_result()
         return True
@@ -122,7 +122,7 @@ class ParserBase(object):
         if not self.items:
             self.logger.echo(f'No datapoints in date range')
             return False        
-        return self.uploader.post(self.items)        
+        return self.uploader(self.items).post()        
     
     def __repr__(self):
         def isodate(dt):

@@ -129,13 +129,14 @@ def test_parse_valid_xml_with_zero_value_on_day_other_than_April_14_2017():
     result = parse_xml(xml_doc)
     assert len(result) >= 1
 
+
 class FakeScrapper(Scrapper):
     def get(self, url):
         return XML_DOC_1
     
 
 def test_UST_on_fake_fetch():
-    u = ust.UST(2017, None, scrap_with=FakeScrapper)
+    u = ust.UST(2017, None, scrapper_class=FakeScrapper)
     u.extract()
     d = u.items[0]
     assert d['date'] == '2017-01-03'
@@ -144,7 +145,6 @@ def test_UST_on_fake_fetch():
     assert d['name'] == 'UST_1MONTH'
 
 
-# FIXME: split into two tests
 @pytest.mark.webtest
 def test_UST_on_real_call():
     u = ust.UST(2017, None)

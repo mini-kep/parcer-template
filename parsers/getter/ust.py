@@ -54,12 +54,12 @@ def parse_xml_raw(content: str):
     soup = bs4.BeautifulSoup(content, "xml")
     properties = soup.find_all('properties')
     result = [{"date": extract_date(prop.find('NEW_DATE').text),
-                "freq": "d",
-                "name": child.name.replace("BC_", "UST_"),
-                "value": format_value(child.text)}
-                 for prop in properties
-                 for child in prop.findChildren()
-                 if child.name.startswith('BC_') and child.text]
+               "freq": "d",
+               "name": child.name.replace("BC_", "UST_"),
+               "value": format_value(child.text)}
+              for prop in properties
+              for child in prop.findChildren()
+              if child.name.startswith('BC_') and child.text]
     return result
 
 
@@ -76,9 +76,9 @@ def parse_xml(content: str):
     result = parse_xml_raw(content)
     return [d for d in result if must_include(d)] 
 
-# FIXME: in this parser we may restrict period to one year only
+# FIXME: in this parser we have to restrict period to one year only
 #        raise error when end_date - start_date  > 1 year 
-#        will disregars end dates beyond start +  1 year
+#        will disregard end dates beyond start +  1 year
          
 class UST(ParserBase):
     """US Treasuries interest rates (UST)"""
