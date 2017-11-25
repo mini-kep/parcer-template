@@ -1,7 +1,7 @@
 import requests
 from urllib.parse import urlparse
 
-from parsers.helpers import Timer, Logger
+from parsers.helper import Timer, Logger
 
 
 def fetch(url):

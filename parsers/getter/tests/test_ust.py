@@ -5,7 +5,7 @@ import random
 from datetime import date
 from decimal import Decimal
 
-from parsers.scrapper import Scrapper
+from parsers.mover import Scrapper
 import parsers.getter.ust as ust
 from parsers.getter.ust import parse_xml
 

@@ -3,7 +3,7 @@ import pytest
 from datetime import date
 from decimal import Decimal
 
-from parsers.scrapper import Scrapper
+from parsers.mover import Scrapper
 from parsers.getter.cbr_fx import (make_url,
                                    transform,
                                    xml_text_to_stream,

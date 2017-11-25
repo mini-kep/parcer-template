@@ -2,9 +2,8 @@ import arrow
 from datetime import date, datetime
 from decimal import Decimal
 
-from parsers.uploader import Uploader
-from parsers.scrapper import Scrapper
-from parsers.helpers.logger import Logger
+from parsers.mover import Uploader, Scrapper
+from parsers.helper import Logger
 
 
 def format_date(date_string: str, fmt):

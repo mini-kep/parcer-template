@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from parsers.helpers.markdown import Markdown
+from parsers.helper.markdown import Markdown
 from parsers.getter.base import ParserBase
 
 

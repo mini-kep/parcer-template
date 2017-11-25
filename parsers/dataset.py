@@ -1,8 +1,8 @@
 import arrow
 from pathlib import Path
-from parsers.serialiser import to_json
-from parsers.uploader import Uploader
-from parsers.helpers import Markdown, Timer
+
+from parsers.mover import to_json, Uploader
+from parsers.helper import Markdown, Timer
 from parsers import PARSERS, PARSERS_DICT
 
 

@@ -1,9 +1,9 @@
 import pytest
-from parsers.uploader import Uploader, Poster
+from parsers.mover.uploader import Uploader, Poster
 
 # TODO: review testing guidelines: https://github.com/mini-kep/guidelines/blob/master/testing.md
-# with focus on test naming, test name should substitute the comments in
-# test
+# with focus on test naming
+# test name should substitute the comments in test + allow replicating the test by knowing its name 
 
 
 def mock_post_returns_200_status_code(data):

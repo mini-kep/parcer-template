@@ -1,10 +1,10 @@
 import pytest
-from parsers.helpers.timer import Timer
+from parsers.helper.timer import Timer
 from time import sleep
 
 
 def test_Timer_elapsed_property_retruns_expected_float():
-    delay = 0.01
+    delay = 0.001
     with Timer() as t:
         sleep(delay)
     assert isinstance(t.elapsed, float)

@@ -1,6 +1,6 @@
 import pytest
 import requests_mock
-from parsers.scrapper import fetch, Scrapper
+from parsers.mover.scrapper import fetch, Scrapper
 
 # def fetch(url):
 #    """Fetch content from *url* from internet."""

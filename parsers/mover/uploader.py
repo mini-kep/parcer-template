@@ -3,8 +3,8 @@ import requests
 from time import sleep
 
 from parsers.config import HEROKU_API_KEY as UPLOAD_API_TOKEN, UPLOAD_URL
-from parsers.serialiser import to_json
-from parsers.helpers import Logger, Timer
+from parsers.mover.serialiser import to_json
+from parsers.helper import Logger, Timer
 
 
 def post(data, token=UPLOAD_API_TOKEN, endpoint=UPLOAD_URL):
