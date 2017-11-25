@@ -8,7 +8,7 @@ from parsers.getter.base import ParserBase, format_value
 def make_url(freq):
     return ('https://raw.githubusercontent.com/mini-kep/'
             'parser-rosstat-kep/master/data/processed/latest/'
-           f'df{freq}.csv')
+            f'df{freq}.csv')
 
 
 def read_csv(source):
@@ -34,7 +34,7 @@ def yield_all_dicts(df, freq):
                    'freq': freq,
                    'name': name,
                    'value': format_value(value)}
-            
+
 
 def is_valid(d):
     # no datapoints with year, qtr or month - these are supplementary variables
@@ -49,12 +49,12 @@ def is_valid(d):
 class KEP_Annual(ParserBase):
     """Annual data from KEP publication (Rosstat)"""
     observation_start_date = '1999-01-01'
-    freq = 'a'      
-                                        
+    freq = 'a'
+
     @property
     def url(self):
         return make_url(self.freq)
-    
+
     def parse_response(self, response_text):
         df = read_csv(io.StringIO(response_text))
         gen = filter(is_valid, yield_all_dicts(df, self.freq))
@@ -65,14 +65,13 @@ class KEP_Qtr(KEP_Annual):
     """Quarterly data from KEP publication (Rosstat)"""
     freq = 'q'
 
-    
+
 class KEP_Monthly(KEP_Annual):
     """Monthly data from KEP publication (Rosstat)"""
     freq = 'm'
 
 
-if __name__ == "__main__": #pragma:  no cover
+if __name__ == "__main__":  # pragma:  no cover
     u = KEP_Monthly(2016)
     u.extract()
     print(u.items[0])
-

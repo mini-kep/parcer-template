@@ -14,6 +14,7 @@ import json
 from parsers.config import EIA_ACCESS_KEY
 from parsers.getter.base import ParserBase, format_date, format_value
 
+
 def make_url(access_key=EIA_ACCESS_KEY):
     series_id = 'PET.RBRTE.D'
     return ("http://api.eia.gov/series/"
@@ -45,19 +46,19 @@ class Brent(ParserBase):
     """Brent oil price (EIA)"""
     observation_start_date = '1987-05-20'
     freq = 'd'
-                                                                  
+
     @property
     def url(self):
         return make_url()
-    
+
     @staticmethod
     def get_datapoints(response):
-        return list(yield_brent_dicts(response)) 
-    
-if __name__ == '__main__': #pragma: no cover
-   u = Brent(1992)
-   u.extract()
-   print(len(u.items))
-   assert u.items[0]
-   print(u.items[0])
+        return list(yield_brent_dicts(response))
 
+
+if __name__ == '__main__':  # pragma: no cover
+    u = Brent(1992)
+    u.extract()
+    print(len(u.items))
+    assert u.items[0]
+    print(u.items[0])

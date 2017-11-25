@@ -11,18 +11,19 @@ def fetch(url):
         raise ValueError(f"Cannot read from: {url}")
     return content
 
-    
-class Scrapper(object):    
-    """Download data from url."""    
+
+class Scrapper(object):
+    """Download data from url."""
+
     def __init__(self, download_func=fetch, silent=True):
         self.download_func = download_func
         self.logger = Logger(silent)
-    
-    @staticmethod        
+
+    @staticmethod
     def site(url):
         return urlparse(url).netloc
-        
-    def get(self, url):  
+
+    def get(self, url):
         with Timer() as t:
             response = self.download_func(url)
         self.logger.echo(f'Read data from <{self.site(url)}>', t)

@@ -42,23 +42,22 @@ def transform(datapoint):
     return datapoint
 
 
-
 class USDRUR(ParserBase):
     """Official USD/RUR exchange rate (Bank of Russia)"""
     observation_start_date = '1992-07-01'
     freq = 'd'
-                                                                  
+
     @property
     def url(self):
         return make_url(self.start_date, self.end_date)
-    
+
     @staticmethod
     def get_datapoints(response):
         gen = map(transform, xml_text_to_stream(response))
         return list(gen)
 
 
-if __name__ == "__main__": #pragma: no cover
+if __name__ == "__main__":  # pragma: no cover
     dt = '1992-07-01'
     u = USDRUR(dt, dt)
     u.extract()

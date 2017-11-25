@@ -1,6 +1,6 @@
 import arrow
 from datetime import date, datetime
-from decimal import Decimal  
+from decimal import Decimal
 
 from parsers.uploader import Uploader
 from parsers.scrapper import Scrapper
@@ -20,60 +20,62 @@ def format_value(value_string: str, precision=2):
 def make_date(s):
     """Convert string s to datetime.date under flexible rules.
     Args:
-        s - can be ISO date string (ex: '2017-01-01') 
-            or int year (ex: 2017). Year always coerced to Jan 1. 
-    Returns:        
+        s - can be ISO date string (ex: '2017-01-01')
+            or int year (ex: 2017). Year always coerced to Jan 1.
+    Returns:
         datetime.date
-    """ 
+    """
     if s is None:
         return None
     elif '-' in str(s):
-        return arrow.get(s).date() 
+        return arrow.get(s).date()
     else:
         return date(int(s), 1, 1)
 
-    
-DATE_FLOOR = make_date(1864) 
+
+DATE_FLOOR = make_date(1864)
+
 
 class ParserBase(object):
     """Must customise in child class:
-       - observation_start_date 
+       - observation_start_date
        - freq
        - url
-       - get_datapoints        
+       - get_datapoints
     """
-    
-    # in child class must change this to actual parser start date - 
+
+    # in child class must change this to actual parser start date -
     # the earlier date on which the parser can return data
-    observation_start_date = NotImplementedError("Must be a string like '1990-01-15'")
+    observation_start_date = NotImplementedError(
+        "Must be a string like '1990-01-15'")
     freq = 'z'
-     
+
     def _init_start(self, start_date):
-        # HACK: make this class testable 
+        # HACK: make this class testable
         try:
             obs = make_date(self.observation_start_date)
         except NotImplementedError:
-            obs = DATE_FLOOR  
-        return make_date(start_date) or obs        
+            obs = DATE_FLOOR
+        return make_date(start_date) or obs
 
     def _init_end(self, end_date):
         if end_date:
             return make_date(end_date)
-        else:           
+        else:
             return date.today()
-                                                             
-    def __init__(self, start_date=None, 
-                       end_date=None,
-                       scrapper_class=Scrapper,
-                       uploader_class=Uploader):
+
+    def __init__(self, start_date=None,
+                 end_date=None,
+                 scrapper_class=Scrapper,
+                 uploader_class=Uploader):
         self.logger = Logger(silent=False)
         self.scrapper = scrapper_class
         self.uploader = uploader_class
         self.parsing_result = []
         self.start_date = self._init_start(start_date)
         self.end_date = self._init_end(end_date)
-        # tell about class init 
-        self.logger.echo()        
+        # tell about class init
+        self.logger.echo()
         self.logger.echo(self.__class__.__doc__)
         self.logger.echo(f'Date range {self.start_date} {self.end_date}')
 
@@ -82,33 +84,34 @@ class ParserBase(object):
         raise NotImplementedError('Must return string with URL, '
                                   'usually based on start and end date '
                                   'or frequency.')
-    
+
     @staticmethod
     def get_datapoints(response_str):
-        raise NotImplementedError('Must return list or generator of dictionaries. ' 
-                                  'Each dicttionary has keys: '
-                                  'name, date, freq, value')
-    
+        raise NotImplementedError(
+            'Must return list or generator of dictionaries. '
+            'Each dicttionary has keys: '
+            'name, date, freq, value')
+
     def parse_response(self, response_str):
         if not isinstance(response_str, str):
-            raise TypeError(response_str) 
-        return self.get_datapoints(response_str)   
-   
+            raise TypeError(response_str)
+        return self.get_datapoints(response_str)
+
     def extract(self):
         response = self.scrapper().get(self.url)
-        self.parsing_result = self.parse_response(response) 
+        self.parsing_result = self.parse_response(response)
         self.log_extract_result()
         return True
-    
+
     def log_extract_result(self):
         n = len(self.parsing_result)
         k = len(self.items)
         self.logger.echo(f'{n} datapoints extracted, {k} in date range')
-    
+
     def is_in_date_range(self, item):
-        dt = make_date(item['date'])        
+        dt = make_date(item['date'])
         return self.start_date <= dt <= self.end_date
-        
+
     @property
     def items(self):
         """Return subset of parsing result bound by start and end date"""
@@ -121,9 +124,9 @@ class ParserBase(object):
             return False
         if not self.items:
             self.logger.echo(f'No datapoints in date range')
-            return False        
-        return self.uploader(self.items).post()        
-    
+            return False
+        return self.uploader(self.items).post()
+
     def __repr__(self):
         def isodate(dt):
             return f"'{dt.strftime('%Y-%m-%d')}'"

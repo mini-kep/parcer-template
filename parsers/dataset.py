@@ -9,15 +9,15 @@ from parsers import PARSERS, PARSERS_DICT
 class ReadmeTable:
     def __init__(self, parsers=PARSERS):
         self.parsers = parsers
-        
-    def _yield_rows(self):    
+
+    def _yield_rows(self):
         yield ('Class', 'Description', 'Frequency', 'Start date')
         for p in self.parsers:
-            yield (p.__name__, 
-                   p.__doc__, 
-                   p.freq, 
+            yield (p.__name__,
+                   p.__doc__,
+                   p.freq,
                    p.observation_start_date)
-        
+
     def __repr__(self):
         rows = list(self._yield_rows())
         return Markdown.table(rows)
@@ -45,15 +45,15 @@ class Dataset(object):
 
     def save_json(self, filename):
         Path(filename).write_text(self.json)
-        
+
     def upload(self):
         return Uploader(self.items).post()
- 
 
-def save_reference_dataset(filename='test_data_2016H2.json'): 
-    with Timer() as t: 
-        dataset = Dataset(parsers=PARSERS, 
-                          start_date='2016-06-01', 
+
+def save_reference_dataset(filename='test_data_2016H2.json'):
+    with Timer() as t:
+        dataset = Dataset(parsers=PARSERS,
+                          start_date='2016-06-01',
                           end_date='2016-12-31',
                           silent=True)
         dataset.extract()
@@ -68,29 +68,29 @@ def shift(**kwargs):
 
 def get_start_date(freq):
     d = dict(a=shift(years=-1),
-             q=shift(quarters=-1), 
+             q=shift(quarters=-1),
              m=shift(months=-4),
-             d=shift(weeks=-1))  
+             d=shift(weeks=-1))
     return d[freq]
 
 
 def update(freq):
-     dt = get_start_date(freq)
-     parsers = PARSERS_DICT[freq]
-     d = Dataset(start_date=dt, parsers = parsers)
-     d.extract()
-     return d.upload()
+    dt = get_start_date(freq)
+    parsers = PARSERS_DICT[freq]
+    d = Dataset(start_date=dt, parsers=parsers)
+    d.extract()
+    return d.upload()
 
 
-if __name__ == '__main__': #pragma: no cover
-#    from parsers.getter.cbr_fx import USDRUR
-#    from parsers.getter.brent import Brent
-#    d = Dataset('2017-11-13', [USDRUR, Brent])
-#    #d.extract()
-#    assert d.items[0]['name'] == 'USDRUR_CB'
-#    assert isinstance(d.json, str)
-#    assert d.json
-#    #d.save_json('abc.txt')
-#    print()
-#    #d.upload()
-     assert update('d')
+if __name__ == '__main__':  # pragma: no cover
+    #    from parsers.getter.cbr_fx import USDRUR
+    #    from parsers.getter.brent import Brent
+    #    d = Dataset('2017-11-13', [USDRUR, Brent])
+    #    #d.extract()
+    #    assert d.items[0]['name'] == 'USDRUR_CB'
+    #    assert isinstance(d.json, str)
+    #    assert d.json
+    #    #d.save_json('abc.txt')
+    #    print()
+    #    #d.upload()
+    assert update('d')

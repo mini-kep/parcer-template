@@ -8,7 +8,6 @@ class Markdown:
                       d='daily')
         return mapper[freq].capitalize()
 
-
     def _add_dividers(row):
         content = " | ".join(row)
         return "| {} |".format(content)

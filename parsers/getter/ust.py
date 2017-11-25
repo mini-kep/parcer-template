@@ -21,8 +21,9 @@ import bs4
 from datetime import date
 
 from parsers.getter.base import ParserBase, format_date, format_value
-           
-VALID_YEARS = list(range(1990, date.today().year + 1))   
+
+VALID_YEARS = list(range(1990, date.today().year + 1))
+
 
 def make_year(start_date):
     """Extract year form *start_date*
@@ -66,36 +67,39 @@ def parse_xml_raw(content: str):
 def must_include(d):
     flag = True
     if (d['date'] == '2017-04-14' or
-        d['name'] == 'UST_30YEARDISPLAY'):
+            d['name'] == 'UST_30YEARDISPLAY'):
         flag = False
-    return flag    
+    return flag
+
 
 assert must_include(dict(date='2017-04-14', name='UST_30YEARDISPLAY')) is False
 
+
 def parse_xml(content: str):
     result = parse_xml_raw(content)
-    return [d for d in result if must_include(d)] 
+    return [d for d in result if must_include(d)]
 
 # FIXME: in this parser we have to restrict period to one year only
-#        raise error when end_date - start_date  > 1 year 
+#        raise error when end_date - start_date  > 1 year
 #        will disregard end dates beyond start +  1 year
-         
+
+
 class UST(ParserBase):
     """US Treasuries interest rates (UST)"""
     observation_start_date = '1990-01-01'
     freq = 'd'
-                                                                  
+
     @property
     def url(self):
         return make_url(make_year(self.start_date))
-    
+
     @staticmethod
     def get_datapoints(response):
-        return parse_xml(response) 
-    
-if __name__ == '__main__': # pragma: no cover
-   u = UST(2017)
-   u.extract()
-   print(len(u.items))
-   assert u.items[0]
-    
+        return parse_xml(response)
+
+
+if __name__ == '__main__':  # pragma: no cover
+    u = UST(2017)
+    u.extract()
+    print(len(u.items))
+    assert u.items[0]

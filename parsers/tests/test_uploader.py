@@ -1,8 +1,9 @@
 import pytest
 from parsers.uploader import Uploader, Poster
 
-#TODO: review testing guidelines: https://github.com/mini-kep/guidelines/blob/master/testing.md
-#      with focus on test naming, test name should substitute the comments in test
+# TODO: review testing guidelines: https://github.com/mini-kep/guidelines/blob/master/testing.md
+# with focus on test naming, test name should substitute the comments in
+# test
 
 
 def mock_post_returns_200_status_code(data):
@@ -16,35 +17,36 @@ def mock_post_returns_400_status_code(data):
 class MockPoster200(Poster):
     def __init__(self, data_chuck):
         super().__init__(data_chuck,
-                         post_func = mock_post_returns_200_status_code,
-                         delay = 0.001)
-            
+                         post_func=mock_post_returns_200_status_code,
+                         delay=0.001)
+
+
 class MockPoster400(Poster):
     def __init__(self, data_chuck):
         super().__init__(data_chuck,
-                         post_func = mock_post_returns_400_status_code,
-                         delay = 0.001)
+                         post_func=mock_post_returns_400_status_code,
+                         delay=0.001)
 
 
-#TODO: add simple test here
+# TODO: add simple test here
 def test_yield_chunks():
     pass
 
 
-#recylcing setup
+# recylcing setup
 data_chunk_sample = [{
-            "date": "1999-12-31",
+    "date": "1999-12-31",
             "freq": "a",
             "name": "GDP_yoy",
-           "value": 106.4
-        },
-        {
-            "date": "2000-12-31",
+    "value": 106.4
+},
+    {
+    "date": "2000-12-31",
             "freq": "a",
             "name": "GDP_yoy",
-           "value": 110.0
-            }]
-    
+    "value": 110.0
+}]
+
 
 class TestPoster():
 
@@ -53,24 +55,25 @@ class TestPoster():
                         post_func=mock_post_returns_200_status_code)
         poster.post()
         assert poster.status_code == 200
-        
+
     def test_status_code_on_bad_poster_equals_400(self):
         poster = Poster(data_chunk=data_chunk_sample,
                         post_func=mock_post_returns_400_status_code,
-                        delay = 0.001)
+                        delay=0.001)
         poster.post()
         assert poster.status_code == 400
 
     def test_attempts_on_bad_poster_equals_max_attempts(self):
         poster = Poster(data_chunk=data_chunk_sample,
                         post_func=mock_post_returns_400_status_code,
-                        delay = 0.001)
+                        delay=0.001)
         poster.post()
         # EP: we basically do not care about the message, but rather the status_code
         #     the status message is derived based on status_code
-        #     must check Poster.max_attempts = poster.attempts, this is much better test 
-        assert poster.attempts == Poster.max_attempts 
-    
+        # must check Poster.max_attempts = poster.attempts, this is much better
+        # test
+        assert poster.attempts == Poster.max_attempts
+
     def test_is_success_property_on_status_code_200_is_true(self):
         poster = Poster(data_chunk_sample)
         poster.status_code = 200
@@ -80,11 +83,12 @@ class TestPoster():
         poster = Poster(data_chunk_sample)
         poster.status_code = 400
         assert poster.is_success is False
-        
-        
-## FIXME (optinal): review how parsers.scrapper.fetch() is tested with 'requests_mock'.
-    
-        
+
+
+# FIXME (optinal): review how parsers.scrapper.fetch() is tested with
+# 'requests_mock'.
+
+
 class TestUploader(object):
 
     def setup_method(self):
@@ -95,7 +99,7 @@ class TestUploader(object):
         assert isinstance(self.uploader.posters, list)
         assert len(self.uploader.posters) == 6
 
-    def test_post_method_returns_true(self):           
+    def test_post_method_returns_true(self):
         assert self.uploader.post() is True
 
     def test_is_success_after_calling_post_is_True(self):

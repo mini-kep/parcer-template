@@ -6,8 +6,9 @@ from decimal import Decimal
 from parsers.scrapper import Scrapper
 from parsers.getter.cbr_fx import (make_url,
                                    transform,
-                                   xml_text_to_stream, 
+                                   xml_text_to_stream,
                                    USDRUR)
+
 
 @pytest.fixture
 def fake_xml_content(url=None):
@@ -19,18 +20,21 @@ def fake_xml_content(url=None):
               </ValCurs>
               """
 
+
 class Test_make_url:
     def test_make_url_with_good_args(self):
         url = make_url(date(2017, 12, 5), date(2018, 12, 5))
         assert '05/12/2017&date_req2=05/12/2018' in url
 
-    def test_make_url_with_end_date_less_than_start_date_raises_ValueError_exception(self):
+    def test_make_url_with_end_date_less_than_start_date_raises_ValueError_exception(
+            self):
         with pytest.raises(ValueError):
             make_url(date(2018, 12, 5), date(2017, 12, 5))
 
     def test_make_url_with_bad_date_format_raises_TypeError_exception(self):
         with pytest.raises(TypeError):
             make_url('bad_date_format', None)
+
 
 def test_xml_text_to_stream(fake_xml_content):
     gen = xml_text_to_stream(fake_xml_content)
@@ -41,12 +45,16 @@ def test_xml_text_to_stream(fake_xml_content):
     assert d['value'] == Decimal('125.2600')
 
 # FIXME: method naming
+
+
 class Test_transform:
-    def test_transform_with_year_less_than_1997_devide_and_round_datapoint_value(self):
+    def test_transform_with_year_less_than_1997_devide_and_round_datapoint_value(
+            self):
         datapoint = {'date': '1996-12-29', 'value': 11.25987}
         assert transform(datapoint) == {'date': '1996-12-29', 'value': 0.0113}
 
-    def test_transform_with_year_over_than_1997_takes_original_datapoint_value(self):
+    def test_transform_with_year_over_than_1997_takes_original_datapoint_value(
+            self):
         datapoint = {'date': '2017-09-25', 'value': 11.25987}
         assert transform(datapoint) == datapoint
 

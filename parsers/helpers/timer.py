@@ -1,9 +1,9 @@
 from time import time
 
-#class Timer:
+# class Timer:
 #    def __init__(self):
 #        self.start()
-#        
+#
 #    def start(self):
 #        self.start_time = time()
 #        self.total_time = 0
@@ -15,18 +15,19 @@ from time import time
 #            return time() - self.start_time
 #        else:
 #            return self.total_time
-#        
+#
 #    def stop(self):
 #        self.total_time = self.elapsed
 #        self.is_running = False
-#        
+#
 #    def __repr__(self):
 #        return f'Time elapsed: {self.elapsed:.2f} sec'
 
-  
+
 def now():
     return time()
-    
+
+
 class Timer:
     def __enter__(self):
         self.t = now()
@@ -40,10 +41,11 @@ class Timer:
         return (self.e - self.t)
 
     def __repr__(self):
-        return f'Elapsed {self.elapsed:.2} sec'    
+        return f'Elapsed {self.elapsed:.2} sec'
 
-if '__main__' == __name__: # pragma: no cover  
+
+if '__main__' == __name__:  # pragma: no cover
     from time import sleep
     with Timer() as t:
         sleep(0.01)
-    print(t)    
+    print(t)
