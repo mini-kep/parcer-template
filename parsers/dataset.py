@@ -50,12 +50,11 @@ class Dataset(object):
         return Uploader(self.items).post()
 
 
-def save_reference_dataset(filename='test_data_2016H2.json'):
+def save_reference_dataset(filename='test_data_2016H2.json'): #pragma: no cover
     with Timer() as t:
-        dataset = Dataset(parsers=PARSERS,
-                          start_date='2016-06-01',
+        dataset = Dataset(start_date='2016-06-01',
                           end_date='2016-12-31',
-                          silent=True)
+                          parsers=PARSERS)
         dataset.extract()
         dataset.save_json(filename)
     print(f'Saved reference dataset to {filename} in {t.elapsed} sec')
