@@ -2,14 +2,14 @@ import requests
 from parsers.config import UPLOAD_URL
 
 
-def delete(params, token, endpoint=UPLOAD_URL):
+def delete(params, token, endpoint=UPLOAD_URL): #pragma: no cover
     """Delete method."""
     return requests.delete(url=endpoint,
                            params=params,
                            headers={'API_TOKEN': token})
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": #pragma: no cover
     names = ["UST_10YEAR",
              "UST_1MONTH",
              "UST_1YEAR",
