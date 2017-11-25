@@ -114,7 +114,7 @@ class Uploader(object):
         return all([p.is_success for p in self.posters])
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": # pragma: no cover
     data = [
         {
             "date": "1999-12-31",
