@@ -95,7 +95,10 @@ class TestUploader(object):
         self.long_data = data_chunk_sample * 1000 * 3
         self.uploader = Uploader(self.long_data, poster_class=MockPoster200)
 
-    def test_posters_on_init_is_list_(self):
+    def test_repr_on_init_is_string(self):
+        assert self.uploader.__repr__()
+        
+    def test_posters_attribute_on_init_is_list_(self):
         assert isinstance(self.uploader.posters, list)
         assert len(self.uploader.posters) == 6
 
