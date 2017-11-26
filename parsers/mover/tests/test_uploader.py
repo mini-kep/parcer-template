@@ -1,5 +1,5 @@
 import pytest
-from parsers.mover.uploader import Uploader, Poster
+from parsers.mover.uploader import Uploader, Poster, yield_chunks
 
 # TODO: review testing guidelines: https://github.com/mini-kep/guidelines/blob/master/testing.md
 # with focus on test naming
@@ -21,6 +21,8 @@ class MockPoster200(Poster):
                          delay=0.001)
 
 
+# not used in tests
+# is it needed for some purpose?
 class MockPoster400(Poster):
     def __init__(self, data_chuck):
         super().__init__(data_chuck,
@@ -28,9 +30,10 @@ class MockPoster400(Poster):
                          delay=0.001)
 
 
-# TODO: add simple test here
-def test_yield_chunks():
-    pass
+def test_yield_chunks_on_list_input_returns_chunks():
+    gen = [1,2,3,4,5]
+    chunk_size = 3
+    assert list(yield_chunks(gen=gen, chunk_size=chunk_size)) == [[1, 2, 3], [4, 5]]
 
 
 # recylcing setup
