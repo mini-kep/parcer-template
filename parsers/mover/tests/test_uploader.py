@@ -10,27 +10,26 @@ def mocked_content():
         yield m
 
 
-def mock_post_returns_200_status_code(data):
-    return 200
-
-
-def mock_post_returns_400_status_code(data):
-    return 400
-
-
 class MockPoster200(Poster):
+
     def __init__(self, data_chuck):
         super().__init__(data_chuck,
-                         post_func=mock_post_returns_200_status_code,
+                         post_func=self.mock_post_returns_200_status_code,
                          delay=0.001)
+
+    def mock_post_returns_200_status_code(self, data):
+        return 200
 
 
 # not used
 class MockPoster400(Poster):
     def __init__(self, data_chuck):
         super().__init__(data_chuck,
-                         post_func=mock_post_returns_400_status_code,
+                         post_func=self.mock_post_returns_400_status_code,
                          delay=0.001)
+
+        def mock_post_returns_400_status_code(data):
+            return 400
 
 
 def test_yield_chunks_on_list_input_returns_chunks():
