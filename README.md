@@ -4,7 +4,7 @@
 Concept
 =======
 
-Parsers extract data from sources (static files or other APIs) to upload them to database. 
+Parsers extract data from static files or other APIs to upload them to database. 
 
 Output data structure
 =====================
@@ -33,14 +33,14 @@ Individual parsers
 | USDRUR | Official USD/RUR exchange rate (Bank of Russia) | d | 1992-07-01 |
 | UST | US Treasuries interest rates (UST) | d | 1990-01-01 |
 
-Use ```dataset.ReadmeTable()``` to update. 
+Use ```dataset.ReadmeTable()``` to update this table. 
 
 
 #### Parser construction
 
 Each parser is a child of `parsers.getter.base.ParserBase` class.
 
-Each parser has itw own:
+A parser has itw own:
 - observation start date (class attribute)
 - frequency (class attribute) 
 - url constructor (property)
@@ -50,11 +50,7 @@ Parsers are stored in `parsers.getter` folder.
 
 #### Arguments
 
-Creating a parser without arguments forces parser to scan full dataset, 
-and it is a burden on the original sources. 
-
-Parsers can return 
-datapoints from a specific date to present: 
+Parsers can return datapoints from a specific date to present: 
 
 ```python
 from parsers.getter.cbr_fx import USDRUR
@@ -67,6 +63,8 @@ or for a fixed period in time:
 from parsers.getter.brent import Brent
 parser = Brent('2017-09-15', '2017-10-17')
 ```
+
+A parser without arguments scans full dataset, and it makes a burden on the original sources. 
 
 Running
 =======

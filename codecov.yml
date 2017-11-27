@@ -4,5 +4,5 @@ ignore:
   - "tests/*"         # wildcards accepted
   - heroku_runner.py
   - manage.py
-  - delete.py
+  - __delete__.py
   - tasks.py
