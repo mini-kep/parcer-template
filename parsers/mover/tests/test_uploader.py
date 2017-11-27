@@ -14,28 +14,26 @@ class MockPoster200(Poster):
 
     def __init__(self, data_chuck):
         super().__init__(data_chuck,
-                         post_func=self.mock_post_returns_200_status_code,
+                         post_func=lambda data: 200,
                          delay=0.001)
-
-    def mock_post_returns_200_status_code(self, data):
-        return 200
 
 
 # not used
 class MockPoster400(Poster):
     def __init__(self, data_chuck):
         super().__init__(data_chuck,
-                         post_func=self.mock_post_returns_400_status_code,
+                         post_func=lambda data: 400,
                          delay=0.001)
-
-        def mock_post_returns_400_status_code(data):
-            return 400
 
 
 def test_yield_chunks_on_list_input_returns_chunks():
-    gen = [1,2,3,4,5]
+    # setup
+    incoming_data = [1,2,3,4,5]
     chunk_size = 3
-    assert list(yield_chunks(gen=gen, chunk_size=chunk_size)) == [[1, 2, 3], [4, 5]]
+    # call
+    result = yield_chunks(gen=incoming_data, chunk_size=chunk_size)
+    # check
+    assert list(result) == [[1, 2, 3], [4, 5]]
 
 
 # recylcing setup
