@@ -27,9 +27,13 @@ class MockPoster400(Poster):
 
 
 def test_yield_chunks_on_list_input_returns_chunks():
-    gen = [1,2,3,4,5]
+    # setup
+    incoming_data = [1,2,3,4,5]
     chunk_size = 3
-    assert list(yield_chunks(gen=gen, chunk_size=chunk_size)) == [[1, 2, 3], [4, 5]]
+    # call
+    result = yield_chunks(gen=incoming_data, chunk_size=chunk_size)
+    # check
+    assert list(result) == [[1, 2, 3], [4, 5]]
 
 
 # recylcing setup
