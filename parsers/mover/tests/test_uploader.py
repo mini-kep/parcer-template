@@ -1,9 +1,13 @@
 import pytest
+import requests_mock
 from parsers.mover.uploader import Uploader, Poster, yield_chunks
+from parsers.config import UPLOAD_URL
 
-# TODO: review testing guidelines: https://github.com/mini-kep/guidelines/blob/master/testing.md
-# with focus on test naming
-# test name should substitute the comments in test + allow replicating the test by knowing its name 
+
+@pytest.fixture(scope='module')
+def mocked_content():
+    with requests_mock.mock() as m:
+        yield m
 
 
 def mock_post_returns_200_status_code(data):
@@ -21,8 +25,7 @@ class MockPoster200(Poster):
                          delay=0.001)
 
 
-# not used in tests
-# is it needed for some purpose?
+# not used
 class MockPoster400(Poster):
     def __init__(self, data_chuck):
         super().__init__(data_chuck,
@@ -53,23 +56,23 @@ data_chunk_sample = [{
 
 class TestPoster():
 
-    def test_status_code_on_good_poster_equals_200(self):
-        poster = Poster(data_chunk=data_chunk_sample,
-                        post_func=mock_post_returns_200_status_code)
+    def test_status_code_on_good_poster_equals_200(self, mocked_content):
+        poster = Poster(data_chunk=data_chunk_sample)
+        mocked_content.post(UPLOAD_URL, status_code=200)
         poster.post()
         assert poster.status_code == 200
 
-    def test_status_code_on_bad_poster_equals_400(self):
+    def test_status_code_on_bad_poster_equals_400(self, mocked_content):
         poster = Poster(data_chunk=data_chunk_sample,
-                        post_func=mock_post_returns_400_status_code,
                         delay=0.001)
+        mocked_content.post(UPLOAD_URL, status_code=400)
         poster.post()
         assert poster.status_code == 400
 
-    def test_attempts_on_bad_poster_equals_max_attempts(self):
+    def test_attempts_on_bad_poster_equals_max_attempts(self, mocked_content):
         poster = Poster(data_chunk=data_chunk_sample,
-                        post_func=mock_post_returns_400_status_code,
                         delay=0.001)
+        mocked_content.post(UPLOAD_URL, status_code=400)
         poster.post()
         # EP: we basically do not care about the message, but rather the status_code
         #     the status message is derived based on status_code
@@ -86,10 +89,6 @@ class TestPoster():
         poster = Poster(data_chunk_sample)
         poster.status_code = 400
         assert poster.is_success is False
-
-
-# FIXME (optinal): review how parsers.scrapper.fetch() is tested with
-# 'requests_mock'.
 
 
 class TestUploader(object):
