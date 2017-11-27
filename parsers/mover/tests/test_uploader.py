@@ -1,6 +1,6 @@
 import pytest
 import requests_mock
-from parsers.mover.uploader import Uploader, Poster, yield_chunks, post
+from parsers.mover.uploader import Uploader, Poster, yield_chunks
 from parsers.config import UPLOAD_URL
 
 
