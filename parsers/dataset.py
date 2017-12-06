@@ -82,6 +82,11 @@ def update(freq):
 
 
 if __name__ == '__main__':  # pragma: no cover
+    from parsers.getter.kep import KEP_Annual, KEP_Qtr, KEP_Monthly
+    d = Dataset('1999-01-01', parsers=[KEP_Annual, KEP_Qtr, KEP_Monthly])
+    d.extract()
+    d.upload()
+    
     #    from parsers.getter.cbr_fx import USDRUR
     #    from parsers.getter.brent import Brent
     #    d = Dataset('2017-11-13', [USDRUR, Brent])
@@ -92,4 +97,4 @@ if __name__ == '__main__':  # pragma: no cover
     #    #d.save_json('abc.txt')
     #    print()
     #    #d.upload()
-    assert update('d')
+    #assert update('d')
