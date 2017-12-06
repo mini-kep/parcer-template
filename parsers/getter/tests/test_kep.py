@@ -38,7 +38,7 @@ def test_make_url():
 
 
 @pytest.mark.webtest
-def test_get_dataframe_from_repo_on_real_data():
+def test_get_dataframe_from_repo_on_real_data_by_web_call():
     return get_dataframe_from_repo('a') == read_csv(url_a)
 
 

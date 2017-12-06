@@ -153,7 +153,7 @@ def test_UST_on_fake_fetch():
 
 
 @pytest.mark.webtest
-def test_UST_on_real_call():
+def test_UST_by_web_call():
     u = ust.UST(2017, None)
     assert not u.items
     u.extract()
@@ -165,7 +165,7 @@ def test_UST_on_real_call():
 
 @pytest.mark.webtest
 @pytest.mark.skip("This will test runs too long")
-def test_UST_on_randomised_year_reads_whole_year_data():
+def test_UST_on_randomised_year_reads_whole_year_data_by_web_call():
     year = random.choice(ust.VALID_YEARS)
     p = ust.UST(year, None)
     p.extract()
