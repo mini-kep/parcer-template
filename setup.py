@@ -4,7 +4,9 @@ setup(
     version="0.1",
     packages=[
         'parsers',
-        'parsers.getter'
+        'parsers.getter',
+        'parsers.mover',
+        'parsers.helper',
     ],
     install_requires=[
         'arrow',

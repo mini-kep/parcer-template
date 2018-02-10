@@ -30,10 +30,11 @@ def yield_all_dicts(df, freq):
     d = df.to_dict('index')
     for dt in d.keys():
         for name, value in d[dt].items():
-            yield {'date': dt.strftime("%Y-%m-%d"),
-                   'freq': freq,
-                   'name': name,
-                   'value': format_value(value)}
+            if value is not None:
+                yield {'date': dt.strftime("%Y-%m-%d"),
+                       'freq': freq,
+                       'name': name,
+                       'value': format_value(value)}
 
 
 def is_valid(d):
